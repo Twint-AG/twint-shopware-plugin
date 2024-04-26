@@ -3,9 +3,10 @@
 namespace Twint\Storefront\Controller;
 
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Checkout\Order\OrderException;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,20 +29,28 @@ class PaymentController extends StorefrontController
         name: 'frontend.twint.waiting',
         methods: ['GET']
     )]
-    public function showWaiting(Request $request, SalesChannelContext $context): Response
+    public function showWaiting(Request $request, Context $context): Response
     {
         $orderNumber = $request->get('orderNumber');
-        $orderNumber = $this->cryptoService->unHash($orderNumber);
-        $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('orderNumber', $orderNumber));
-        $criteria->addAssociation('orderCustomer.customer')
-            ->addAssociation('transactions.paymentMethod')
-            ->addAssociation('lineItems')
-            ->addAssociation('currency')
-            ->addAssociation('addresses.country')
-            ->addAssociation('customFields');;
-        /** @var OrderEntity|null $order */
-        $order = $this->orderRepository->search($criteria, $context->getContext())->first();
+        try{
+            $orderNumber = $this->cryptoService->unHash($orderNumber);
+            $criteria = new Criteria();
+            $criteria->addFilter(new EqualsFilter('orderNumber', $orderNumber));
+            $criteria->addAssociation('orderCustomer.customer')
+                ->addAssociation('transactions.paymentMethod')
+                ->addAssociation('lineItems')
+                ->addAssociation('currency')
+                ->addAssociation('addresses.country')
+                ->addAssociation('customFields');;
+            /** @var OrderEntity|null $order */
+            $order = $this->orderRepository->search($criteria, $context)->first();
+            if(empty($order)){
+                throw OrderException::orderNotFound($orderNumber);
+            }
+        }
+        catch(\Exception $e){
+            return $this->redirectToRoute('frontend.account.order.page');
+        }
         $twintApiResponse = json_decode($order->getCustomFields()[OrderCustomFieldInstaller::TWINT_API_RESPONSE_CUSTOM_FIELD] ?? '{}', true);
         $qrcode = '';
         if($twintApiResponse){
