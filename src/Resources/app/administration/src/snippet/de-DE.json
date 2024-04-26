@@ -1,0 +1,12 @@
+{
+    "twint": {
+        "validation": {
+            "errorTitle": "TWINT payment validation error",
+            "errorMessage": "There was an error validating the TWINT certificate (selected file and password). Please try again or use a different certification."
+        },
+        "certificateSuccess": "Certificate is an valid TWINT certificate.",
+        "certificateLabel": "Certificate Password (optional)",
+        "certificatePasswordHelpText": "The password for the certificate file is optional. If you have set a password for the certificate file, please enter it here.",
+        "certificateFileLabel": "Select a certificate file (.p12)"
+    }
+}

@@ -1,0 +1,7 @@
+{
+    "twintPayment": {
+        "error": {
+            "invalidPaymentError": "Das  %name% wurde aufgrund der fehlenden %currency%-Währung entfernt"
+        }
+    }
+}

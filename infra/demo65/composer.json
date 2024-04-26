@@ -1,0 +1,87 @@
+{
+    "license": "proprietary",
+    "type": "project",
+    "require": {
+        "composer-runtime-api": "^2.0",
+        "shopware/administration": "~v6.5.0",
+        "shopware/core": "~v6.5.0",
+        "shopware/elasticsearch": "~v6.5.0",
+        "shopware/storefront": "~v6.5.0",
+        "symfony/flex": "~2",
+        "symfony/runtime": "^5.0|^6.0",
+        "twint/twint": "^0.0.1"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "custom/plugins/*",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "custom/plugins/*/packages/*",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "custom/static-plugins/*",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "name": "twint/twint",
+            "type": "path",
+            "url": "/var/www/plugin",
+            "options": {
+                "symlink": true,
+                "versions": {
+                    "twint/twint": "0.0.1"
+                }
+            }
+        },
+        {
+            "type": "vcs",
+            "url": "https://git.nfq.asia/twint-ag/php-sdk.git"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "symfony/flex": true,
+            "symfony/runtime": true,
+            "php-http/discovery": true
+        },
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "scripts": {
+        "auto-scripts": {
+            "assets:install": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ]
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": true,
+            "endpoint": [
+                "https://raw.githubusercontent.com/shopware/recipes/flex/main/index.json",
+                "flex://defaults"
+            ]
+        }
+    },
+    "require-dev": {
+        "symfony/stopwatch": "^6.4",
+        "symfony/web-profiler-bundle": "^6.4"
+    }
+}

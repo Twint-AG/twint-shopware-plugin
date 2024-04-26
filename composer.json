@@ -1,0 +1,47 @@
+{
+    "name": "twint/twint",
+    "description": "TBU - Twint payment plugin",
+    "type": "shopware-platform-plugin",
+    "version": "0.0.1",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "require": {
+        "twint-ch/twint-sdk": "dev-develop",
+        "chillerlan/php-qrcode": "4.3.4"
+    },
+    "authors": [
+        {
+            "name": "TWINT"
+        },
+        {
+            "name": "NFQ"
+        }
+    ],
+    "extra": {
+        "shopware-plugin-class": "Twint\\TwintPayment",
+        "copyright": "(c) by Twint 2024 (c) by NFQ",
+        "label": {
+            "de-DE": "TBU - Twint Payment",
+            "en-GB": "TBU - Twint Payment",
+            "fr-FR": "TBU - Twint Payment"
+        },
+        "description": {
+            "de-DE": "TBU - Twint Payment",
+            "en-GB": "TBU - Twint Payment"
+        },
+        "supportLink": {
+            "de-DE": "https://localhost/",
+            "en-GB": "https://localhost/"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Twint\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Twint\\Tests\\": "tests/"
+        }
+    }
+}

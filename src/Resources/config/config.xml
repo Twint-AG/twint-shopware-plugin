@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/trunk/src/Core/System/SystemConfig/Schema/config.xsd">
+
+    <card>
+        <title>Merchant configurations</title>
+
+        <input-field type="text">
+            <name>merchantId</name>
+            <label>Merchant ID</label>
+            <defaultValue></defaultValue>
+            <placeholder>xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx</placeholder>
+        </input-field>
+
+        <input-field type="bool">
+            <name>testMode</name>
+            <label>Switch to <b>Custom Acceptance Test</b> mode</label>
+            <label lang="de-DE">Zum benutzerdefinierten Abnahmetestmodus wechseln</label>
+            <helpText>Custom Acceptance Test mode (On) / Production Mode (Off)</helpText>
+            <defaultValue>false</defaultValue>
+        </input-field>
+    </card>
+
+    <card>
+        <title>Credentials</title>
+        <component name="twint-certificate">
+            <name>certificate</name>
+            <label>Certificate</label>
+            <label lang="de-DE">Zertifikat Passwort</label>
+            <helpText>SwissSign certificate password to allow reading above certificate.</helpText>
+        </component>
+    </card>
+
+    <card>
+        <title>Display options</title>
+
+        <input-field type="multi-select">
+            <name>screens</name>
+            <label>Screens</label>
+            <helpText>Screen end-users can see TWINT checkout button.</helpText>
+            <options>
+                <option>
+                    <id>PDP</id>
+                    <name>Product details page</name>
+                </option>
+                <option>
+                    <id>PLP</id>
+                    <name>Product listing page</name>
+                </option>
+                <option>
+                    <id>CART</id>
+                    <name>Cart page</name>
+                </option>
+                <option>
+                    <id>CART_FLYOUT</id>
+                    <name>Cart flyout</name>
+                </option>
+            </options>
+            <defaultValue>["PDP", "PLP", "CART"]</defaultValue>
+        </input-field>
+    </card>
+    <card>
+        <title>Cronjob/Command Configuration</title>
+        <input-field type="int">
+            <name>onlyPickOrderFromMinutes</name>
+            <label>Only pick orders from last this minutes</label>
+            <label lang="de-DE">Wählen Sie nur Bestellungen der letzten Minute aus</label>
+            <defaultValue>10</defaultValue>
+        </input-field>
+    </card>
+</config>

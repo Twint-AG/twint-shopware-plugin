@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  shop:
+    container_name: sw66
+    image: dockware/dev:latest
+    ports:
+      - "22:22"     # ssh
+      - "80:80"     # apache2
+      - "443:443"   # apache2 https
+      - "8888:8888" # watch admin
+      - "9998:9998" # watch storefront proxy
+      - "9999:9999" # watch storefront
+      - "3306:3306" # mysql port
+    volumes:
+      - ".:/var/www/html:rw"
+      - "./../..:/var/www/plugin:rw"
+      - "sw66_volume:/var/lib/mysql:rw"
+    networks:
+      - web
+    environment:
+      - XDEBUG_ENABLED=0
+      - PHP_VERSION=8.2
+volumes:
+  sw66_volume:
+    driver: local
+## ***********************************************************************
+##  NETWORKS
+## ***********************************************************************
+networks:
+  web:
+    external: false

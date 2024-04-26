@@ -1,0 +1,35 @@
+.swag-paypal-checkout-finish-pui-instructions-content {
+    .instruction-title,
+    .instruction-description {
+        @extend .m-sm-0;
+        @extend .py-1;
+        @extend .p-sm-3;
+    }
+
+    .instruction-title {
+        @extend .col-sm-5;
+    }
+
+    .instruction-description {
+        @extend .col-sm-7;
+    }
+
+    dt:nth-of-type(#{$table-striped-order}), dd:nth-of-type(#{$table-striped-order}) {
+        background-color: $gray-100;
+    }
+
+    .instruction-title {
+        font-weight: normal;
+    }
+
+    .instruction-description {
+        font-weight: bold;
+    }
+}
+
+.swag-paypal-pui-polling {
+    .loader {
+        width: 44px;
+        height: 44px;
+    }
+}

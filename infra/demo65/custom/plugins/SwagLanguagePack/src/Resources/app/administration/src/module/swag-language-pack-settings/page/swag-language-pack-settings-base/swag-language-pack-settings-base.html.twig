@@ -1,0 +1,46 @@
+{% block swag_language_pack_settings_base %}
+{% block swag_language_pack_settings_base_card_view_language_selection %}
+    <sw-card
+        class="swag-language-pack-settings-base"
+        position-identifier="swag-language-pack-settings-base"
+        :title="$tc(`swag-language-pack.settings.card.${settingsType}.title`)"
+        :disabled="isLoading"
+    >
+
+        {% block swag_language_pack_settings_base_card_view_card_loader %}
+        <sw-loader v-if="isLoading"/>
+        {% endblock %}
+
+        {% block swag_language_pack_settings_base_card_view_description%}
+        <div
+            v-html="description"
+            class="swag-language-pack-settings-base__description"
+        />
+        {% endblock %}
+
+        {% block swag_language_pack_settings_base_card_view_language_selection_languages %}
+        <template
+            v-for="packLanguage in packLanguages"
+            :key="packLanguage.id"
+        >
+            {% block swag_language_pack_settings_base_card_view_language_selection_language %}
+            <swag-pack-language-entry
+                class="swag-language-pack-settings-base__entry"
+                {% if VUE3 %}
+                v-model:value="packLanguage"
+                {% else %}
+                :value="packLanguage"
+                {% endif %}
+                :field="`${settingsType}Active`"
+                :label="packLanguage.language.name"
+                :description="packLanguage.language.locale?.code"
+                :flag-locale="packLanguage.language.locale?.code"
+                :disabled="!acl.can('swag_language_pack_language:update')"
+            />
+            {% endblock %}
+        </template>
+        {% endblock %}
+
+    </sw-card>
+{% endblock %}
+{% endblock %}

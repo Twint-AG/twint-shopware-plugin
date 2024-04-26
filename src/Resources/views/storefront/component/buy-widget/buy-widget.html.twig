@@ -1,0 +1,14 @@
+{% sw_extends "@Storefront/storefront/component/buy-widget/buy-widget.html.twig" %}
+{% set fastButton = page.extensions['TwintFastCheckoutButton'] %}
+{% block buy_widget_buy_container %}
+    {{ parent() }}
+
+    {% block twint_buy_button %}
+        {% if fastButton is defined and fastButton %}
+            <button class="btn btn-secondary w-100" title="{{ fastButton.getName() }}" aria-label="{{ fastButton.getName() }}">
+                {{ fastButton.getName() }}
+            </button>
+        {% endif %}
+    {% endblock %}
+
+{% endblock %}

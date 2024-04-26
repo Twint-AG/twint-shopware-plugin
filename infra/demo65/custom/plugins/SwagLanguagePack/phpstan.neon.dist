@@ -1,0 +1,26 @@
+includes:
+    - ../../../vendor/phpstan/phpstan/conf/bleedingEdge.neon
+
+parameters:
+    level: 8
+    tmpDir: var/cache/phpstan
+    inferPrivatePropertyTypeFromConstructor: true
+
+    bootstrapFiles:
+        - tests/TestBootstrap.php
+        # run `php tests/TestBootstrap.php` to create the container
+    symfony:
+        constantHassers: false
+        containerXmlPath: '../../../var/cache/test/Shopware_Core_DevOps_StaticAnalyze_StaticAnalyzeKernelTestDebugContainer.xml'
+    excludePaths:
+        - vendor
+        - var
+        - ecs.php
+        - tests/TestBootstrap.php
+    paths:
+        - src
+        - tests
+    type_coverage:
+        return_type: 99
+        param_type: 99
+        property_type: 84

@@ -1,0 +1,66 @@
+{
+    "sw-extension-store": {
+        "general": {
+            "labelPrice": "Kostenlos | {price}/Monat | {price}",
+            "labelFree": "Kostenlos",
+            "labelRentSuffix": "/ Monat*",
+            "labelDiscountedPrice": "Kostenlos | <s>{price}</s> <strong>{discountedPrice}</strong>/Monat | <s>{price}</s> <strong>{discountedPrice}</strong>",
+            "title": "Store"
+        },
+        "tabs": {
+            "apps": "Apps",
+            "themes": "Themes"
+        },
+        "listing":  {
+            "placeholderSearchBar": "Finde Erweiterungen..."
+        },
+        "updateWarning": {
+            "headline": "Wir haben den Shopware Store aktualisiert.<br>Nimm Dir einen Moment Zeit, um auf die neueste Version zu aktualisieren.",
+            "description": "Entdecke zahlreiche, großartige Erweiterungen, die Dir helfen, Dein Geschäft auszubauen.",
+            "requestDescription": "Du musst auf die neueste Version upgraden, um neue und aktualisierte Erweiterungen oder Themes für Deinen Shop zu erhalten.",
+            "update": "Update"
+        },
+        "offline": {
+            "headline": "Der Shopware Store ist nicht verfügbar",
+            "description": "Überprüfe Deine Internetverbindung oder versuche es später noch einmal."
+        },
+        "detail": {
+            "enterpriseContactLinkText": "Vertrieb kontaktieren",
+            "enterpriseContactUrl": "https://www.shopware.com/de/enterprise-kontakt",
+            "enterpriseFeatureAlertText": "Diese Erweiterung ist Bestandteil der Enterprise Edition.",
+            "hasTrialPhase": "Probemonat inbegriffen",
+            "openConfiguration": "Konfiguration",
+            "themeIsAlreadyInstalled": "Theme ist bereits installiert",
+            "extensionIsAlreadyInstalled": "Erweiterung ist bereits installiert"
+        },
+        "typeLabels": {
+            "self-hosted": "Selbst-gehosted",
+            "cloud": "Cloud"
+        },
+        "buy-modal": {
+            "paymentSelectionPlaceholder": "Wähle eine Zahlungsmethode...",
+            "checkboxes": {
+                "permissionsAndAppProvider": {
+                    "introText": "Ich bin mir bewusst, dass diese App weitere",
+                    "buttonPermissions": "Berechtigungen",
+                    "middleText": "benötigt und akzeptiere den",
+                    "buttonAppProvider": "App-Anbieter",
+                    "endText": "als neuen Unterauftragnehmer von Shopware",
+                    "appProviderStartText": "Ich akzeptiere den"
+                }
+            },
+            "legalTextModal": {
+                "title": "Unterauftragnehmer von Shopware"
+            },
+            "rent": {
+                "priceDisplay": "{priceDisplay}/Monat",
+                "freeTrial": "30-Tage-Testversion",
+                "disclaimer": "Es können zusätzliche Kosten anfallen."
+            },
+            "warnings": {
+                "paymentMeansRequiredText": "Um diese App zu kaufen, musst Du",
+                "paymentMeansRequiredLinkText": "eine Zahlungsmethode hinzufügen"
+            }
+        }
+    }
+}
