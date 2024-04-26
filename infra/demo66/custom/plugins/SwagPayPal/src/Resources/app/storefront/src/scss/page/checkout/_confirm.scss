@@ -1,0 +1,16 @@
+/* stylelint-disable selector-max-id */
+#swag-paypal-acdc-form {
+    margin-top: 8px;
+
+    .row {
+        margin-bottom: 4px;
+    }
+
+    .col-sm-6:first-of-type {
+        padding-right: 4px;
+    }
+
+    .col-sm-6:last-of-type {
+        padding-left: 4px;
+    }
+}

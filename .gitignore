@@ -1,0 +1,9 @@
+.idea
+
+**/.env
+
+**/var
+**/vendor
+**/public/static
+src/Resources/public/administration
+**/dist/**

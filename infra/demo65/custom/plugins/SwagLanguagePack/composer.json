@@ -1,0 +1,89 @@
+{
+    "name": "swag/language-pack",
+    "description": "Language pack for Shopware 6",
+    "version": "3.1.0",
+    "type": "shopware-platform-plugin",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Shopware"
+        }
+    ],
+    "require": {
+        "shopware/core": "~6.5.0@RC",
+        "shopware/storefront": "~6.5.0@RC",
+        "shopware/administration": "~6.5.0@RC"
+    },
+    "conflict": {
+        "shopware/storefront": "<6,>=7",
+        "shopware/administration": "<6,>=7",
+        "swag/i18n-bosnian": "*",
+        "swag/i18n-czech": "*",
+        "swag/i18n-danish": "*",
+        "swag/i18n-dutch": "*",
+        "swag/i18n-french": "*",
+        "swag/i18n-indonesian": "*",
+        "swag/i18n-italian": "*",
+        "swag/i18n-latvian": "*",
+        "swag/i18n-polish": "*",
+        "swag/i18n-portuguese": "*",
+        "swag/i18n-russian": "*",
+        "swag/i18n-spanish": "*",
+        "swag/i18n-swedish": "*"
+    },
+    "extra": {
+        "shopware-plugin-class": "Swag\\LanguagePack\\SwagLanguagePack",
+        "copyright": "(c) by shopware AG",
+        "label": {
+            "de-DE": "Sprachpaket",
+            "en-GB": "Language pack"
+        },
+        "description": {
+            "de-DE": "Das Sprachpaket von Shopware vereint alle Übersetzungen, die von Shopware angeboten werden sowie Länderflaggen für eine Sprachauswahl in der Storefront.",
+            "en-GB": "The Shopware language pack combines all translations offered by Shopware, as well as associated country flags for a language selection in our storefront."
+        },
+        "manufacturerLink": {
+            "de-DE": "https://store.shopware.com/shopware-ag.html",
+            "en-GB": "https://store.shopware.com/en/shopware-ag.html"
+        },
+        "supportLink": {
+            "de-DE": "https://issues.shopware.com/",
+            "en-GB": "https://issues.shopware.com/"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Swag\\LanguagePack\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Swag\\LanguagePack\\Test\\": "tests/"
+        }
+    },
+    "suggest": {
+        "shopware/administration": "Allows you to to set up the extension easily",
+        "shopware/storefront": "This extension also offers translations for the Shopware Storefront"
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "bamarni/composer-bin-plugin": true,
+            "phpstan/extension-installer": true,
+            "symfony/runtime": true
+        }
+    },
+    "scripts": {
+        "phpstan": [
+            "@php tests/TestBootstrap.php",
+            "../../../vendor/bin/phpstan"
+        ]
+    },
+    "repositories": {
+        "platform-packages": {
+            "type": "path",
+            "url": "../../../src/*",
+            "canonical": true
+        }
+    }
+}

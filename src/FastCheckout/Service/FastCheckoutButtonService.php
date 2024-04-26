@@ -1,0 +1,47 @@
+<?php
+namespace Twint\FastCheckout\Service;
+
+use Doctrine\DBAL\Exception;
+use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Twint\Core\Setting\Settings;
+use Twint\FastCheckout\Model\FastCheckoutButton;
+use Twint\FastCheckout\Util\PaymentMethodUtil;
+use Twint\Service\SettingService;
+
+class FastCheckoutButtonService
+{
+    public function __construct(private readonly PaymentMethodUtil $paymentMethodUtil,
+                                private readonly SettingService $settingService
+        )
+    {
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getButton(SalesChannelContext $context, string $screen){
+        // Check if the fast checkout is enabled
+        $enabled = $this->paymentMethodUtil->isFastCheckoutEnabled($context);
+        if(!$enabled){
+            return null;
+        }
+
+        // Check if the currency is allowed
+        $currency = $context->getCurrency()->getIsoCode();
+        if(!in_array($currency, Settings::ALLOWED_CURRENCIES)){
+            return null;
+        }
+
+        // Check if the screens are allowed
+        $settings = $this->settingService->getSetting($context->getSalesChannel()->getId());
+        if(!in_array($screen, (array) $settings->getScreens())){
+            return null;
+        }
+
+        return new FastCheckoutButton(
+            'TWINT Fast Checkout',
+            'Fast Checkout Description',
+            'https://example.com/image.png',
+            'https://example.com/link');
+    }
+}

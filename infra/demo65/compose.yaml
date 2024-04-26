@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  shop:
+    container_name: sw65
+    image: dockware/dev:6.5.0.0
+    ports:
+      - "23:22"     # ssh
+      - "81:80"     # apache2
+      - "444:443"   # apache2 https
+      - "5555:5555" # watch admin
+      - "5558:9998" # watch storefront proxy
+      - "5559:9999" # watch storefront
+      - "5306:3306" # mysql port
+    volumes:
+      - ".:/var/www/html"
+      - "./../..:/var/www/plugin:ro"
+      - "sw65_volume:/var/lib/mysql:rw"
+    networks:
+      - web
+    environment:
+      - XDEBUG_ENABLED=0
+      - PHP_VERSION=8.2
+volumes:
+  sw65_volume:
+    driver: local
+## ***********************************************************************
+##  NETWORKS
+## ***********************************************************************
+networks:
+  web:
+    external: false

@@ -1,0 +1,28 @@
+{% sw_extends '@Storefront/storefront/layout/footer/footer.html.twig' %}
+
+{% block layout_footer_payment_logos %}
+    {% block layout_footer_payment_logos_paypal_installment_banner %}
+        {# @var \Swag\PayPal\Installment\Banner\BannerData installmentBanner #}
+        {% set installmentBanner = page.footer.extensions[constant('Swag\\PayPal\\Installment\\Banner\\InstallmentBannerSubscriber::PAYPAL_INSTALLMENT_BANNER_DATA_EXTENSION_ID')] %}
+
+        {% if installmentBanner.footerEnabled %}
+            <div class="col-4 mt-2 p-0 footer-logo is-payment"
+                 data-swag-paypal-installment-banner="true"
+                 data-swag-pay-pal-installment-banner-options="{{ installmentBanner|json_encode }}">
+            </div>
+        {% endif %}
+    {% endblock %}
+
+    {{ parent() }}
+
+    {% block layout_footer_payment_logos_paypal_funding_eligibility %}
+        {# @var \Swag\PayPal\Storefront\Data\Struct\FundingEligibilityData fundingEligibilityData #}
+        {% set fundingEligibilityData = page.footer.extensions[constant('Swag\\PayPal\\Storefront\\Data\\FundingSubscriber::FUNDING_ELIGIBILITY_EXTENSION')] %}
+
+        {% if fundingEligibilityData %}
+            <div data-swag-paypal-funding-eligibility="true"
+                 data-swag-paypal-funding-eligibility-options="{{ fundingEligibilityData|json_encode }}">
+            </div>
+        {% endif %}
+    {% endblock %}
+{% endblock %}

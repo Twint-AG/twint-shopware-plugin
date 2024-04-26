@@ -1,0 +1,129 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="Twint\Core\Handler\DefaultMethodHandler">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
+            <tag name="shopware.payment.method.sync" />
+        </service>
+
+        <service id="Twint\Core\Handler\PaymentHandler" class="Twint\Core\Handler\PaymentHandler">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
+            <argument type="service" id="Twint\Service\PaymentService"/>
+            <argument type="service" id="Twint\Core\Service\CryptoService"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
+        <service id="Twint\Command\ExampleCommand">
+            <tag name="console.command"/>
+        </service>
+
+        <service id="Twint\ScheduledTask\ExampleTask">
+            <tag name="shopware.scheduled.task"/>
+        </service>
+
+        <service id="Twint\Subscriber\MySubscriber">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Twint\Storefront\Controller\ExampleController" public="true">
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+            <call method="setTwig">
+                <argument type="service" id="twig"/>
+            </call>
+        </service>
+        <service id="Twint\Storefront\Controller\PaymentController" public="true">
+            <argument type="service" id="order.repository"/>
+            <argument type="service" id="Twint\Core\Service\CryptoService"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+            <call method="setTwig">
+                <argument type="service" id="twig"/>
+            </call>
+        </service>
+
+        <service id="Twint\Core\Content\Example\SalesChannel\ExampleRoute">
+            <argument type="service" id="product.repository"/>
+        </service>
+
+        <service id="Twint\Core\Content\No\NoDefinition">
+            <tag name="shopware.entity.definition" entity="no" />
+        </service>
+
+        <service id="Twint\Util\Method\DefaultMethod">
+            <tag name="twint.method.definition" />
+        </service>
+
+        <service id="Twint\Util\PaymentMethodRegistry">
+            <argument type="service" id="service_container"/>
+            <argument type="tagged_iterator" tag="twint.method.definition"/>
+        </service>
+        <service id="Twint\Service\SettingService">
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <argument type="service" id="order.repository"/>
+            <argument type="service" id="sales_channel.repository"/>
+        </service>
+        <service id="Twint\Service\PaymentService">
+            <argument type="service" id="order.repository"/>
+            <argument type="service" id="state_machine.repository"/>
+            <argument type="service" id="state_machine_state.repository"/>
+            <argument type="service" id="Twint\Service\SettingService" />
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
+            <argument type="service" id="Twint\Core\Service\CryptoService"/>
+        </service>
+
+        <service id="Twint\Command\OrderMonitorCommand">
+            <argument type="service" id="Twint\Service\PaymentService" />
+            <tag name="console.command" />
+        </service>
+        <service id="Twint\ScheduledTask\OrderMonitorTask">
+            <tag name="shopware.scheduled.task"/>
+        </service>
+        <service id="Twint\ScheduledTask\OrderMonitorTaskHandler">
+            <argument type="service" id="scheduled_task.repository"/>
+            <argument type="service" id="Twint\Service\PaymentService" />
+            <argument type="service" id="logger"/>
+            <tag name="messenger.message_handler"/>
+        </service>
+
+        <service id="Twint\Administration\Controller\TwintController" public="true">
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+            <call method="setEncryptor">
+                <argument type="service" id="Twint\Core\Service\CryptoService"/>
+            </call>
+            <tag name="controller.service_arguments"/>
+        </service>
+
+        <service id="Twint\Core\Service\CryptoService" public="true">
+            <argument>%env(APP_SECRET)%</argument>
+        </service>
+
+        <service id="Twint\Subscriber\CheckoutConfirmPageSubscriber">
+            <argument type="service" id="translator" />
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Twint\FastCheckout\Util\PaymentMethodUtil">
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
+        </service>
+
+        <service id="Twint\FastCheckout\Service\FastCheckoutButtonService">
+            <argument type="service" id="Twint\FastCheckout\Util\PaymentMethodUtil"/>
+            <argument type="service" id="Twint\Service\SettingService"/>
+        </service>
+
+        <service id="Twint\FastCheckout\Subscriber\ProductPageLoadedSubscriber">
+            <argument type="service" id="Twint\FastCheckout\Service\FastCheckoutButtonService" />
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+    </services>
+</container>
