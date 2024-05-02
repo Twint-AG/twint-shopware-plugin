@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Twint\Core\Service;
+namespace Twint\Core\Util;
 
 class PemExtractor
 {

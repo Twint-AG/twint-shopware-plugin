@@ -1,6 +1,6 @@
 <?php
 
-namespace Twint\Setting;
+namespace Twint\Core\Model;
 
 use Shopware\Core\Framework\Struct\Struct;
 
@@ -22,7 +22,7 @@ class TwintSettingStruct extends Struct
     protected $certificate;
 
     /**
-     * @var string
+     * @var array
      */
     protected $screens;
 
@@ -82,7 +82,7 @@ class TwintSettingStruct extends Struct
      */
     public function getCertificate(): array
     {
-       return (array)$this->certificate;
+        return (array)$this->certificate;
     }
 
     /**
@@ -95,6 +95,7 @@ class TwintSettingStruct extends Struct
         $this->certificate = $certificate;
         return $this;
     }
+
     /**
      * @return array
      */
@@ -102,6 +103,7 @@ class TwintSettingStruct extends Struct
     {
         return $this->screens;
     }
+
     /**
      * @param array $screens
      *
@@ -114,17 +116,16 @@ class TwintSettingStruct extends Struct
     }
 
     /**
-     * @return bool
+     * @return int|null
      */
     public function getOnlyPickOrderFromMinutes(): ?int
     {
-        return (int)$this->onlyPickOrderFromMinutes;
+        return (int) $this->onlyPickOrderFromMinutes;
     }
 
     /**
-     * @param bool $shopwareFailedPayment
-     *
-     * @return self
+     * @param int $onlyPickOrderFromMinutes
+     * @return $this
      */
     public function setOnlyPickOrderFromMinutes(int $onlyPickOrderFromMinutes): self
     {

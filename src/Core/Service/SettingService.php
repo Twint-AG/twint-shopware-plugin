@@ -1,16 +1,17 @@
 <?php declare(strict_types=1);
 
-namespace Twint\Service;
+namespace Twint\Core\Service;
 
-use Twint\Setting\TwintSettingStruct;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
+use Twint\Core\Model\TwintSettingStruct;
+use Twint\Core\Setting\Settings;
 
 class SettingService
 {
-    public const SYSTEM_CONFIG_DOMAIN = 'TwintPayment.config.';
+    public const SYSTEM_CONFIG_DOMAIN = Settings::PREFIX;
 
     /**
      * @var SystemConfigService

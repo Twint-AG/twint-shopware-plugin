@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Twint\Core\Service\PemExtractor;
+use Twint\Core\Util\PemExtractor;
 
 #[Package('checkout')]
 #[Route(defaults: ['_routeScope' => ['api']])]

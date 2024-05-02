@@ -10,12 +10,12 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Swag\PayPal\Util\Lifecycle\Method\AbstractMethodData;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Twint\Util\Method\AbstractMethod;
-use Twint\Util\Method\DefaultMethod;
+use Twint\Util\Method\RegularPaymentMethod;
 
 class PaymentMethodRegistry
 {
     private const PAYMENT_METHODS = [
-        DefaultMethod::class
+        RegularPaymentMethod::class
     ];
 
     /** @var AbstractMethod[] $methods */
