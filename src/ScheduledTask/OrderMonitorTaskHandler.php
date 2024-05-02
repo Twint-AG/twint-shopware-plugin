@@ -5,8 +5,7 @@ namespace Twint\ScheduledTask;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
-use Twint\Service\PaymentService;
+use Twint\Core\Service\PaymentService;
 
 /**
  * Class OrderMonitorTaskHandler

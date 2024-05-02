@@ -2,7 +2,8 @@
 
 namespace Twint\Core\Setting;
 
-class Settings{
+class Settings
+{
     public const ENVIRONMENT_PROD = false;
     public const ENVIRONMENT_TEST = true;
 

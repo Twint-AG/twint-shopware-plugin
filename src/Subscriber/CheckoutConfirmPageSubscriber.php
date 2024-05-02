@@ -39,7 +39,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         $currencyCode = $salesChannelContext->getCurrency()->getIsoCode();
         if ($currencyCode != Money::CHF) {
             foreach ($event->getPage()->getPaymentMethods() as $paymentMethod) {
-                if ($paymentMethod->getHandlerIdentifier() === 'Twint\Core\Handler\PaymentHandler') {
+                if ($paymentMethod->getHandlerIdentifier() === 'Twint\Core\Handler\TwintRegularPaymentHandler') {
                     $event->getPage()->getPaymentMethods()->remove($paymentMethod->getId());
                     $event->getRequest()->getSession()->getFlashBag()->add('danger', $this->translator->trans('twintPayment.error.invalidPaymentError', ['%name%' => $paymentMethod->getName(), '%currency%' => Money::CHF]));
                     break;
