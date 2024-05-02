@@ -23,7 +23,7 @@
             </call>
         </service>
 
-        <service id="Twint\Util\Method\DefaultMethod">
+        <service id="Twint\Util\Method\RegularPaymentMethod">
             <tag name="twint.method.definition" />
         </service>
 
