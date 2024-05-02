@@ -5,10 +5,12 @@ namespace Twint\Core\Service;
 use Exception;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -107,12 +109,17 @@ class PaymentService
     public function createOrder(AsyncPaymentTransactionStruct $transaction): Order
     {
         $order = $transaction->getOrder();
+        if(!$order instanceof OrderEntity || $order->getCurrency() == null){
+            throw PaymentException::asyncProcessInterrupted($transaction->getOrderTransaction()->getId(),'Missing order or currency' . PHP_EOL);
+        }
         $currency = $order->getCurrency()->getIsoCode();
         $client = $this->getApiClient($order->getSalesChannelId());
         try {
-            /** @var Order * */
-            return $client->startOrder(new UnfiledMerchantTransactionReference($order->getOrderNumber()), new Money($currency, $order->getAmountTotal()));
-        } catch (Exception $e) {
+            /**var non-empty-string $orderNumber**/
+            $orderNumber = !empty($order->getOrderNumber()) ? $order->getOrderNumber() : $order->getId();
+            /** @var Order **/
+            return $client->startOrder(new UnfiledMerchantTransactionReference($orderNumber), new Money($currency, $order->getAmountTotal()));
+        } catch (\Exception $e) {
             throw PaymentException::asyncProcessInterrupted(
                 $transaction->getOrderTransaction()->getId(),
                 'An error occurred during the communication with external payment gateway' . PHP_EOL . $e->getMessage()
@@ -120,23 +127,26 @@ class PaymentService
         }
     }
 
-    public function checkOrderStatus($order): Order
-    {
+    /**
+     * @param $order
+     * @return Order|null
+     */
+    public function checkOrderStatus($order):?Order {
         try {
             $currency = $order->getCurrency()->getIsoCode();
             $twintApiResponse = json_decode($order->getCustomFields()[OrderCustomFieldInstaller::TWINT_API_RESPONSE_CUSTOM_FIELD] ?? '{}', true);
-            if (empty($twintApiResponse) || empty($twintApiResponse['id'])) {
-                throw PaymentException::asyncProcessInterrupted(
-                    $order->getId(),
-                    'Missing Twint response for this order:' . $order->getId() . PHP_EOL
-                );
+            if(empty($twintApiResponse) || empty($twintApiResponse['id'])){
+                throw PaymentException::asyncProcessInterrupted($order->getId(),'Missing Twint response for this order:'. $order->getId() . PHP_EOL);
             }
             $client = $this->getApiClient($order->getSalesChannelId());
             /** @var Order * */
             $twintOrder = $client->monitorOrder(new OrderId(new Uuid($twintApiResponse['id'])));
-            if (true || $twintOrder->transactionStatus() == OrderStatus::SUCCESS) {
+            if($twintOrder->status()->equals(OrderStatus::SUCCESS())){
                 $this->transactionStateHandler->paid($order->getTransactions()->first()->getId(), $this->context);
                 return $client->confirmOrder(new OrderId(new Uuid($twintApiResponse['id'])), new Money($currency, $order->getAmountTotal()));
+            }
+            else if($twintOrder->status()->equals(OrderStatus::FAILURE())){
+                $this->transactionStateHandler->cancel($order->getTransactions()->first()->getId(), $this->context);
             }
             return $twintOrder;
         } catch (Exception $e) {
@@ -148,11 +158,10 @@ class PaymentService
     }
 
     /**
-     * @param $orderId
-     * @param $customFields
+     * @param string $orderId
+     * @param array $customFields
      */
-    public function updateOrderCustomField($orderId, $customFields): void
-    {
+    public function updateOrderCustomField(string $orderId, array $customFields):void {
         $this->orderRepository->update([[
             'id' => $orderId,
             'customFields' => $customFields
@@ -171,8 +180,10 @@ class PaymentService
             new EqualsFilter('transactions.stateId', $paymentInProgressStateId)
         );
         $criteria->addFilter(new EqualsAnyFilter('order.transactions.paymentMethod.technicalName', [RegularPaymentMethod::TECHNICAL_NAME]));
-        if ($onlyPickOrderFromMinutes > 0) {
-            $time = date("Y-m-d H:i:s", strtotime("-$onlyPickOrderFromMinutes minutes"));
+        if($onlyPickOrderFromMinutes > 0){
+            /** @var int $time */
+            $time = strtotime("-$onlyPickOrderFromMinutes minutes");
+            $time = date("Y-m-d H:i:s", $time);
             $criteria->addFilter(
                 new MultiFilter(
                     MultiFilter::CONNECTION_OR,
@@ -215,7 +226,7 @@ class PaymentService
     }
 
     /**
-     * @param $salesChannelId
+     * @param string $salesChannelId
      * @return Client
      * @throw PaymentException
      */

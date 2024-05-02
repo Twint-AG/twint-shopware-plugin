@@ -10,6 +10,12 @@
         "chillerlan/php-qrcode": "4.3.4",
         "ext-openssl": "*"
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://git.nfq.asia/twint-ag/php-sdk.git"
+        }
+    ],
     "authors": [
         {
             "name": "TWINT"
@@ -43,6 +49,15 @@
     "autoload-dev": {
         "psr-4": {
             "Twint\\Tests\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "phpstan/phpstan": "2.0.x-dev",
+        "phpunit/phpunit": "^10.5"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true
         }
     }
 }
