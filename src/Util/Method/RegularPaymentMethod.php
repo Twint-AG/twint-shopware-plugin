@@ -2,7 +2,9 @@
 
 namespace Twint\Util\Method;
 
-class DefaultMethod extends AbstractMethod
+use Twint\Core\Handler\TwintRegularPaymentHandler;
+
+class RegularPaymentMethod extends AbstractMethod
 {
 
     public const TECHNICAL_NAME = 'twint_checkout';
@@ -28,7 +30,7 @@ class DefaultMethod extends AbstractMethod
 
     public function getHandler(): string
     {
-        return \Twint\Core\Handler\PaymentHandler::class;
+        return TwintRegularPaymentHandler::class;
     }
 
     public function getTechnicalName(): string

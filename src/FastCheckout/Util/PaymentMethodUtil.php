@@ -7,7 +7,7 @@ use Doctrine\DBAL\Exception;
 use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Twint\Core\Handler\PaymentHandler;
+use Twint\Core\Handler\TwintRegularPaymentHandler;
 
 class PaymentMethodUtil
 {
@@ -71,7 +71,7 @@ class PaymentMethodUtil
      */
     public function getFastCheckoutMethodId(): ?string
     {
-        return $this->getPaymentMethodIdByHandler(PaymentHandler::class);
+        return $this->getPaymentMethodIdByHandler(TwintRegularPaymentHandler::class);
     }
 
     /**

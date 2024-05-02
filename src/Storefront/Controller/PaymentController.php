@@ -2,6 +2,8 @@
 
 namespace Twint\Storefront\Controller;
 
+use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\OrderException;
 use Shopware\Core\Framework\Context;
@@ -11,15 +13,13 @@ use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use chillerlan\QRCode\QRCode;
-use chillerlan\QRCode\QROptions;
-use Twint\Core\Service\CryptoService;
+use Twint\Core\Util\CryptoHandler;
 use Twint\Util\OrderCustomFieldInstaller;
 
 #[Route(defaults: ['_routeScope' => ['storefront']])]
 class PaymentController extends StorefrontController
 {
-    public function __construct(private $orderRepository, private CryptoService $cryptoService)
+    public function __construct(private $orderRepository, private CryptoHandler $cryptoService)
     {
         $this->orderRepository = $orderRepository;
         $this->cryptoService = $cryptoService;

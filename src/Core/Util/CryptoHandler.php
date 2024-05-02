@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Twint\Core\Service;
+namespace Twint\Core\Util;
 
-class CryptoService
+class CryptoHandler
 {
     const CIPHERING = "AES-128-CBC";
 
@@ -30,6 +30,7 @@ class CryptoService
         $iv = openssl_random_pseudo_bytes($ivLen);
         $ciphertext_raw = openssl_encrypt($data, self::CIPHERING, $this->key, $options = OPENSSL_RAW_DATA, $iv);
         $hmac = hash_hmac('sha256', $ciphertext_raw, $this->key, $as_binary = true);
+
         return base64_encode($iv . $hmac . $ciphertext_raw);
     }
 
@@ -45,7 +46,7 @@ class CryptoService
         $hmac = substr($c, $ivLen, $sha2len = 32);
         $ciphertext_raw = substr($c, $ivLen + $sha2len);
 
-        return (string) openssl_decrypt($ciphertext_raw, self::CIPHERING, $this->key, $options = OPENSSL_RAW_DATA, $iv);
+        return (string)openssl_decrypt($ciphertext_raw, self::CIPHERING, $this->key, $options = OPENSSL_RAW_DATA, $iv);
     }
 
     /**

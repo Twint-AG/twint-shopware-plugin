@@ -1,4 +1,5 @@
 <?php
+
 namespace Twint\FastCheckout\Model;
 
 
