@@ -7,6 +7,7 @@ use chillerlan\QRCode\QROptions;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\OrderException;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Storefront\Controller\StorefrontController;
@@ -19,7 +20,7 @@ use Twint\Util\OrderCustomFieldInstaller;
 #[Route(defaults: ['_routeScope' => ['storefront']])]
 class PaymentController extends StorefrontController
 {
-    public function __construct(private $orderRepository, private CryptoHandler $cryptoService)
+    public function __construct(private EntityRepository $orderRepository, private CryptoHandler $cryptoService)
     {
         $this->orderRepository = $orderRepository;
         $this->cryptoService = $cryptoService;

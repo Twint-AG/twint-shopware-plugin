@@ -72,7 +72,7 @@ class SettingService
         $resultIDs = $this->repoSalesChannels->searchIds(new Criteria(), $context)->getIds();
 
         foreach ($resultIDs as $scID) {
-            $allConfigs[(string)$scID] = $this->getSettings((string)$scID);
+            $allConfigs[(string)$scID] = $this->getSetting((string)$scID);
         }
 
         return $allConfigs;
