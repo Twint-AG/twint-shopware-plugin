@@ -14,7 +14,7 @@ services:
       - "5306:3306" # mysql port
     volumes:
       - ".:/var/www/html"
-      - "./../..:/var/www/plugin:ro"
+      - "./../..:/var/www/plugin:rw"
       - "sw65_volume:/var/lib/mysql:rw"
     networks:
       - web

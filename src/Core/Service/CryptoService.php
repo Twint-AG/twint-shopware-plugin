@@ -44,7 +44,8 @@ class CryptoService
         $iv = substr($c, 0, $ivLen);
         $hmac = substr($c, $ivLen, $sha2len = 32);
         $ciphertext_raw = substr($c, $ivLen + $sha2len);
-        return openssl_decrypt($ciphertext_raw, self::CIPHERING, $this->key, $options = OPENSSL_RAW_DATA, $iv);
+
+        return (string) openssl_decrypt($ciphertext_raw, self::CIPHERING, $this->key, $options = OPENSSL_RAW_DATA, $iv);
     }
 
     /**
