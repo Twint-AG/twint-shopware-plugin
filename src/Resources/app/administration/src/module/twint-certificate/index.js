@@ -1,10 +1,11 @@
 import template from './twint-certificate.html.twig';
+import template65 from './twint-certificate-65.html.twig';
 import './twint-certificate.scss';
 
 const { Component, Mixin } = Shopware;
 
 Component.register('twint-certificate', {
-    template: template,
+    template: Shopware.Feature.isActive('v6.6.0.0') ? template : template65,
 
     mixins: [
         Mixin.getByName('notification'),
