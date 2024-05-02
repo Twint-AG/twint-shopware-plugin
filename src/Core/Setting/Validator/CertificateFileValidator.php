@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Twint\Core\Setting\Validation;
+namespace Twint\Core\Setting\Validator;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
