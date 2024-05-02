@@ -17,7 +17,7 @@ class TwintSettingStruct extends Struct
     protected $testMode = false;
 
     /**
-     * @var string
+     * @var array
      */
     protected $certificate;
 
@@ -51,7 +51,7 @@ class TwintSettingStruct extends Struct
     }
 
     /**
-     * @return string
+     * @return bool
      */
     public function getTestMode(): bool
     {
@@ -116,16 +116,17 @@ class TwintSettingStruct extends Struct
     }
 
     /**
-     * @return int|null
+     * @return int
      */
-    public function getOnlyPickOrderFromMinutes(): ?int
+    public function getOnlyPickOrderFromMinutes(): int
     {
         return (int) $this->onlyPickOrderFromMinutes;
     }
 
     /**
      * @param int $onlyPickOrderFromMinutes
-     * @return $this
+     *
+     * @return self
      */
     public function setOnlyPickOrderFromMinutes(int $onlyPickOrderFromMinutes): self
     {

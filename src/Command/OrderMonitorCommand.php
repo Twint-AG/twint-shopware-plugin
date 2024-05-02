@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Twint\Command;
 
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -48,21 +49,17 @@ class OrderMonitorCommand extends Command
         if(count($pendingOrders) > 0){
             $style->info(''.sprintf("These total: %d orders are going to process soon !", count($pendingOrders)));
             foreach($pendingOrders as $order){
-                if(is_array($order)){
-                    if(!empty($order[2])){
-                        $order[2] = "<error>".$order[2]."</error>";
+                if($order instanceof OrderEntity){
+                    $style->info('Process for order '.$order->getOrderNumber());
+                    try{
+                        $twintOrder = $this->paymentService->checkOrderStatus($order);
+                        if($twintOrder){
+                            $style->success('Update order '.$order->getOrderNumber().' successful!');
+                        }
                     }
-                    $style->text(str_pad($order[0],17)."  ".$order[1]."  ".$order[2]);
-                }
-                $style->info('Process for order '.$order->getOrderNumber());
-                try{
-                    $order = $this->paymentService->checkOrderStatus($order);
-                    if($order){
-                        $style->success('Update order '.$order->getOrderNumber().' successful!');
+                    catch (\Exception $e) {
+                        $style->error("Could not update the order status:". $e->getMessage() . 'Error Code:' . $e->getCode());
                     }
-                }
-                catch (\Exception $e) {
-                    $style->error("Could not update the order status:". $e->getMessage() . 'Error Code:' . $e->getCode());
                 }
             }
 

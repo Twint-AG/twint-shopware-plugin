@@ -2,7 +2,6 @@
 
 namespace Twint\Util;
 
-use Shopware\Core\Checkout\Customer\CustomerDefinition;
 use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -11,6 +10,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\System\CustomField\Aggregate\CustomFieldSet\CustomFieldSetEntity;
 use Shopware\Core\System\CustomField\CustomFieldTypes;
 
 class OrderCustomFieldInstaller
@@ -93,7 +93,7 @@ class OrderCustomFieldInstaller
         $customFieldSetId = $this->customFieldSetRepository->search((new Criteria())
             ->addFilter(new EqualsFilter('name', OrderCustomFieldInstaller::TWINT_CUSTOM_FIELD_SET)), $context
         )->first();
-        if($customFieldSetId){
+        if($customFieldSetId instanceof CustomFieldSetEntity){
             $this->customFieldSetRepository->delete([
                 ['id' => $customFieldSetId->getId()]
             ], $context);
