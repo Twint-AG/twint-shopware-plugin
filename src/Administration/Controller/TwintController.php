@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Twint\Core\Util\CryptoHandler;
 use Twint\Core\Util\PemExtractor;
 
 #[Package('checkout')]
@@ -19,9 +20,9 @@ use Twint\Core\Util\PemExtractor;
 ])]
 final class TwintController extends AbstractController
 {
-    private $encryptor;
+    private CryptoHandler $encryptor;
 
-    public function setEncryptor($encryptor)
+    public function setEncryptor(CryptoHandler $encryptor): void
     {
         $this->encryptor = $encryptor;
     }
@@ -36,16 +37,16 @@ final class TwintController extends AbstractController
             $content = file_get_contents($file->getPathname());
 
             $extractor = new PemExtractor();
-            $certificate = $extractor->extractFromPKCS12($content, $password);
+            $certificate = $extractor->extractFromPKCS12((string) $content, $password);
             if (is_array($certificate)) {
                 return $this->json([
                     'success' => true,
                     'message' => 'Extract certificate successfully',
                     'data' => [
-                        'cert' => $this->encryptor->encrypt($certificate['cert']),
+                        'cert' => $this->encryptor->setPassphraseForPemCertificate($certificate['cert']),
                         'pkey' => $this->encryptor->encrypt($certificate['pkey']),
                     ],
-                ], 200);
+                ]);
             }
 
             return $this->json([

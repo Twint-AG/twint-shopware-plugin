@@ -2,8 +2,7 @@
 
 use Shopware\Core\TestBootstrapper;
 
-$projectRoot = $_SERVER['PROJECT_ROOT'] ?? dirname(__DIR__, 2);
-$projectRoot .= '/html';
+$projectRoot = $_SERVER['PROJECT_ROOT'] ?? dirname(__DIR__, 4);
 
 $moduleAutoloader = __DIR__ . '/../vendor/autoload.php';
 if (!file_exists($moduleAutoloader)) {

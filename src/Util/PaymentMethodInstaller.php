@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Twint\Util;
 
+use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -73,31 +74,6 @@ final class PaymentMethodInstaller
         }
     }
 
-    /**
-     * @param class-string<AbstractMethod> $methodDataClass
-     */
-    public function install(string $methodDataClass, Context $context): void
-    {
-        $method = $this->methodRegistry->getPaymentMethod($methodDataClass);
-        $this->installMethod($method, $context);
-    }
-
-    public function installMethod(AbstractMethod $method, Context $context): void
-    {
-        $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass(TwintPayment::class, $context);
-
-        $data = $this->getPaymentMethodData($method, $pluginId, $context);
-
-        // due to NEXT-12900, we write translations separately
-        $translationData = [
-            'id' => $data['id'],
-            'translations' => $method->getTranslations(),
-        ];
-
-        $this->paymentMethodRepository->upsert([$data], $context);
-        $this->paymentMethodRepository->upsert([$translationData], $context);
-    }
-
     public function removeRules(Context $context): void
     {
         $ruleRemovals = [];
@@ -105,7 +81,7 @@ final class PaymentMethodInstaller
 
         foreach ($this->methodRegistry->getPaymentMethods() as $method) {
             $entity = $this->methodRegistry->getEntityFromData($method, $context);
-            if ($entity === null) {
+            if (!$entity instanceof PaymentMethodEntity) {
                 continue;
             }
 
@@ -142,7 +118,7 @@ final class PaymentMethodInstaller
         }
     }
 
-    private function getPaymentMethodData($method, string $pluginId, Context $context): array
+    private function getPaymentMethodData(AbstractMethod $method, string $pluginId, Context $context): array
     {
         $translations = $method->getTranslations();
         $defaultTranslation = $translations['en-GB'];
@@ -197,7 +173,7 @@ final class PaymentMethodInstaller
     {
         $ids = $this->getPaymentMethodIds($context);
 
-        if (!$ids) {
+        if ($ids === []) {
             return;
         }
 
@@ -217,8 +193,6 @@ final class PaymentMethodInstaller
 
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsAnyFilter('handlerIdentifier', $handlers));
-        /** @var string[] $ids */
-
         return $this->paymentMethodRepository->searchIds($criteria, $context)
             ->getIds();
     }

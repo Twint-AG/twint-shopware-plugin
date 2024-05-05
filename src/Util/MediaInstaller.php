@@ -68,6 +68,9 @@ final class MediaInstaller
             return;
         }
 
+        if (!is_string($fileName)) {
+            return;
+        }
         $mediaFile = $this->getMediaFile($fileName);
         $savedFileName = sprintf('twint_method_%s', $fileName);
 

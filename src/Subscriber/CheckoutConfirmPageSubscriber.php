@@ -6,6 +6,7 @@ namespace Twint\Subscriber;
 
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twint\Sdk\Value\Money;
 
@@ -39,14 +40,17 @@ final class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
                     $event->getPage()
                         ->getPaymentMethods()
                         ->remove($paymentMethod->getId());
-                    $event->getRequest()
-                        ->getSession()
-                        ->getFlashBag()
-                        ->add('danger', $this->translator->trans('twintPayment.error.invalidPaymentError', [
-                            '%name%' => $paymentMethod->getName(),
-                            '%currency%' => Money::CHF,
-                        ]));
-                    break;
+                    $session = $event->getRequest()
+                        ->getSession();
+
+                    if ($session instanceof FlashBagAwareSessionInterface) {
+                        $session->getFlashBag()
+                            ->add('danger', $this->translator->trans('twintPayment.error.invalidPaymentError', [
+                                '%name%' => $paymentMethod->getName(),
+                                '%currency%' => Money::CHF,
+                            ]));
+                        break;
+                    }
                 }
             }
         }

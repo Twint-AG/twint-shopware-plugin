@@ -6,6 +6,7 @@ namespace Twint\ScheduledTask;
 
 use Exception;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 use Twint\Core\Service\PaymentService;
@@ -36,12 +37,12 @@ final class OrderMonitorTaskHandler extends ScheduledTaskHandler
      */
     public function run(): void
     {
-        $result = [];
         $pendingOrders = $this->paymentService->getPendingOrders();
         if (count($pendingOrders) > 0) {
+            /** @var OrderEntity $order */
             foreach ($pendingOrders as $order) {
                 try {
-                    $result[] = $this->paymentService->checkOrderStatus($order);
+                    $this->paymentService->checkOrderStatus($order);
                 } catch (Exception $e) {
                     $this->logger->error(
                         'Could not update the order status:' . $e->getMessage() . 'Error Code:' . $e->getCode()

@@ -9,7 +9,6 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Swag\PayPal\Util\Lifecycle\Method\AbstractMethodData;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Twint\Util\Method\AbstractMethod;
 use Twint\Util\Method\RegularPaymentMethod;
@@ -26,14 +25,14 @@ final class PaymentMethodRegistry
     public function __construct(
         private readonly ContainerInterface $container,
         private readonly EntityRepository $paymentMethodRepository,
-        ?iterable $methods
+        ?array $methods
     ) {
         $this->methods = $methods ?? [];
     }
 
     public function getPaymentMethods(): array
     {
-        if (empty($this->methods)) {
+        if ($this->methods === []) {
             foreach (self::PAYMENT_METHODS as $method) {
                 $this->methods[$method] = new $method($this->container);
             }
@@ -50,7 +49,7 @@ final class PaymentMethodRegistry
             ->firstId();
     }
 
-    public function getEntityFromData(AbstractMethodData $method, Context $context): ?PaymentMethodEntity
+    public function getEntityFromData(AbstractMethod $method, Context $context): ?PaymentMethodEntity
     {
         $criteria = new Criteria();
         $criteria->addAssociation('availabilityRule');
