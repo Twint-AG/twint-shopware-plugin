@@ -83,7 +83,7 @@ final class OrderCustomFieldInstaller
         }
     }
 
-    public function uninstall(Context $context)
+    public function uninstall(Context $context): void
     {
         //delete custom_field_set entry
         $customFieldSetId = $this->customFieldSetRepository->search(

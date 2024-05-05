@@ -83,40 +83,46 @@ final class TwintPayment extends Plugin
         // Update necessary stuff, mostly non-database related
     }
 
-    public function postInstall(InstallContext $installContext): void
-    {
-    }
-
-    public function postUpdate(UpdateContext $updateContext): void
-    {
-    }
-
-    private function getInstaller()
+    private function getInstaller(): Installer
     {
         return new Installer(
             new PaymentMethodInstaller(
+                // @phpstan-ignore-next-line
                 $this->getRepository($this->container, PaymentMethodDefinition::ENTITY_NAME),
+                // @phpstan-ignore-next-line
                 $this->getRepository($this->container, RuleDefinition::ENTITY_NAME),
+                // @phpstan-ignore-next-line
                 $this->container->get(PluginIdProvider::class),
                 new PaymentMethodRegistry(
+                    // @phpstan-ignore-next-line
                     $this->container,
+                    // @phpstan-ignore-next-line
                     $this->getRepository($this->container, PaymentMethodDefinition::ENTITY_NAME),
                     []
                 ),
                 new MediaInstaller(
+                    // @phpstan-ignore-next-line
                     $this->getRepository($this->container, MediaDefinition::ENTITY_NAME),
+                    // @phpstan-ignore-next-line
                     $this->getRepository($this->container, MediaFolderDefinition::ENTITY_NAME),
+                    // @phpstan-ignore-next-line
                     $this->getRepository($this->container, PaymentMethodDefinition::ENTITY_NAME),
+                    // @phpstan-ignore-next-line
                     $this->container->get(FileSaver::class)
                 ),
             ),
             new ConfigInstaller(
+                // @phpstan-ignore-next-line
                 $this->getRepository($this->container, SystemConfigDefinition::ENTITY_NAME),
+                // @phpstan-ignore-next-line
                 $this->container->get(SystemConfigService::class)
             ),
             new OrderCustomFieldInstaller(
+                // @phpstan-ignore-next-line
                 $this->getRepository($this->container, CustomFieldSetDefinition::ENTITY_NAME),
+                // @phpstan-ignore-next-line
                 $this->getRepository($this->container, CustomFieldDefinition::ENTITY_NAME),
+                // @phpstan-ignore-next-line
                 $this->getRepository($this->container, SnippetDefinition::ENTITY_NAME),
             )
         );

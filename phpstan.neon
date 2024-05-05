@@ -15,6 +15,12 @@ parameters:
 
     paths:
         - src
+    excludePaths:
+        - infra
+        - vendor
+        - build
+        - bin
+        - tests
 
     bootstrapFiles:
         - bin/static-analyze-autoloader.php

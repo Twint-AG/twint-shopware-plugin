@@ -9,6 +9,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 abstract class AbstractMethod
 {
     /**
+     * @var ContainerInterface
+     */
+    public $container;
+
+    /**
      * @internal
      */
     final public function __construct(ContainerInterface $container)

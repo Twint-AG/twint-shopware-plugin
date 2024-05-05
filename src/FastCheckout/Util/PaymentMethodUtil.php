@@ -36,7 +36,7 @@ final class PaymentMethodUtil
             return false;
         }
 
-        if ($paymentMethods !== null) {
+        if ($paymentMethods instanceof PaymentMethodCollection) {
             return $paymentMethods->has($methodId);
         }
 

@@ -22,7 +22,7 @@ final class FastCheckoutButtonService
     /**
      * @throws Exception
      */
-    public function getButton(SalesChannelContext $context, string $screen)
+    public function getButton(SalesChannelContext $context, string $screen): ?FastCheckoutButton
     {
         // Check if the fast checkout is enabled
         $enabled = $this->paymentMethodUtil->isFastCheckoutEnabled($context);
@@ -39,7 +39,7 @@ final class FastCheckoutButtonService
 
         // Check if the screens are allowed
         $settings = $this->settingService->getSetting($context->getSalesChannel()->getId());
-        if (!in_array($screen, (array) $settings->getScreens(), true)) {
+        if (!in_array($screen, $settings->getScreens(), true)) {
             return null;
         }
 

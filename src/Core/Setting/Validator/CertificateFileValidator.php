@@ -19,12 +19,7 @@ final class CertificateFileValidator
         if (!in_array(strtolower($originalExtension), static::ALLOWED_EXTENSIONS, true)) {
             return false;
         }
-
         // Validate file size
-        if ($file->getSize() > static::MAX_SIZE) {
-            return false;
-        }
-
-        return true;
+        return $file->getSize() <= static::MAX_SIZE;
     }
 }

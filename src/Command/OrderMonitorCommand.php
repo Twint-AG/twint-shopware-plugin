@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Twint\Core\Service\PaymentService;
+use Twint\Sdk\Value\Order;
 use Twint\TwintPayment;
 
 final class OrderMonitorCommand extends Command
@@ -41,7 +42,7 @@ final class OrderMonitorCommand extends Command
                     $style->info('Process for order ' . $order->getOrderNumber());
                     try {
                         $twintOrder = $this->paymentService->checkOrderStatus($order);
-                        if ($twintOrder) {
+                        if ($twintOrder instanceof Order) {
                             $style->success('Update order ' . $order->getOrderNumber() . ' successful!');
                         }
                     } catch (Exception $e) {
