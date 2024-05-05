@@ -32,21 +32,22 @@ class TwintController extends AbstractController
             $content = file_get_contents($file->getPathname());
 
             $extractor = new PemExtractor();
-            $privateKey = $extractor->extractFromPKCS12($content, $password);
-            if ($privateKey) {
+            $certificate = $extractor->extractFromPKCS12($content, $password);
+            if (is_array($certificate)) {
                 return $this->json([
                     'success' => true,
                     'message' => 'Extract certificate successfully',
                     'data' => [
-                        'cert' => $this->encryptor->encrypt($privateKey['cert']),
-                        'pkey' => $this->encryptor->encrypt($privateKey['pkey']),
+                        'cert' => $this->encryptor->encrypt($certificate['cert']),
+                        'pkey' => $this->encryptor->encrypt($certificate['pkey']),
                     ]
                 ], 200);
             }
 
             return $this->json([
                 'success' => false,
-                'message' => 'Could not extract private key. Please check certificate file and password'
+                'message' => 'Invalid certificate file',
+                'errorCode' => $certificate
             ], 400);
         }
 
