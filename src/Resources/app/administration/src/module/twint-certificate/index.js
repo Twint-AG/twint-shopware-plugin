@@ -2,7 +2,7 @@ import template from './twint-certificate.html.twig';
 import template65 from './twint-certificate-65.html.twig';
 import './twint-certificate.scss';
 
-const { Component, Mixin } = Shopware;
+const {Component, Mixin} = Shopware;
 
 Component.register('twint-certificate', {
     template: Shopware.Feature.isActive('v6.6.0.0') ? template : template65,
@@ -18,23 +18,23 @@ Component.register('twint-certificate', {
         };
     },
 
-    methods:{
-        onFileChange(file){
+    methods: {
+        onFileChange(file) {
             this.currentCertFile = file;
             this.extractPem();
         },
 
-        updatePassword(event){
+        updatePassword(event) {
             this.extractPem();
         },
 
-        extractPem(){
+        extractPem() {
             const service = Shopware.Service('twintFileUploadService');
-            if(!this.currentCertFile){
+            if (!this.currentCertFile) {
                 return;
             }
 
-            service.uploadFile(this.currentCertFile , this.currentPassword ?? '').then((res) => {
+            service.uploadFile(this.currentCertFile, this.currentPassword ?? '').then((res) => {
                 this.updateCertificate(res.data.data);
                 this.createNotification({
                     title: "Success",
@@ -45,15 +45,27 @@ Component.register('twint-certificate', {
                 });
 
             }).catch((err) => {
+                //specific error handling
+                if (err.response.status === 400) {
+                    let errorCode = err.response.data.errorCode;
+
+                    return this.createNotificationError({
+                        title: this.$tc('twint.certificateErrorTitle'),
+                        message: this.$tc('twint.errors.' + errorCode),
+                        growl: true
+                    });
+                }
+
+                // Generic error handling
                 this.createNotificationError({
-                    title: this.$tc('twint.validation.errorTitle'),
+                    title: this.$tc('twint.certificateErrorTitle'),
                     message: this.$tc('twint.validation.errorMessage'),
                     growl: true
                 });
             })
         },
 
-        updateCertificate(value){
+        updateCertificate(value) {
             if (this.feature.isActive('v6.6.0.0')) {
                 this.$emit('update:value', value);
                 return;

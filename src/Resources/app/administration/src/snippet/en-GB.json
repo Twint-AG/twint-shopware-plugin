@@ -1,12 +1,20 @@
 {
     "twint": {
         "validation": {
-            "errorTitle": "TWINT payment validation error",
+            "errorTitle": "TWINT configuration error",
             "errorMessage": "There was an error validating the TWINT certificate (selected file and password). Please try again or use a different certification."
         },
+        "certificateErrorTitle": "Certificate",
+        "merchantErrorTitle": "Merchant ID",
         "certificateSuccess": "Certificate is an valid TWINT certificate.",
         "certificateLabel": "Certificate Password (optional)",
         "certificateFileLabel": "Select a certificate file (.p12)",
-        "certificatePasswordHelpText": "The password for the certificate file is optional. If you have set a password for the certificate file, please enter it here."
+        "certificatePasswordHelpText": "The password for the certificate file is optional. If you have set a password for the certificate file, please enter it here.",
+        "errors": {
+            "INVALID_CREDENTIAL": "Invalid credentials. Please check your certificate and password.",
+            "INVALID_TIME_RANGE": "Invalid time range",
+            "INVALID_ISSUER": "Invalid Issuer; Only allow CH and TWINT AG",
+            "invalidUUIDv4": "Invalid UUIDv4"
+        }
     }
 }

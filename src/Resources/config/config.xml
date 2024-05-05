@@ -6,12 +6,12 @@
     <card>
         <title>Merchant configurations</title>
 
-        <input-field type="text">
+        <component name="twint-merchant-id">
             <name>merchantId</name>
-            <label>Merchant ID</label>
+            <label>Merchant ID*</label>
             <defaultValue></defaultValue>
             <placeholder>xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx</placeholder>
-        </input-field>
+        </component>
 
         <input-field type="bool">
             <name>testMode</name>
@@ -26,7 +26,7 @@
         <title>Credentials</title>
         <component name="twint-certificate">
             <name>certificate</name>
-            <label>Certificate</label>
+            <label>Certificate*</label>
             <label lang="de-DE">Zertifikat Passwort</label>
             <helpText>SwissSign certificate password to allow reading above certificate.</helpText>
         </component>
