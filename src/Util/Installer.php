@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Twint\Util;
 
@@ -6,14 +8,13 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Log\Package;
 
 #[Package('checkout')]
-class Installer
+final class Installer
 {
     public function __construct(
         private readonly PaymentMethodInstaller $paymentMethodInstaller,
-        private readonly ConfigInstaller        $configInstaller,
+        private readonly ConfigInstaller $configInstaller,
         private readonly OrderCustomFieldInstaller $orderCustomFieldInstaller
-    )
-    {
+    ) {
     }
 
     public function install(Context $context): void

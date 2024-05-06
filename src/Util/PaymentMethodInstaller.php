@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Twint\Util;
 
@@ -14,7 +16,7 @@ use Twint\Util\Method\AbstractMethod;
 use function array_map;
 use function preg_match;
 
-class PaymentMethodInstaller
+final class PaymentMethodInstaller
 {
     private EntityRepository $paymentMethodRepository;
 
@@ -30,13 +32,12 @@ class PaymentMethodInstaller
      * @internal
      */
     public function __construct(
-        EntityRepository      $paymentMethodRepository,
-        EntityRepository      $ruleRepository,
-        PluginIdProvider      $pluginIdProvider,
+        EntityRepository $paymentMethodRepository,
+        EntityRepository $ruleRepository,
+        PluginIdProvider $pluginIdProvider,
         PaymentMethodRegistry $methodRegistry,
-        MediaInstaller        $mediaInstaller
-    )
-    {
+        MediaInstaller $mediaInstaller
+    ) {
         $this->paymentMethodRepository = $paymentMethodRepository;
         $this->ruleRepository = $ruleRepository;
         $this->pluginIdProvider = $pluginIdProvider;
@@ -117,7 +118,9 @@ class PaymentMethodInstaller
                 continue;
             }
 
-            $ruleRemovals[] = ['id' => $rule->getId()];
+            $ruleRemovals[] = [
+                'id' => $rule->getId(),
+            ];
 
             $paymentMethodUpdates[] = [
                 'id' => $entity->getId(),
@@ -175,7 +178,8 @@ class PaymentMethodInstaller
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsAnyFilter('handlerIdentifier', $handlers));
         /** @var string[] $ids */
-        $ids = $this->paymentMethodRepository->searchIds($criteria, $context)->getIds();
+        $ids = $this->paymentMethodRepository->searchIds($criteria, $context)
+            ->getIds();
 
         if (!$ids) {
             return;
@@ -199,12 +203,13 @@ class PaymentMethodInstaller
 
         $this->paymentMethodRepository->delete(array_map(static function (string $id) {
             return [
-                'id' => $id
+                'id' => $id,
             ];
         }, $ids), $context);
     }
 
-    protected function getPaymentMethodIds(Context $context): array{
+    private function getPaymentMethodIds(Context $context): array
+    {
         $handlers = [];
         foreach ($this->methodRegistry->getPaymentMethods() as $paymentMethod) {
             $handlers[] = $paymentMethod->getHandler();
@@ -214,6 +219,7 @@ class PaymentMethodInstaller
         $criteria->addFilter(new EqualsAnyFilter('handlerIdentifier', $handlers));
         /** @var string[] $ids */
 
-        return $this->paymentMethodRepository->searchIds($criteria, $context)->getIds();
+        return $this->paymentMethodRepository->searchIds($criteria, $context)
+            ->getIds();
     }
 }
