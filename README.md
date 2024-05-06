@@ -10,3 +10,13 @@ sudo ln -s /var/www/plugin /var/www/html/custom/plugins/TwintPayment
 ./bin/phpunit.sh
 ##phpstan
 ./bin/phpstan.sh
+
+### Coding standards
+Check coding standards with ecs
+```
+vendor/bin/ecs
+```
+Fixing coding standards
+```
+vendor/bin/ecs --fix
+```

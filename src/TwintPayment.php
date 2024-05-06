@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Twint;
 
@@ -36,14 +38,18 @@ use Twint\Util\MediaInstaller;
 use Twint\Util\OrderCustomFieldInstaller;
 use Twint\Util\PaymentMethodInstaller;
 use Twint\Util\PaymentMethodRegistry;
+use function rtrim;
+use function sprintf;
 
 #[Package('checkout')]
-class TwintPayment extends Plugin
+final class TwintPayment extends Plugin
 {
     public const EXIT_CODE_SUCCESS = 0;
+
     public function install(InstallContext $installContext): void
     {
-        $this->getInstaller()->install($installContext->getContext());
+        $this->getInstaller()
+            ->install($installContext->getContext());
 
         parent::install($installContext);
     }
@@ -51,7 +57,8 @@ class TwintPayment extends Plugin
     public function uninstall(UninstallContext $uninstallContext): void
     {
         if (!$uninstallContext->keepUserData()) {
-            $this->getInstaller()->uninstall($uninstallContext->getContext());
+            $this->getInstaller()
+                ->uninstall($uninstallContext->getContext());
         }
 
         parent::uninstall($uninstallContext);
@@ -60,13 +67,15 @@ class TwintPayment extends Plugin
     public function activate(ActivateContext $activateContext): void
     {
         parent::activate($activateContext);
-        $this->getInstaller()->activate($activateContext->getContext());
+        $this->getInstaller()
+            ->activate($activateContext->getContext());
     }
 
     public function deactivate(DeactivateContext $deactivateContext): void
     {
         parent::deactivate($deactivateContext);
-        $this->getInstaller()->deactivate($deactivateContext->getContext());
+        $this->getInstaller()
+            ->deactivate($deactivateContext->getContext());
     }
 
     public function update(UpdateContext $updateContext): void
@@ -84,22 +93,23 @@ class TwintPayment extends Plugin
 
     private function getInstaller()
     {
-        return new Installer(new PaymentMethodInstaller(
-            $this->getRepository($this->container, PaymentMethodDefinition::ENTITY_NAME),
-            $this->getRepository($this->container, RuleDefinition::ENTITY_NAME),
-            $this->container->get(PluginIdProvider::class),
-            new PaymentMethodRegistry(
-                $this->container,
+        return new Installer(
+            new PaymentMethodInstaller(
                 $this->getRepository($this->container, PaymentMethodDefinition::ENTITY_NAME),
-                []
+                $this->getRepository($this->container, RuleDefinition::ENTITY_NAME),
+                $this->container->get(PluginIdProvider::class),
+                new PaymentMethodRegistry(
+                    $this->container,
+                    $this->getRepository($this->container, PaymentMethodDefinition::ENTITY_NAME),
+                    []
+                ),
+                new MediaInstaller(
+                    $this->getRepository($this->container, MediaDefinition::ENTITY_NAME),
+                    $this->getRepository($this->container, MediaFolderDefinition::ENTITY_NAME),
+                    $this->getRepository($this->container, PaymentMethodDefinition::ENTITY_NAME),
+                    $this->container->get(FileSaver::class)
+                ),
             ),
-            new MediaInstaller(
-                $this->getRepository($this->container, MediaDefinition::ENTITY_NAME),
-                $this->getRepository($this->container, MediaFolderDefinition::ENTITY_NAME),
-                $this->getRepository($this->container, PaymentMethodDefinition::ENTITY_NAME),
-                $this->container->get(FileSaver::class)
-            ),
-        ),
             new ConfigInstaller(
                 $this->getRepository($this->container, SystemConfigDefinition::ENTITY_NAME),
                 $this->container->get(SystemConfigService::class)
@@ -114,10 +124,13 @@ class TwintPayment extends Plugin
 
     private function getRepository(ContainerInterface $container, string $entityName): EntityRepository
     {
-        $repository = $container->get(\sprintf('%s.repository', $entityName), ContainerInterface::NULL_ON_INVALID_REFERENCE);
+        $repository = $container->get(
+            sprintf('%s.repository', $entityName),
+            ContainerInterface::NULL_ON_INVALID_REFERENCE
+        );
 
         if (!$repository instanceof EntityRepository) {
-            throw new ServiceNotFoundException(\sprintf('%s.repository', $entityName));
+            throw new ServiceNotFoundException(sprintf('%s.repository', $entityName));
         }
 
         return $repository;
@@ -137,7 +150,7 @@ class TwintPayment extends Plugin
 
         $configLoader = new DelegatingLoader($resolver);
 
-        $confDir = \rtrim($this->getPath(), '/') . '/Resources/config';
+        $confDir = rtrim($this->getPath(), '/') . '/Resources/config';
 
         $configLoader->load($confDir . '/{packages}/*.yaml', 'glob');
     }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Twint\Administration\Controller;
 
@@ -12,8 +14,10 @@ use Symfony\Component\Routing\Annotation\Route;
 use Twint\Core\Util\PemExtractor;
 
 #[Package('checkout')]
-#[Route(defaults: ['_routeScope' => ['api']])]
-class TwintController extends AbstractController
+#[Route(defaults: [
+    '_routeScope' => ['api'],
+])]
+final class TwintController extends AbstractController
 {
     private $encryptor;
 
@@ -40,17 +44,20 @@ class TwintController extends AbstractController
                     'data' => [
                         'cert' => $this->encryptor->encrypt($certificate['cert']),
                         'pkey' => $this->encryptor->encrypt($certificate['pkey']),
-                    ]
+                    ],
                 ], 200);
             }
 
             return $this->json([
                 'success' => false,
                 'message' => 'Invalid certificate file',
-                'errorCode' => $certificate
+                'errorCode' => $certificate,
             ], 400);
         }
 
-        return $this->json(['success' => false, 'message' => 'Please upload an valid file'], 400);
+        return $this->json([
+            'success' => false,
+            'message' => 'Please upload an valid file',
+        ], 400);
     }
 }

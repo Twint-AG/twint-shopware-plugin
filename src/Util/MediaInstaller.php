@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Twint\Util;
 
@@ -18,7 +20,7 @@ use function pathinfo;
 use function sprintf;
 use const PATHINFO_EXTENSION;
 
-class MediaInstaller
+final class MediaInstaller
 {
     private const RESOURCES_ICONS = 'Resources/icons';
 
@@ -37,29 +39,27 @@ class MediaInstaller
         EntityRepository $mediaRepository,
         EntityRepository $mediaFolderRepository,
         EntityRepository $paymentMethodRepository,
-        FileSaver        $fileSaver
-    )
-    {
+        FileSaver $fileSaver
+    ) {
         $this->mediaRepository = $mediaRepository;
         $this->mediaFolderRepository = $mediaFolderRepository;
         $this->paymentMethodRepository = $paymentMethodRepository;
         $this->fileSaver = $fileSaver;
     }
 
-    /**
-     * @param string $paymentMethodId
-     * @param Context $context
-     * @param bool $replace
-     * @return void
-     */
-    public function installPaymentMethodMedia(AbstractMethod $method, string $paymentMethodId, Context $context, bool $replace = false): void
-    {
+    public function installPaymentMethodMedia(
+        AbstractMethod $method,
+        string $paymentMethodId,
+        Context $context,
+        bool $replace = false
+    ): void {
         $fileName = $method->getMediaFileName();
 
         $criteria = new Criteria([$paymentMethodId]);
         $criteria->addAssociation('media');
         /** @var PaymentMethodEntity|null $paymentMethod */
-        $paymentMethod = $this->paymentMethodRepository->search($criteria, $context)->first();
+        $paymentMethod = $this->paymentMethodRepository->search($criteria, $context)
+            ->first();
         if ($paymentMethod === null) {
             throw PaymentException::unknownPaymentMethodById($paymentMethodId);
         }
@@ -79,26 +79,23 @@ class MediaInstaller
         );
     }
 
-    /**
-     * @param Context $context
-     * @return string|null
-     */
     private function getMediaDefaultFolderId(Context $context): ?string
     {
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('media_folder.defaultFolder.entity', $this->paymentMethodRepository->getDefinition()->getEntityName()));
+        $criteria->addFilter(
+            new EqualsFilter(
+                'media_folder.defaultFolder.entity',
+                $this->paymentMethodRepository->getDefinition()
+                    ->getEntityName()
+            )
+        );
         $criteria->addAssociation('defaultFolder');
         $criteria->setLimit(1);
 
-        return $this->mediaFolderRepository->searchIds($criteria, $context)->firstId();
+        return $this->mediaFolderRepository->searchIds($criteria, $context)
+            ->firstId();
     }
 
-    /**
-     * @param string $fileName
-     * @param PaymentMethodEntity $paymentMethod
-     * @param Context $context
-     * @return string
-     */
     private function getMediaId(string $fileName, PaymentMethodEntity $paymentMethod, Context $context): string
     {
         $media = $paymentMethod->getMedia();
@@ -108,7 +105,8 @@ class MediaInstaller
 
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('fileName', $fileName));
-        $mediaId = $this->mediaRepository->searchIds($criteria, $context)->firstId();
+        $mediaId = $this->mediaRepository->searchIds($criteria, $context)
+            ->firstId();
 
         if ($mediaId === null) {
             $mediaId = Uuid::randomHex();
@@ -128,10 +126,6 @@ class MediaInstaller
         return $mediaId;
     }
 
-    /**
-     * @param string $fileName
-     * @return MediaFile
-     */
     private function getMediaFile(string $fileName): MediaFile
     {
         $filePath = sprintf('%s/%s/%s.svg', dirname(__DIR__, 1), self::RESOURCES_ICONS, $fileName);

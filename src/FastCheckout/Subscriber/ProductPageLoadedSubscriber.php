@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Twint\FastCheckout\Subscriber;
 
@@ -10,10 +12,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Twint\Core\Setting\Settings;
 use Twint\FastCheckout\Service\FastCheckoutButtonService;
 
-class ProductPageLoadedSubscriber implements EventSubscriberInterface
+final class ProductPageLoadedSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private readonly FastCheckoutButtonService $service)
-    {
+    public function __construct(
+        private readonly FastCheckoutButtonService $service
+    ) {
     }
 
     /**

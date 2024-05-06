@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Twint\FastCheckout\Service;
 
 use Doctrine\DBAL\Exception;
@@ -9,12 +11,12 @@ use Twint\Core\Setting\Settings;
 use Twint\FastCheckout\Model\FastCheckoutButton;
 use Twint\FastCheckout\Util\PaymentMethodUtil;
 
-class FastCheckoutButtonService
+final class FastCheckoutButtonService
 {
-    public function __construct(private readonly PaymentMethodUtil $paymentMethodUtil,
-                                private readonly SettingService    $settingService
-    )
-    {
+    public function __construct(
+        private readonly PaymentMethodUtil $paymentMethodUtil,
+        private readonly SettingService $settingService
+    ) {
     }
 
     /**
@@ -29,14 +31,15 @@ class FastCheckoutButtonService
         }
 
         // Check if the currency is allowed
-        $currency = $context->getCurrency()->getIsoCode();
-        if (!in_array($currency, Settings::ALLOWED_CURRENCIES)) {
+        $currency = $context->getCurrency()
+            ->getIsoCode();
+        if (!in_array($currency, Settings::ALLOWED_CURRENCIES, true)) {
             return null;
         }
 
         // Check if the screens are allowed
         $settings = $this->settingService->getSetting($context->getSalesChannel()->getId());
-        if (!in_array($screen, (array)$settings->getScreens())) {
+        if (!in_array($screen, (array) $settings->getScreens(), true)) {
             return null;
         }
 
@@ -44,6 +47,7 @@ class FastCheckoutButtonService
             'TWINT Fast Checkout',
             'Fast Checkout Description',
             'https://example.com/image.png',
-            'https://example.com/link');
+            'https://example.com/link'
+        );
     }
 }

@@ -1,19 +1,22 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Twint\Core\Setting\Validator;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class CertificateFileValidator
+final class CertificateFileValidator
 {
-    const ALLOWED_EXTENSIONS = ['.p12'];
-    const MAX_SIZE = 1024 * 1024; // 1MB
+    public const ALLOWED_EXTENSIONS = ['.p12'];
+
+    public const MAX_SIZE = 1024 * 1024; // 1MB
 
     public function validate(UploadedFile $file): bool
     {
         // Validate file extension
         $originalExtension = $file->getClientOriginalExtension();
-        if (!in_array(strtolower($originalExtension), static::ALLOWED_EXTENSIONS)) {
+        if (!in_array(strtolower($originalExtension), static::ALLOWED_EXTENSIONS, true)) {
             return false;
         }
 

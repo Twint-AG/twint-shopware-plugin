@@ -1,12 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Twint\Util\Method;
 
 use Twint\Core\Handler\TwintRegularPaymentHandler;
 
-class RegularPaymentMethod extends AbstractMethod
+final class RegularPaymentMethod extends AbstractMethod
 {
-
     public const TECHNICAL_NAME = 'twint_checkout';
 
     public function getTranslations(): array

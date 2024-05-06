@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Twint\Util;
 
@@ -12,19 +14,20 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Twint\Util\Method\AbstractMethod;
 use Twint\Util\Method\RegularPaymentMethod;
 
-class PaymentMethodRegistry
+final class PaymentMethodRegistry
 {
-    private const PAYMENT_METHODS = [
-        RegularPaymentMethod::class
-    ];
+    private const PAYMENT_METHODS = [RegularPaymentMethod::class];
 
-    /** @var AbstractMethod[] $methods */
+    /**
+     * @var AbstractMethod[]
+     */
     private array $methods;
 
-    public function __construct(private readonly ContainerInterface $container,
-                                private readonly EntityRepository   $paymentMethodRepository,
-                                ?iterable                           $methods)
-    {
+    public function __construct(
+        private readonly ContainerInterface $container,
+        private readonly EntityRepository $paymentMethodRepository,
+        ?iterable $methods
+    ) {
         $this->methods = $methods ?? [];
     }
 
@@ -43,7 +46,8 @@ class PaymentMethodRegistry
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('handlerIdentifier', $method->getHandler()));
 
-        return $this->paymentMethodRepository->searchIds($criteria, $context)->firstId();
+        return $this->paymentMethodRepository->searchIds($criteria, $context)
+            ->firstId();
     }
 
     public function getEntityFromData(AbstractMethodData $method, Context $context): ?PaymentMethodEntity
@@ -53,7 +57,8 @@ class PaymentMethodRegistry
         $criteria->addFilter(new EqualsFilter('handlerIdentifier', $method->getHandler()));
 
         /** @var PaymentMethodEntity|null $paymentMethod */
-        $paymentMethod = $this->paymentMethodRepository->search($criteria, $context)->first();
+        $paymentMethod = $this->paymentMethodRepository->search($criteria, $context)
+            ->first();
 
         return $paymentMethod;
     }

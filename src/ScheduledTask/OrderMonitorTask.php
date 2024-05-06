@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Twint\ScheduledTask;
 
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTask;
 
-class OrderMonitorTask extends ScheduledTask
+final class OrderMonitorTask extends ScheduledTask
 {
     public static function getTaskName(): string
     {

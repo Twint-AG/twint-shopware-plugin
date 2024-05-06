@@ -6,3 +6,4 @@
 **/vendor
 **/public/static
 **/dist/**
+build/
