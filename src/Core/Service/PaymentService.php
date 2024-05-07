@@ -262,9 +262,61 @@ class PaymentService
                 $environment,
             );
             $status = $client->checkSystemStatus();
-            return $client;
+            if($status->isOk()){
+                return $client;
+            }
+            else{
+                throw PaymentException::asyncProcessInterrupted($salesChannelId, 'API is not available');
+            }
+
         } catch (Exception $e) {
             throw PaymentException::asyncProcessInterrupted($salesChannelId, $e->getMessage());
         }
+    }
+    /**
+     * @param OrderEntity $order
+     * @return bool
+     */
+    public function isOrderPaid(OrderEntity $order): bool
+    {
+        $transactions = $order->getTransactions();
+
+        if ($transactions === null) {
+            return false;
+        }
+
+        $transaction = $transactions->last();
+        if ($transaction === null) {
+            return false;
+        }
+
+        $stateMachineState = $transaction->getStateMachineState();
+        if ($stateMachineState === null) {
+            return false;
+        }
+        return $stateMachineState->getTechnicalName() === OrderTransactionStates::STATE_PAID;
+    }
+    /**
+     * @param OrderEntity $order
+     * @return bool
+     */
+    public function isCancelPaid(OrderEntity $order): bool
+    {
+        $transactions = $order->getTransactions();
+
+        if ($transactions === null) {
+            return false;
+        }
+
+        $transaction = $transactions->last();
+        if ($transaction === null) {
+            return false;
+        }
+
+        $stateMachineState = $transaction->getStateMachineState();
+        if ($stateMachineState === null) {
+            return false;
+        }
+        return $stateMachineState->getTechnicalName() === OrderTransactionStates::STATE_CANCELLED;
     }
 }

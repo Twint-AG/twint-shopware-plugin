@@ -2,6 +2,22 @@
 
 {% block base_content %}
     {% block page_checkout %}
+        <script>
+            function reloadPage() {
+                localStorage.setItem('lastReloadTime', Date.now());
+                location.reload();
+            }
+
+            window.onload = function() {
+                var lastReloadTime = localStorage.getItem('lastReloadTime');
+                var currentTime = Date.now();
+                var reloadInterval = 10 * 60 * 1000; // 10 minutes in milliseconds
+                if (!lastReloadTime || (currentTime - lastReloadTime > reloadInterval)) {
+                    reloadPage();
+                }
+                setInterval(reloadPage, reloadInterval);
+            };
+        </script>
         <div class="checkout">
             {% block page_checkout_container %}
                 <div class="checkout-container">
