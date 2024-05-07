@@ -14,16 +14,18 @@ use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Twint\Core\Service\PaymentService;
 use Twint\Core\Util\CryptoHandler;
 use Twint\Util\OrderCustomFieldInstaller;
 
 #[Route(defaults: ['_routeScope' => ['storefront']])]
 class PaymentController extends StorefrontController
 {
-    public function __construct(private EntityRepository $orderRepository, private CryptoHandler $cryptoService)
+    public function __construct(private EntityRepository $orderRepository, private CryptoHandler $cryptoService, private PaymentService $paymentService)
     {
         $this->orderRepository = $orderRepository;
         $this->cryptoService = $cryptoService;
+        $this->paymentService = $paymentService;
     }
     #[Route(
         path: '/payment/waiting/{orderNumber}',
@@ -39,10 +41,11 @@ class PaymentController extends StorefrontController
             $criteria->addFilter(new EqualsFilter('orderNumber', $orderNumber));
             $criteria->addAssociation('orderCustomer.customer')
                 ->addAssociation('transactions.paymentMethod')
+                ->addAssociation('transactions.stateMachineState')
                 ->addAssociation('lineItems')
                 ->addAssociation('currency')
                 ->addAssociation('addresses.country')
-                ->addAssociation('customFields');;
+                ->addAssociation('customFields');
             /** @var OrderEntity|null $order */
             $order = $this->orderRepository->search($criteria, $context)->first();
             if(empty($order)){
@@ -51,6 +54,12 @@ class PaymentController extends StorefrontController
         }
         catch(\Exception $e){
             return $this->redirectToRoute('frontend.account.order.page');
+        }
+        if($this->paymentService->isOrderPaid($order)){
+            return $this->redirectToRoute('frontend.checkout.finish.page', ['orderId' => $order->getId()]);
+        }
+        else if($this->paymentService->isCancelPaid($order)){
+            return $this->redirectToRoute('frontend.account.edit-order.page', ['orderId' => $order->getId(), 'error-code' => 'CHECKOUT__TWINT_PAYMENT_DECLINED',]);
         }
         $twintApiResponse = json_decode($order->getCustomFields()[OrderCustomFieldInstaller::TWINT_API_RESPONSE_CUSTOM_FIELD] ?? '{}', true);
         $qrcode = '';
@@ -71,4 +80,6 @@ class PaymentController extends StorefrontController
             'order' => $order
         ]);
     }
+
+
 }
