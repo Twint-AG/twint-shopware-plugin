@@ -21,6 +21,8 @@ class Settings
     public const SCREENS_OPTIONS_CART = 'CART';
     public const SCREENS_OPTIONS_CART_FLYOUT = 'CART_FLYOUT';
 
+    public const ONLY_PICK_ORDERS_FROM_MINUTES = 30;
+
     public const DEFAULT_VALUES = [
         self::TEST_MODE => self::ENVIRONMENT_PROD,
         self::MERCHANT_ID => '',

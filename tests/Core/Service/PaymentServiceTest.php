@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Twint\Tests\Service;
+namespace Twint\Tests\Core\Service;
 
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
