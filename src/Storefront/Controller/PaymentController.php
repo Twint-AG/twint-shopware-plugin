@@ -1,9 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Twint\Storefront\Controller;
 
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
+use Exception;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\OrderException;
 use Shopware\Core\Framework\Context;
@@ -13,29 +16,31 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Twint\Core\Service\PaymentService;
 use Twint\Core\Util\CryptoHandler;
 use Twint\Util\OrderCustomFieldInstaller;
 
-#[Route(defaults: ['_routeScope' => ['storefront']])]
-class PaymentController extends StorefrontController
+#[Route(defaults: [
+    '_routeScope' => ['storefront'],
+])]
+final class PaymentController extends StorefrontController
 {
-    public function __construct(private EntityRepository $orderRepository, private CryptoHandler $cryptoService, private PaymentService $paymentService)
-    {
+    public function __construct(
+        private EntityRepository $orderRepository,
+        private CryptoHandler $cryptoService,
+        private PaymentService $paymentService
+    ) {
         $this->orderRepository = $orderRepository;
         $this->cryptoService = $cryptoService;
         $this->paymentService = $paymentService;
     }
-    #[Route(
-        path: '/payment/waiting/{orderNumber}',
-        name: 'frontend.twint.waiting',
-        methods: ['GET']
-    )]
+
+    #[Route(path: '/payment/waiting/{orderNumber}', name: 'frontend.twint.waiting', methods: ['GET'])]
     public function showWaiting(Request $request, Context $context): Response
     {
         $orderNumber = $request->get('orderNumber');
-        try{
+        try {
             $orderNumber = $this->cryptoService->unHash($orderNumber);
             $criteria = new Criteria();
             $criteria->addFilter(new EqualsFilter('orderNumber', $orderNumber));
@@ -47,26 +52,33 @@ class PaymentController extends StorefrontController
                 ->addAssociation('addresses.country')
                 ->addAssociation('customFields');
             /** @var OrderEntity|null $order */
-            $order = $this->orderRepository->search($criteria, $context)->first();
-            if(empty($order)){
+            $order = $this->orderRepository->search($criteria, $context)
+                ->first();
+            if (empty($order)) {
                 throw OrderException::orderNotFound($orderNumber);
             }
-        }
-        catch(\Exception $e){
+        } catch (Exception $e) {
             $this->addFlash(self::DANGER, $this->trans('twintPayment.error.orderNotFound'));
             return $this->redirectToRoute('frontend.account.order.page');
         }
-        if($this->paymentService->isOrderPaid($order)){
+        if ($this->paymentService->isOrderPaid($order)) {
             $this->addFlash(self::SUCCESS, $this->trans('twintPayment.message.successPayment'));
-            return $this->redirectToRoute('frontend.checkout.finish.page', ['orderId' => $order->getId()]);
-        }
-        else if($this->paymentService->isCancelPaid($order)){
+            return $this->redirectToRoute('frontend.checkout.finish.page', [
+                'orderId' => $order->getId(),
+            ]);
+        } elseif ($this->paymentService->isCancelPaid($order)) {
             $this->addFlash(self::DANGER, $this->trans('twintPayment.message.cancelPayment'));
-            return $this->redirectToRoute('frontend.account.edit-order.page', ['orderId' => $order->getId(), 'error-code' => 'CHECKOUT__TWINT_PAYMENT_DECLINED',]);
+            return $this->redirectToRoute('frontend.account.edit-order.page', [
+                'orderId' => $order->getId(),
+                'error-code' => 'CHECKOUT__TWINT_PAYMENT_DECLINED',
+            ]);
         }
-        $twintApiResponse = json_decode($order->getCustomFields()[OrderCustomFieldInstaller::TWINT_API_RESPONSE_CUSTOM_FIELD] ?? '{}', true);
+        $twintApiResponse = json_decode(
+            $order->getCustomFields()[OrderCustomFieldInstaller::TWINT_API_RESPONSE_CUSTOM_FIELD] ?? '{}',
+            true
+        );
         $qrcode = '';
-        if($twintApiResponse){
+        if ($twintApiResponse) {
             $options = new QROptions(
                 [
                     'eccLevel' => QRCode::ECC_L,
@@ -80,9 +92,7 @@ class PaymentController extends StorefrontController
         return $this->renderStorefront('@TwintPayment/storefront/page/waiting.html.twig', [
             'orderNumber' => $orderNumber,
             'qrCode' => $qrcode,
-            'order' => $order
+            'order' => $order,
         ]);
     }
-
-
 }
