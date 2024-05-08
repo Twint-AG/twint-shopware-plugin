@@ -1,7 +1,15 @@
 {
     "twintPayment": {
         "error": {
-            "invalidPaymentError": "Das  %name% wurde aufgrund der fehlenden %currency%-Währung entfernt"
+            "invalidPaymentError": "Der %name% wurde aufgrund der fehlenden Währung %currency% entfernt",
+            "orderNotFound": "Die Bestellung konnte nicht gefunden werden"
+        },
+        "message": {
+            "successPayment": "Die Zahlung ist erfolgreich",
+            "cancelPayment": "Die Zahlung wurde storniert"
+        },
+        "waitingPage" : {
+            "headline": "Bitte scannen Sie zur Bezahlung der Bestellung : %orderNumber% den QR-Code mit der Twint App"
         }
     }
 }

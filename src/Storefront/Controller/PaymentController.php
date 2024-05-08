@@ -53,12 +53,15 @@ class PaymentController extends StorefrontController
             }
         }
         catch(\Exception $e){
+            $this->addFlash(self::DANGER, $this->trans('twintPayment.error.orderNotFound'));
             return $this->redirectToRoute('frontend.account.order.page');
         }
         if($this->paymentService->isOrderPaid($order)){
+            $this->addFlash(self::SUCCESS, $this->trans('twintPayment.message.successPayment'));
             return $this->redirectToRoute('frontend.checkout.finish.page', ['orderId' => $order->getId()]);
         }
         else if($this->paymentService->isCancelPaid($order)){
+            $this->addFlash(self::DANGER, $this->trans('twintPayment.message.cancelPayment'));
             return $this->redirectToRoute('frontend.account.edit-order.page', ['orderId' => $order->getId(), 'error-code' => 'CHECKOUT__TWINT_PAYMENT_DECLINED',]);
         }
         $twintApiResponse = json_decode($order->getCustomFields()[OrderCustomFieldInstaller::TWINT_API_RESPONSE_CUSTOM_FIELD] ?? '{}', true);

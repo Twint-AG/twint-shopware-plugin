@@ -37,8 +37,10 @@
 
                     {% block page_checkout_additional %}
                         <div style="text-align:center">
-                            <h2>Please use the Twint app to scan the QR code for pay the : {{ orderNumber }} order</h2>
-                            <img src="{{ qrCode }}" style="width:40%;align:auto" alt="QR Code"/>
+                            <h2>{{ "twintPayment.waitingPage.headline"|trans({'%orderNumber%': orderNumber}) }}</h2>
+                            {% if qrCode %}
+                                <img src="{{ qrCode }}" style="width:40%;align:auto" alt="QR-Code"/>
+                            {% endif %}
                         </div>
                     {% endblock %}
 
