@@ -60,13 +60,4 @@
             <defaultValue>["PDP", "PLP", "CART"]</defaultValue>
         </input-field>
     </card>
-    <card>
-        <title>Cronjob/Command Configuration</title>
-        <input-field type="int">
-            <name>onlyPickOrderFromMinutes</name>
-            <label>Only pick orders from last this minutes</label>
-            <label lang="de-DE">Wählen Sie nur Bestellungen der letzten Minute aus</label>
-            <defaultValue>10</defaultValue>
-        </input-field>
-    </card>
 </config>

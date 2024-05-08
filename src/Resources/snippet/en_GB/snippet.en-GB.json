@@ -1,7 +1,15 @@
 {
     "twintPayment": {
         "error": {
-            "invalidPaymentError": "The  %name%  got removed due the missing %currency% currency"
+            "invalidPaymentError": "The  %name%  got removed due the missing %currency% currency",
+            "orderNotFound": "The order is not found"
+        },
+        "message": {
+            "successPayment": "The payment is successfully",
+            "cancelPayment": "The payment got cancel"
+        },
+        "waitingPage" : {
+            "headline": "Please use the Twint app to scan the QR code for pay the : %orderNumber% order"
         }
     }
 }

@@ -22,6 +22,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Pricing\CashRoundingConfig;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
+use Shopware\Core\Framework\Test\TestCaseBase\KernelLifecycleManager;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -29,6 +30,11 @@ use Shopware\Core\System\SalesChannel\SalesChannelDefinition;
 use Shopware\Core\System\StateMachine\Loader\InitialStateIdLoader;
 use Shopware\Core\Test\Integration\PaymentHandler\SyncTestPaymentHandler;
 use Shopware\Core\Test\TestDefaults;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
+
 
 trait ServicesTrait
 {
@@ -102,10 +108,11 @@ trait ServicesTrait
     /**
      * @param string $customerId
      * @param Context $context
+     * @param array $customFields
      * @return OrderEntity
      * @throws \JsonException
      */
-    private function createOrder(string $customerId, Context $context): OrderEntity
+    private function createOrder(string $customerId, Context $context, array $customFields): OrderEntity
     {
         /** @var EntityRepository $orderRepository */
         $orderRepository = $this->getContainer()->get(\sprintf('%s.repository', OrderDefinition::ENTITY_NAME));
@@ -159,9 +166,7 @@ trait ServicesTrait
                     'priceDefinition' => new QuantityPriceDefinition(200, new TaxRuleCollection(), 2),
                 ],
             ],
-            'customFields' => [
-                'twint_api_response' => '{"id":"40684cd7-66a0-4118-92e0-5b06b5459f59","status":"IN_PROGRESS","transactionStatus":"ORDER_RECEIVED","pairingToken":"74562","merchantTransactionReference":"10095"}'
-            ],
+            'customFields' => $customFields,
             'deliveries' => [
             ],
             'context' => '{}',
