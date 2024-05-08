@@ -10,7 +10,6 @@ use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -18,6 +17,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
+use Twint\Core\Setting\Settings;
 use Twint\Core\Util\CryptoHandler;
 use Twint\Sdk\Certificate\CertificateContainer;
 use Twint\Sdk\Certificate\PemCertificate;
@@ -113,7 +113,7 @@ class PaymentService
             throw PaymentException::asyncProcessInterrupted($transaction->getOrderTransaction()->getId(),'Missing order or currency' . PHP_EOL);
         }
         $currency = $order->getCurrency()->getIsoCode();
-        $client = $this->getApiClient($order->getSalesChannelId());
+        $client = $this->getApiClient($order->getSalesChannelId(), $transaction->getOrderTransaction()->getId());
         try {
             /**var non-empty-string $orderNumber**/
             $orderNumber = !empty($order->getOrderNumber()) ? $order->getOrderNumber() : $order->getId();
@@ -134,11 +134,12 @@ class PaymentService
     public function checkOrderStatus($order):?Order {
         try {
             $currency = $order->getCurrency()->getIsoCode();
+            $orderTransactionId = $order->getTransactions()->first()->getId() ?? $order->getId();
             $twintApiResponse = json_decode($order->getCustomFields()[OrderCustomFieldInstaller::TWINT_API_RESPONSE_CUSTOM_FIELD] ?? '{}', true);
             if(empty($twintApiResponse) || empty($twintApiResponse['id'])){
-                throw PaymentException::asyncProcessInterrupted($order->getId(),'Missing Twint response for this order:'. $order->getId() . PHP_EOL);
+                throw PaymentException::asyncProcessInterrupted($orderTransactionId, 'Missing Twint response for this order:'. $order->getId() . PHP_EOL);
             }
-            $client = $this->getApiClient($order->getSalesChannelId());
+            $client = $this->getApiClient($order->getSalesChannelId(), $orderTransactionId);
             /** @var Order * */
             $twintOrder = $client->monitorOrder(new OrderId(new Uuid($twintApiResponse['id'])));
             if($twintOrder->status()->equals(OrderStatus::SUCCESS())){
@@ -151,7 +152,7 @@ class PaymentService
             return $twintOrder;
         } catch (Exception $e) {
             throw PaymentException::asyncProcessInterrupted(
-                $order->getId(),
+                $orderTransactionId,
                 'An error occurred during the communication with external payment gateway' . PHP_EOL . $e->getMessage()
             );
         }
@@ -173,28 +174,26 @@ class PaymentService
      */
     public function getPendingOrders(): EntityCollection
     {
-        $onlyPickOrderFromMinutes = $this->settingService->getSetting()->getOnlyPickOrderFromMinutes();
+        $onlyPickOrderFromMinutes = Settings::ONLY_PICK_ORDERS_FROM_MINUTES;
         $paymentInProgressStateId = $this->getPaymentInProgressStateId();
         $criteria = new Criteria();
         $criteria->addFilter(
             new EqualsFilter('transactions.stateId', $paymentInProgressStateId)
         );
         $criteria->addFilter(new EqualsAnyFilter('order.transactions.paymentMethod.technicalName', [RegularPaymentMethod::TECHNICAL_NAME]));
-        if($onlyPickOrderFromMinutes > 0){
-            /** @var int $time */
-            $time = strtotime("-$onlyPickOrderFromMinutes minutes");
-            $time = date("Y-m-d H:i:s", $time);
-            $criteria->addFilter(
-                new MultiFilter(
-                    MultiFilter::CONNECTION_OR,
-                    [
-                        new RangeFilter('createdAt', [RangeFilter::GT => $time]),
-                        new RangeFilter('updatedAt', [RangeFilter::GT => $time])
-                    ]
-                )
+        /** @var int $time */
+        $time = strtotime("-$onlyPickOrderFromMinutes minutes");
+        $time = date("Y-m-d H:i:s", $time);
+        $criteria->addFilter(
+            new MultiFilter(
+                MultiFilter::CONNECTION_OR,
+                [
+                    new RangeFilter('createdAt', [RangeFilter::GT => $time]),
+                    new RangeFilter('updatedAt', [RangeFilter::GT => $time])
+                ]
+            )
 
-            );
-        }
+        );
         $criteria->addAssociation('currency');
         $criteria->addAssociation('transactions.paymentMethod');
         $criteria->addAssociation('customFields');
@@ -227,10 +226,11 @@ class PaymentService
 
     /**
      * @param string $salesChannelId
+     * @param string $orderTransactionId
      * @return Client
      * @throw PaymentException
      */
-    public function getApiClient($salesChannelId): Client
+    public function getApiClient(string $salesChannelId, string $orderTransactionId): Client
     {
         $setting = $this->settingService->getSetting($salesChannelId);
         $merchantId = $setting->getMerchantId();
@@ -238,14 +238,14 @@ class PaymentService
         $environment = $setting->isTestMode() ? Environment::TESTING() : Environment::PRODUCTION();
         if (empty($merchantId)) {
             throw PaymentException::asyncProcessInterrupted(
-                $salesChannelId,
+                $orderTransactionId,
                 'Missing merchantId for config' . PHP_EOL
             );
         }
         if (empty($certificate)) {
             throw PaymentException::asyncProcessInterrupted(
-                $salesChannelId,
-                'Missing certificate:' . $salesChannelId . PHP_EOL
+                $orderTransactionId,
+                'Missing certificate:'  . PHP_EOL
             );
         }
         try {
@@ -266,11 +266,11 @@ class PaymentService
                 return $client;
             }
             else{
-                throw PaymentException::asyncProcessInterrupted($salesChannelId, 'API is not available');
+                throw PaymentException::asyncProcessInterrupted($orderTransactionId, 'API is not available');
             }
 
         } catch (Exception $e) {
-            throw PaymentException::asyncProcessInterrupted($salesChannelId, $e->getMessage());
+            throw PaymentException::asyncProcessInterrupted($orderTransactionId, $e->getMessage());
         }
     }
     /**

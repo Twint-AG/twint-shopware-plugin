@@ -8,7 +8,8 @@
     "require": {
         "twint-ch/twint-sdk": "dev-develop",
         "chillerlan/php-qrcode": "4.3.4",
-        "ext-openssl": "*"
+        "ext-openssl": "*",
+        "symfony/browser-kit": "7.1.x-dev"
     },
     "repositories": [
         {
@@ -57,7 +58,8 @@
     },
     "config": {
         "allow-plugins": {
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
     }
 }

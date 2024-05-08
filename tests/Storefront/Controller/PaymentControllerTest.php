@@ -11,13 +11,14 @@ use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\Test\TestDefaults;
 use Twint\Tests\Helper\ServicesTrait;
-use Symfony\Component\HttpFoundation\Request;
+use Twint\Tests\Helper\StorefrontControllerTestBehaviour;
 use Twint\Storefront\Controller\PaymentController;
 use Twint\Core\Util\CryptoHandler;
 
 class PaymentControllerTest extends TestCase
 {
     use ServicesTrait;
+    use StorefrontControllerTestBehaviour;
 
     /**
      * @var PaymentController
@@ -37,38 +38,64 @@ class PaymentControllerTest extends TestCase
         /** @var SalesChannelContextFactory $contextFactory */
         $contextFactory = $this->getContainer()->get(SalesChannelContextFactory::class);
         $this->salesChannelContext = $contextFactory->create('', TestDefaults::SALES_CHANNEL);
-    }
 
-    public function testPaymentOutput(): void
-    {
-        $context = $this->salesChannelContext->getContext();
-        $customerId = $this->createCustomer();
-        $order = $this->createOrder($customerId, $context);
-        $orderNumber = !empty($order->getOrderNumber()) ? $order->getOrderNumber() : $order->getId();
-        $response = $this->paymentController->showWaiting(new Request([
-            'orderNumber' => $this->crytoService->hash($orderNumber)
-        ]), $context);
-        static::assertSame(200, $response->getStatusCode());
+    }
+    public function testValidOrder(): void{
+        $email = 'test@example.com';
+        $context = Context::createDefaultContext();
+        $customerId = $this->createCustomer('test@example.com');
+        $customFields = [
+            'twint_api_response' => '{"id":"40684cd7-66a0-4118-92e0-5b06b5459f59","status":"IN_PROGRESS","transactionStatus":"ORDER_RECEIVED","pairingToken":"74562","merchantTransactionReference":"10095"}'
+        ];
+        $order = $this->createOrder($customerId, $context, $customFields);
+        $order->setCustomFields([]);
+        $browser = $this->login($email);
+
+        $browser->request(
+            'GET',
+            '/payment/waiting/' . $this->crytoService->hash($order->getOrderNumber()),
+            []
+        );
+        //check QR code exist or not
+        static::assertStringContainsStringIgnoringCase('QR-Code', (string)$browser->getResponse()->getContent());
     }
     public function testInvalidOrder(): void
     {
-        $context = $this->salesChannelContext->getContext();
-        $response = $this->paymentController->showWaiting(new Request([
-            'orderNumber' => $this->crytoService->hash(Uuid::randomHex())
-        ]), $context);
+        $email = 'test@example.com';
+        $context = Context::createDefaultContext();
+        $customerId = $this->createCustomer('test@example.com');
+
+        $browser = $this->login($email);
+
+        $browser->request(
+            'GET',
+            '/payment/waiting/' . $this->crytoService->hash(Uuid::randomHex()),
+            []
+        );
+        $response = $browser->getResponse();
         static::assertSame(302, $response->getStatusCode());
     }
 
-    public function testRedirect(): void
+    /**
+     * @throws \JsonException
+     */
+    public function testOrderWithoutTwintResponse(): void
     {
+        $email = 'test@example.com';
         $context = Context::createDefaultContext();
-        $customerId = $this->createCustomer();
-        $order = $this->createOrder($customerId, $context);
+        $customerId = $this->createCustomer('test@example.com');
+        $customFields = [];
+        $order = $this->createOrder($customerId, $context, $customFields);
+        //remove twint response;
+        $order->setCustomFields([]);
+        $browser = $this->login($email);
 
-        $response = $this->paymentController->showWaiting(new Request([
-            'orderNumber' => $this->crytoService->hash($order->getOrderNumber())
-        ]), $context);
-
-        static::assertSame(301, $response->getStatusCode());
+        $browser->request(
+            'GET',
+            '/payment/waiting/' . $this->crytoService->hash($order->getOrderNumber()),
+            []
+        );
+        //check QR code exist or not
+        static::assertStringNotContainsStringIgnoringCase('QR-Code', (string)$browser->getResponse()->getContent());
     }
 }

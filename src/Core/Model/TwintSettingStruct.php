@@ -27,11 +27,6 @@ class TwintSettingStruct extends Struct
     protected $screens;
 
     /**
-     * @var int
-     */
-    protected $onlyPickOrderFromMinutes;
-
-    /**
      * @return string
      */
     public function getMerchantId(): string
@@ -112,25 +107,6 @@ class TwintSettingStruct extends Struct
     public function setScreens(array $screens): self
     {
         $this->screens = $screens;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getOnlyPickOrderFromMinutes(): int
-    {
-        return (int) $this->onlyPickOrderFromMinutes;
-    }
-
-    /**
-     * @param int $onlyPickOrderFromMinutes
-     *
-     * @return self
-     */
-    public function setOnlyPickOrderFromMinutes(int $onlyPickOrderFromMinutes): self
-    {
-        $this->onlyPickOrderFromMinutes = $onlyPickOrderFromMinutes;
         return $this;
     }
 }
