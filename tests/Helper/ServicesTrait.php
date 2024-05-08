@@ -31,10 +31,6 @@ use Shopware\Core\System\StateMachine\Loader\InitialStateIdLoader;
 use Shopware\Core\Test\Integration\PaymentHandler\SyncTestPaymentHandler;
 use Shopware\Core\Test\TestDefaults;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
-
 
 trait ServicesTrait
 {
@@ -282,5 +278,25 @@ trait ServicesTrait
         $ruleLoader->loadByToken($context, $context->getToken());
 
         return $context;
+    }
+    /**
+     * @param string $email
+     * @return KernelBrowser
+     */
+    private function login(string $email): KernelBrowser
+    {
+        $browser = KernelLifecycleManager::createBrowser($this->getKernel());
+        $browser->request(
+            'POST',
+            $_SERVER['APP_URL'] . '/account/login',
+            $this->tokenize('frontend.account.login', [
+                'username' => $email,
+                'password' => 'shopware',
+            ])
+        );
+        $response = $browser->getResponse();
+        static::assertSame(200, $response->getStatusCode(), $response->getContent());
+
+        return $browser;
     }
 }
