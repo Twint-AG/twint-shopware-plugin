@@ -1,24 +1,29 @@
 <?php
 declare(strict_types=1);
 
-
 namespace Twint\Tests\Storefront\Controller;
 
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\Log\Package;
+use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\Test\TestDefaults;
 use Twint\Tests\Helper\ServicesTrait;
-use Twint\Tests\Helper\StorefrontControllerTestBehaviour;
 use Twint\Storefront\Controller\PaymentController;
 use Twint\Core\Util\CryptoHandler;
+use Shopware\Storefront\Test\Controller\StorefrontControllerTestBehaviour;
 
+/**
+ * @internal
+ */
 class PaymentControllerTest extends TestCase
 {
     use ServicesTrait;
     use StorefrontControllerTestBehaviour;
+    use IntegrationTestBehaviour;
 
     /**
      * @var PaymentController
@@ -31,8 +36,17 @@ class PaymentControllerTest extends TestCase
 
     private SalesChannelContext $salesChannelContext;
 
+    /**
+     * @return string
+     */
+    static function getName()
+    {
+        return "PaymentControllerTest";
+    }
+
     protected function setUp(): void
     {
+        parent::setUp();
         $this->paymentController = $this->getContainer()->get(PaymentController::class);
         $this->crytoService = $this->getContainer()->get(CryptoHandler::class);
         /** @var SalesChannelContextFactory $contextFactory */
