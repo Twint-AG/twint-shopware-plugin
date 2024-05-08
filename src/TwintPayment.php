@@ -42,7 +42,7 @@ use function rtrim;
 use function sprintf;
 
 #[Package('checkout')]
-final class TwintPayment extends Plugin
+class TwintPayment extends Plugin
 {
     public const EXIT_CODE_SUCCESS = 0;
 

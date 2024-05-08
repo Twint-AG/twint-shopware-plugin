@@ -7,7 +7,7 @@ namespace Twint\FastCheckout\Model;
 use Shopware\Core\Framework\Struct\Struct;
 
 //TODO we need define the properties of the class need for the FastCheckoutButton
-final class FastCheckoutButton extends Struct
+class FastCheckoutButton extends Struct
 {
     private string $name;
 

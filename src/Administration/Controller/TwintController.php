@@ -18,7 +18,7 @@ use Twint\Core\Util\PemExtractor;
 #[Route(defaults: [
     '_routeScope' => ['api'],
 ])]
-final class TwintController extends AbstractController
+class TwintController extends AbstractController
 {
     private CryptoHandler $encryptor;
 

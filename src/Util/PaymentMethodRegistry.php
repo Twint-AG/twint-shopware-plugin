@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Twint\Util\Method\AbstractMethod;
 use Twint\Util\Method\RegularPaymentMethod;
 
-final class PaymentMethodRegistry
+class PaymentMethodRegistry
 {
     private const PAYMENT_METHODS = [RegularPaymentMethod::class];
 

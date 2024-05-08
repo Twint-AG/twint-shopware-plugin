@@ -6,7 +6,7 @@ namespace Twint\ScheduledTask;
 
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTask;
 
-final class OrderMonitorTask extends ScheduledTask
+class OrderMonitorTask extends ScheduledTask
 {
     public static function getTaskName(): string
     {

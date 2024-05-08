@@ -17,7 +17,7 @@ use Twint\Util\Method\AbstractMethod;
 use function array_map;
 use function preg_match;
 
-final class PaymentMethodInstaller
+class PaymentMethodInstaller
 {
     private EntityRepository $paymentMethodRepository;
 

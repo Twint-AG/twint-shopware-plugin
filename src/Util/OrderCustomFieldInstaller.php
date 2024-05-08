@@ -16,7 +16,7 @@ use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\CustomField\Aggregate\CustomFieldSet\CustomFieldSetEntity;
 use Shopware\Core\System\CustomField\CustomFieldTypes;
 
-final class OrderCustomFieldInstaller
+class OrderCustomFieldInstaller
 {
     public const TWINT_CUSTOM_FIELD_SET = 'twint_payment_custom_field_set';
 

@@ -14,7 +14,7 @@ use Twint\Core\Service\PaymentService;
 use Twint\Sdk\Value\Order;
 use Twint\TwintPayment;
 
-final class OrderMonitorCommand extends Command
+class OrderMonitorCommand extends Command
 {
     private PaymentService $paymentService;
 

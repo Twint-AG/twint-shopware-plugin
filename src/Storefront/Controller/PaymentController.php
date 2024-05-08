@@ -24,7 +24,7 @@ use Twint\Util\OrderCustomFieldInstaller;
 #[Route(defaults: [
     '_routeScope' => ['storefront'],
 ])]
-final class PaymentController extends StorefrontController
+class PaymentController extends StorefrontController
 {
     public function __construct(
         private EntityRepository $orderRepository,

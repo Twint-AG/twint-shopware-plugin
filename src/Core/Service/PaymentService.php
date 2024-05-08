@@ -37,7 +37,7 @@ use Twint\Sdk\Value\Version;
 use Twint\Util\Method\RegularPaymentMethod;
 use Twint\Util\OrderCustomFieldInstaller;
 
-final class PaymentService
+class PaymentService
 {
     private EntityRepository $orderRepository;
 

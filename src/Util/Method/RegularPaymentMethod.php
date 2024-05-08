@@ -6,7 +6,7 @@ namespace Twint\Util\Method;
 
 use Twint\Core\Handler\TwintRegularPaymentHandler;
 
-final class RegularPaymentMethod extends AbstractMethod
+class RegularPaymentMethod extends AbstractMethod
 {
     public const TECHNICAL_NAME = 'twint_checkout';
 

@@ -18,7 +18,7 @@ use Twint\Core\Util\CryptoHandler;
 use Twint\Sdk\Value\PairingToken;
 use Twint\Util\OrderCustomFieldInstaller;
 
-final class TwintRegularPaymentHandler implements AsynchronousPaymentHandlerInterface
+class TwintRegularPaymentHandler implements AsynchronousPaymentHandlerInterface
 {
     private OrderTransactionStateHandler $transactionStateHandler;
 

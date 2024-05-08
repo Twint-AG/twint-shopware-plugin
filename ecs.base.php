@@ -76,7 +76,6 @@ return static function (ECSConfig $ecsConfig): void {
     $ecsConfig->rules(
         [
             NoUnusedImportsFixer::class,
-            FinalClassFixer::class,
             OrderedImportsFixer::class,
             FullyQualifiedStrictTypesFixer::class,
             GlobalNamespaceImportFixer::class,

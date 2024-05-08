@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Twint\Core\Setting;
 
-final class Settings
+class Settings
 {
     public const ENVIRONMENT_PROD = false;
 

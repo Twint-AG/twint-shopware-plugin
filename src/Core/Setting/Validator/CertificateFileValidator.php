@@ -6,7 +6,7 @@ namespace Twint\Core\Setting\Validator;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-final class CertificateFileValidator
+class CertificateFileValidator
 {
     public const ALLOWED_EXTENSIONS = ['.p12'];
 

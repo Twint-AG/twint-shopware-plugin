@@ -8,7 +8,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Log\Package;
 
 #[Package('checkout')]
-final class Installer
+class Installer
 {
     public function __construct(
         private readonly PaymentMethodInstaller $paymentMethodInstaller,
