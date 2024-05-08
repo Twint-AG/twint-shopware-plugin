@@ -7,7 +7,7 @@ namespace Twint\Core\Util;
 use InvalidArgumentException;
 use RuntimeException;
 
-final class CryptoHandler
+class CryptoHandler
 {
     public const CIPHERING = 'AES-128-CBC';
 

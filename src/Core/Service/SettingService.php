@@ -11,7 +11,7 @@ use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Twint\Core\Model\TwintSettingStruct;
 use Twint\Core\Setting\Settings;
 
-final class SettingService
+class SettingService
 {
     public const SYSTEM_CONFIG_DOMAIN = Settings::PREFIX;
 

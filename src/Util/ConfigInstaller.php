@@ -12,7 +12,7 @@ use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Twint\Core\Setting\Settings;
 use function array_map;
 
-final class ConfigInstaller
+class ConfigInstaller
 {
     public function __construct(
         private readonly EntityRepository $systemConfigRepository,

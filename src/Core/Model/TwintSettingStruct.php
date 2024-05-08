@@ -6,7 +6,7 @@ namespace Twint\Core\Model;
 
 use Shopware\Core\Framework\Struct\Struct;
 
-final class TwintSettingStruct extends Struct
+class TwintSettingStruct extends Struct
 {
     /**
      * @var string

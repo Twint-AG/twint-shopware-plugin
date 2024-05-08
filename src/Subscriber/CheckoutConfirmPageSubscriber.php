@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twint\Sdk\Value\Money;
 
-final class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
+class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
 {
     private TranslatorInterface $translator;
 

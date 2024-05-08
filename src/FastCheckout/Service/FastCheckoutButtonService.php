@@ -11,7 +11,7 @@ use Twint\Core\Setting\Settings;
 use Twint\FastCheckout\Model\FastCheckoutButton;
 use Twint\FastCheckout\Util\PaymentMethodUtil;
 
-final class FastCheckoutButtonService
+class FastCheckoutButtonService
 {
     public function __construct(
         private readonly PaymentMethodUtil $paymentMethodUtil,

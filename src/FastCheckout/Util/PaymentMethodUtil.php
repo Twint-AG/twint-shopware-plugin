@@ -11,7 +11,7 @@ use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Twint\Core\Handler\TwintRegularPaymentHandler;
 
-final class PaymentMethodUtil
+class PaymentMethodUtil
 {
     private ?array $salesChannels = null;
 

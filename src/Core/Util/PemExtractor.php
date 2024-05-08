@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Twint\Core\Util;
 
-final class PemExtractor
+class PemExtractor
 {
     public const ISSUER_COUNTRIES = ['CH'];
 

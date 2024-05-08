@@ -14,7 +14,7 @@ use Twint\Core\Setting\Settings;
 use Twint\FastCheckout\Model\FastCheckoutButton;
 use Twint\FastCheckout\Service\FastCheckoutButtonService;
 
-final class ProductPageLoadedSubscriber implements EventSubscriberInterface
+class ProductPageLoadedSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly FastCheckoutButtonService $service

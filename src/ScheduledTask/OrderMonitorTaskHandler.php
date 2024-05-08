@@ -11,7 +11,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 use Twint\Core\Service\PaymentService;
 
-final class OrderMonitorTaskHandler extends ScheduledTaskHandler
+class OrderMonitorTaskHandler extends ScheduledTaskHandler
 {
     private PaymentService $paymentService;
 

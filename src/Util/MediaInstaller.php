@@ -20,7 +20,7 @@ use function pathinfo;
 use function sprintf;
 use const PATHINFO_EXTENSION;
 
-final class MediaInstaller
+class MediaInstaller
 {
     private const RESOURCES_ICONS = 'Resources/icons';
 
