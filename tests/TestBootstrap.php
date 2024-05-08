@@ -2,7 +2,18 @@
 
 use Shopware\Core\TestBootstrapper;
 
-$projectRoot = $_SERVER['PROJECT_ROOT'] ?? dirname(__DIR__, 4);
+$paths = [
+    $_SERVER['PROJECT_ROOT'] ?? dirname(__DIR__, 4), //gitlab ci
+    $_SERVER['PROJECT_ROOT'] ?? dirname(__DIR__, 2) . '/html' //local
+];
+
+$projectRoot = '';
+foreach ($paths as $path) {
+    if (file_exists($path . '/vendor/autoload.php')) {
+        $projectRoot = $path;
+        break;
+    }
+}
 
 $moduleAutoloader = __DIR__ . '/../vendor/autoload.php';
 if (!file_exists($moduleAutoloader)) {
