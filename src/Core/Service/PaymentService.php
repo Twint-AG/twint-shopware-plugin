@@ -196,7 +196,7 @@ class PaymentService
             ->getEntities();
     }
 
-    private function getPaymentInProgressStateId(): string
+    public function getPaymentInProgressStateId(): string
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('technicalName', OrderTransactionStates::STATE_MACHINE));
