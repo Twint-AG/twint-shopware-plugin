@@ -21,6 +21,8 @@ test:
   stage: check
   parallel:
     matrix:
+      - SHOPWARE_VERSION: [ "v6.5.7.3" ]
+        PHP_VERSION: [ "8.1", "8.2" ]
       - SHOPWARE_VERSION: [ "v6.5.7.3", "v6.5.8.9" ]
         PHP_VERSION: [ "8.1", "8.2", "8.3" ]
       - SHOPWARE_VERSION: [ "v6.6.0.0", "v6.6.2.0" ]
