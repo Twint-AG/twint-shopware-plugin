@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Twint\Util;
 
@@ -10,10 +12,9 @@ class Installer
 {
     public function __construct(
         private readonly PaymentMethodInstaller $paymentMethodInstaller,
-        private readonly ConfigInstaller        $configInstaller,
+        private readonly ConfigInstaller $configInstaller,
         private readonly OrderCustomFieldInstaller $orderCustomFieldInstaller
-    )
-    {
+    ) {
     }
 
     public function install(Context $context): void

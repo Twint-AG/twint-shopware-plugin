@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Twint\Administration\Controller;
 
@@ -9,15 +11,18 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Twint\Core\Util\CryptoHandler;
 use Twint\Core\Util\PemExtractor;
 
 #[Package('checkout')]
-#[Route(defaults: ['_routeScope' => ['api']])]
+#[Route(defaults: [
+    '_routeScope' => ['api'],
+])]
 class TwintController extends AbstractController
 {
-    private $encryptor;
+    private CryptoHandler $encryptor;
 
-    public function setEncryptor($encryptor)
+    public function setEncryptor(CryptoHandler $encryptor): void
     {
         $this->encryptor = $encryptor;
     }
@@ -32,25 +37,28 @@ class TwintController extends AbstractController
             $content = file_get_contents($file->getPathname());
 
             $extractor = new PemExtractor();
-            $certificate = $extractor->extractFromPKCS12($content, $password);
+            $certificate = $extractor->extractFromPKCS12((string) $content, $password);
             if (is_array($certificate)) {
                 return $this->json([
                     'success' => true,
                     'message' => 'Extract certificate successfully',
                     'data' => [
-                        'cert' => $this->encryptor->encrypt($certificate['cert']),
+                        'cert' => $this->encryptor->setPassphraseForPemCertificate($certificate['cert']),
                         'pkey' => $this->encryptor->encrypt($certificate['pkey']),
-                    ]
-                ], 200);
+                    ],
+                ]);
             }
 
             return $this->json([
                 'success' => false,
                 'message' => 'Invalid certificate file',
-                'errorCode' => $certificate
+                'errorCode' => $certificate,
             ], 400);
         }
 
-        return $this->json(['success' => false, 'message' => 'Please upload an valid file'], 400);
+        return $this->json([
+            'success' => false,
+            'message' => 'Please upload an valid file',
+        ], 400);
     }
 }
