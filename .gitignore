@@ -6,3 +6,7 @@
 **/vendor
 **/public/static
 **/dist/**
+build/
+
+phpunit.clover.xml
+phpunit.junit.xml

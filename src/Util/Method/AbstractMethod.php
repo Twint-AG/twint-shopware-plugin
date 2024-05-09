@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Twint\Util\Method;
 
@@ -6,6 +8,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class AbstractMethod
 {
+    /**
+     * @var ContainerInterface
+     */
+    public $container;
+
     /**
      * @internal
      */

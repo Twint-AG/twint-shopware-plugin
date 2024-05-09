@@ -1,19 +1,24 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Twint\FastCheckout\Subscriber;
 
 use Shopware\Storefront\Page\Checkout\Cart\CheckoutCartPageLoadedEvent;
 use Shopware\Storefront\Page\Checkout\Offcanvas\OffcanvasCartPageLoadedEvent;
 use Shopware\Storefront\Page\Navigation\NavigationPageLoadedEvent;
+use Shopware\Storefront\Page\PageLoadedEvent;
 use Shopware\Storefront\Page\Product\ProductPageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Twint\Core\Setting\Settings;
+use Twint\FastCheckout\Model\FastCheckoutButton;
 use Twint\FastCheckout\Service\FastCheckoutButtonService;
 
 class ProductPageLoadedSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private readonly FastCheckoutButtonService $service)
-    {
+    public function __construct(
+        private readonly FastCheckoutButtonService $service
+    ) {
     }
 
     /**
@@ -44,18 +49,18 @@ class ProductPageLoadedSubscriber implements EventSubscriberInterface
         $this->addExtension($event, Settings::SCREENS_OPTIONS_CART_FLYOUT);
     }
 
-    public function onCheckoutCartPageLoaded(CheckoutCartPageLoadedEvent $event)
+    public function onCheckoutCartPageLoaded(CheckoutCartPageLoadedEvent $event): void
     {
         $this->addExtension($event, Settings::SCREENS_OPTIONS_CART);
     }
 
-    private function addExtension($event, string $screen)
+    private function addExtension(PageLoadedEvent $event, string $screen): void
     {
         $context = $event->getSalesChannelContext();
         $page = $event->getPage();
 
         $button = $this->service->getButton($context, $screen);
-        if ($button !== null) {
+        if ($button instanceof FastCheckoutButton) {
             $page->addExtension('TwintFastCheckoutButton', $button);
         }
     }

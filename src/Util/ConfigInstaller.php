@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Twint\Util;
 
@@ -13,10 +15,9 @@ use function array_map;
 class ConfigInstaller
 {
     public function __construct(
-        private readonly EntityRepository    $systemConfigRepository,
+        private readonly EntityRepository $systemConfigRepository,
         private readonly SystemConfigService $systemConfig
-    )
-    {
+    ) {
     }
 
     public function addDefaultConfiguration(): void
@@ -42,7 +43,9 @@ class ConfigInstaller
         $idSearchResult = $this->systemConfigRepository->searchIds($criteria, $context);
 
         $ids = array_map(static function ($id) {
-            return ['id' => $id];
+            return [
+                'id' => $id,
+            ];
         }, $idSearchResult->getIds());
 
         if ($ids === []) {

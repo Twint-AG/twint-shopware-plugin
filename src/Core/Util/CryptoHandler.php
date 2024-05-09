@@ -1,72 +1,159 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Twint\Core\Util;
 
+use InvalidArgumentException;
+use RuntimeException;
+
 class CryptoHandler
 {
-    const CIPHERING = "AES-128-CBC";
+    public const CIPHERING = 'AES-128-CBC';
 
-    public function __construct(private readonly string $key)
-    {
+    public function __construct(
+        private readonly string $key
+    ) {
     }
 
     /**
-     * @var false|int
-     */
-    private $iv_length;
-
-    /**
-     * @var false|string
-     */
-    private $encryption_key;
-
-    /**
-     * @param string $data
-     * @return string
+     * Encrypts the given data using OpenSSL.
+     *
+     * @param string $data The data to be encrypted.
+     * @throws InvalidArgumentException If the encryption fails.
+     * @return string The encrypted data, base64 encoded.
      */
     public function encrypt(string $data): string
     {
         $ivLen = openssl_cipher_iv_length(self::CIPHERING);
-        $iv = openssl_random_pseudo_bytes($ivLen);
-        $ciphertext_raw = openssl_encrypt($data, self::CIPHERING, $this->key, $options = OPENSSL_RAW_DATA, $iv);
-        $hmac = hash_hmac('sha256', $ciphertext_raw, $this->key, $as_binary = true);
+        if ($ivLen === false) {
+            throw new InvalidArgumentException('Invalid cipher algorithm.');
+        }
 
-        return base64_encode($iv . $hmac . $ciphertext_raw);
+        $iv = openssl_random_pseudo_bytes($ivLen);
+        if ($iv === '' || $iv === '0') {
+            throw new InvalidArgumentException('Failed to generate initialization vector.');
+        }
+
+        $ciphertextRaw = openssl_encrypt($data, self::CIPHERING, $this->key, OPENSSL_RAW_DATA, $iv);
+        if ($ciphertextRaw === false) {
+            throw new InvalidArgumentException('Encryption failed.');
+        }
+
+        $hmac = hash_hmac('sha256', $ciphertextRaw, $this->key, true);
+        if ($hmac === '0') {
+            throw new InvalidArgumentException('Failed to compute HMAC.');
+        }
+
+        return base64_encode($iv . $hmac . $ciphertextRaw);
     }
 
     /**
-     * @param string $encodedData
-     * @return string
+     * Decrypts the given encoded data.
+     *
+     * @param string $encodedData The encoded data to be decrypted.
+     * @throws InvalidArgumentException If the input data is invalid or cannot be decrypted.
+     * @return string The decrypted data.
      */
     public function decrypt(string $encodedData): string
     {
-        $c = base64_decode($encodedData);
-        $ivLen = openssl_cipher_iv_length(self::CIPHERING);
-        $iv = substr($c, 0, $ivLen);
-        $hmac = substr($c, $ivLen, $sha2len = 32);
-        $ciphertext_raw = substr($c, $ivLen + $sha2len);
+        $c = base64_decode($encodedData, true);
+        if ($c === false) {
+            throw new InvalidArgumentException('Invalid base64 encoded data.');
+        }
 
-        return (string)openssl_decrypt($ciphertext_raw, self::CIPHERING, $this->key, $options = OPENSSL_RAW_DATA, $iv);
+        $ivLen = openssl_cipher_iv_length(self::CIPHERING);
+        if ($ivLen === false) {
+            throw new InvalidArgumentException('Invalid cipher algorithm.');
+        }
+
+        $iv = substr($c, 0, $ivLen);
+
+        // Assuming $sha2len is a constant, replace it with the actual value
+        $hmacLen = 32; // Replace 32 with the actual length of the HMAC
+        $ciphertextOffset = $ivLen + $hmacLen;
+
+        $ciphertextRaw = substr($c, $ciphertextOffset);
+        if ($ciphertextRaw === '' || $ciphertextRaw === '0') {
+            throw new InvalidArgumentException('Invalid ciphertext data.');
+        }
+
+        $decryptedData = openssl_decrypt($ciphertextRaw, self::CIPHERING, $this->key, OPENSSL_RAW_DATA, $iv);
+        if ($decryptedData === false) {
+            throw new InvalidArgumentException('Failed to decrypt the data.');
+        }
+
+        $expectedHmac = hash_hmac('sha256', $ciphertextRaw, $this->key, true);
+        if ($expectedHmac === '0') {
+            throw new InvalidArgumentException('Failed to compute HMAC for verification.');
+        }
+
+        $hmac = substr($c, $ivLen, $hmacLen);
+        if (!hash_equals($hmac, $expectedHmac)) {
+            throw new InvalidArgumentException('HMAC verification failed. The data may have been tampered with.');
+        }
+
+        return $decryptedData;
     }
 
     /**
-     * @param string $data
-     * @return string
+     * Converts a string to a hexadecimal representation and encodes it as a base64 string.
+     *
+     * @param string $data The input string to be hashed.
+     * @return string The base64-encoded hexadecimal representation of the input string.
      */
     public function hash(string $data): string
     {
         $hexString = unpack('H*', $data);
+        if ($hexString === false) {
+            throw new InvalidArgumentException('Failed to convert input data to hexadecimal.');
+        }
+
         $hex = array_shift($hexString);
+        if ($hex === null) {
+            throw new RuntimeException('Unexpected error: Failed to extract hexadecimal string.');
+        }
 
         return base64_encode($hex);
     }
 
     /**
-     * @param string $encodedData
-     * @return string
+     * Decodes a base64-encoded hexadecimal string into its original string representation.
+     *
+     * @param string $encodedData The base64-encoded hexadecimal string to be decoded.
+     * @throws InvalidArgumentException If the input data is not a valid base64-encoded hexadecimal string.
+     * @return string The original string representation of the encoded data.
      */
     public function unHash(string $encodedData): string
     {
-        return hex2bin(base64_decode($encodedData));
+        $hex = base64_decode($encodedData, true);
+        if ($hex === false) {
+            throw new InvalidArgumentException('Invalid base64-encoded hexadecimal string.');
+        }
+
+        $decodedData = hex2bin($hex);
+        if ($decodedData === false) {
+            throw new InvalidArgumentException('Failed to decode the hexadecimal string.');
+        }
+
+        return $decodedData;
+    }
+
+    public function setPassphraseForPemCertificate(string $cert): array
+    {
+        $ivLen = openssl_cipher_iv_length(self::CIPHERING);
+        if ($ivLen === false) {
+            throw new InvalidArgumentException('Invalid cipher algorithm.');
+        }
+
+        $iv = openssl_random_pseudo_bytes($ivLen);
+
+        $passphrase = openssl_random_pseudo_bytes(16);
+        $encryptedPem = openssl_encrypt($cert, 'aes256', $passphrase, 0, $iv);
+
+        return [
+            'passphrase' => $this->encrypt($passphrase),
+            'encryptedPem' => $encryptedPem,
+        ];
     }
 }
