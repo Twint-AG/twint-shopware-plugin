@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Twint\Tests\Helper;
 
+
 use Shopware\Core\Checkout\Cart\CartRuleLoader;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
@@ -11,6 +12,8 @@ use Shopware\Core\Checkout\Cart\Price\Struct\QuantityPriceDefinition;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerGroup\CustomerGroupDefinition;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionDefinition;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\OrderStates;
@@ -24,13 +27,20 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Test\TestCaseBase\KernelLifecycleManager;
 use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\PlatformRequest;
+use Shopware\Core\SalesChannelRequest;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SalesChannel\SalesChannelDefinition;
+use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\Loader\InitialStateIdLoader;
+use Shopware\Core\System\StateMachine\StateMachineRegistry;
+use Shopware\Core\System\StateMachine\Transition;
 use Shopware\Core\Test\Integration\PaymentHandler\SyncTestPaymentHandler;
 use Shopware\Core\Test\TestDefaults;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Shopware\Storefront\Framework\Routing\RequestTransformer;
+use Symfony\Component\HttpFoundation\Request;
 
 trait ServicesTrait
 {
@@ -116,6 +126,7 @@ trait ServicesTrait
         /** @var InitialStateIdLoader $initialStateIdLoader */
         $initialStateIdLoader = $this->getContainer()->get(InitialStateIdLoader::class);
         $stateId = $initialStateIdLoader->get(OrderStates::STATE_MACHINE);
+        $transactionStateId = $initialStateIdLoader->get(OrderTransactionStates::STATE_MACHINE);
         $billingAddressId = Uuid::randomHex();
 
         $order = [
@@ -162,16 +173,44 @@ trait ServicesTrait
                     'priceDefinition' => new QuantityPriceDefinition(200, new TaxRuleCollection(), 2),
                 ],
             ],
+            "transactions" => [
+                [
+                    "paymentMethodId" => $this->getValidPaymentMethodId(),
+                    "amount" =>  [
+                        "unitPrice" => 13.98,
+                        "totalPrice" => 13.98,
+                        "quantity" => 1,
+                        "calculatedTaxes" => [
+                            [
+                                "tax" => 0,
+                                "taxRate" => 0,
+                                "price" => 0
+                            ]
+                        ],
+                        "taxRules" => [
+                            [
+                                "taxRate" => 0,
+                                "percentage" => 100
+                            ]
+                        ]
+                    ],
+                    "stateId" => $transactionStateId
+                ]
+            ],
             'customFields' => $customFields,
             'deliveries' => [
             ],
             'context' => '{}',
             'payload' => '{}',
+            'createdAt' => new \DateTime(),
+            'updatedAt' => new \DateTime(),
         ];
 
         $orderRepository->upsert([$order], $context);
+        $criteria = new Criteria([$orderId]);
+        $criteria->addAssociation('transactions');
         /** @var OrderEntity|null $order */
-        $order = $orderRepository->search(new Criteria([$orderId]), $context)->first();
+        $order = $orderRepository->search($criteria, $context)->first();
         if($order instanceof OrderEntity){
             return $order;
         }
@@ -298,5 +337,50 @@ trait ServicesTrait
         static::assertSame(200, $response->getStatusCode(), $response->getContent());
 
         return $browser;
+    }
+    /**
+     * @param array<string, mixed> $params
+     */
+    private function createRequest(string $route, array $params = []): Request
+    {
+        $request = new Request();
+        $request->query->add($params);
+        $request->setSession($this->getSession());
+        $request->headers->set('HOST', 'localhost');
+        $request->attributes->add([
+            '_route' => $route,
+            SalesChannelRequest::ATTRIBUTE_IS_SALES_CHANNEL_REQUEST => true,
+            PlatformRequest::ATTRIBUTE_SALES_CHANNEL_CONTEXT_OBJECT => $this->salesChannelContext,
+            RequestTransformer::STOREFRONT_URL => 'http://localhost',
+        ]);
+
+        return $request;
+    }
+    private function getOrderById($id): OrderEntity
+    {
+        /** @var EntityRepository $orderRepository */
+        $orderRepository = $this->getContainer()->get(\sprintf('%s.repository', OrderDefinition::ENTITY_NAME));
+        $criteria = new Criteria([$id]);
+        $criteria->addAssociation('orderCustomer.customer')
+            ->addAssociation('transactions')
+            ->addAssociation('transactions.stateMachineState')
+            ->addAssociation('customFields');
+        /** @var OrderEntity|null $order */
+        return $orderRepository->search($criteria, $this->context)->first();
+    }
+    public function transitionOrder(OrderEntity $order, string $action, Context $context): OrderEntity
+    {
+        $transactionId = $order->getTransactions()?->first()?->getId() ?? null;
+        $stateMachineRegistry = $this->getContainer()->get(StateMachineRegistry::class);
+        $stateMachineRegistry->transition(
+            new Transition(
+                OrderTransactionDefinition::ENTITY_NAME,
+                $transactionId,
+                $action,
+                'stateId'
+            ),
+            $context
+        );
+        return $this->getOrderById($order->getId());
     }
 }
