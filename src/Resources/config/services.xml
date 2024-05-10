@@ -43,9 +43,8 @@
             <argument type="service" id="order.repository"/>
             <argument type="service" id="state_machine.repository"/>
             <argument type="service" id="state_machine_state.repository"/>
-            <argument type="service" id="Twint\Core\Service\SettingService" />
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
-            <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
+            <argument type="service" id="Twint\Core\Factory\ClientBuilder"/>
         </service>
 
         <service id="Twint\Command\OrderMonitorCommand">
@@ -95,6 +94,11 @@
         <service id="Twint\FastCheckout\Subscriber\ProductPageLoadedSubscriber">
             <argument type="service" id="Twint\FastCheckout\Service\FastCheckoutButtonService" />
             <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Twint\Core\Factory\ClientBuilder">
+            <argument type="service" id="Twint\Core\Service\SettingService"/>
+            <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
         </service>
     </services>
 </container>
