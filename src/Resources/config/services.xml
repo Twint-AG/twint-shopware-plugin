@@ -11,6 +11,10 @@
             <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
             <tag name="shopware.payment.method.async"/>
         </service>
+
+        <service id="Twint\Core\Util\CredentialValidatorInterface" class="Twint\Core\Util\CredentialValidator">
+            <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
+        </service>
         
         <service id="Twint\Storefront\Controller\PaymentController" public="true">
             <argument type="service" id="order.repository"/>
@@ -69,6 +73,9 @@
             </call>
             <call method="setEncryptor">
                 <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
+            </call>
+            <call method="setValidator">
+                <argument type="service" id="Twint\Core\Util\CredentialValidatorInterface"/>
             </call>
             <tag name="controller.service_arguments"/>
         </service>

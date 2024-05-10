@@ -6,12 +6,12 @@
     <card>
         <title>Merchant configurations</title>
 
-        <component name="twint-merchant-id">
+        <input-field>
             <name>merchantId</name>
             <label>Merchant ID</label>
-            <defaultValue></defaultValue>
+            <required>true</required>
             <placeholder>xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx</placeholder>
-        </component>
+        </input-field>
 
         <input-field type="bool">
             <name>testMode</name>
