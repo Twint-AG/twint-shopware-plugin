@@ -19,54 +19,28 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
+use Twint\Core\Factory\ClientBuilder;
 use Twint\Core\Setting\Settings;
-use Twint\Core\Util\CryptoHandler;
-use Twint\Sdk\Certificate\CertificateContainer;
-use Twint\Sdk\Certificate\PemCertificate;
-use Twint\Sdk\Client;
-use Twint\Sdk\Io\InMemoryStream;
-use Twint\Sdk\Value\Environment;
-use Twint\Sdk\Value\MerchantId;
 use Twint\Sdk\Value\Money;
 use Twint\Sdk\Value\Order;
 use Twint\Sdk\Value\OrderId;
 use Twint\Sdk\Value\OrderStatus;
 use Twint\Sdk\Value\UnfiledMerchantTransactionReference;
 use Twint\Sdk\Value\Uuid;
-use Twint\Sdk\Value\Version;
 use Twint\Util\Method\RegularPaymentMethod;
 use Twint\Util\OrderCustomFieldInstaller;
 
 class PaymentService
 {
-    private EntityRepository $orderRepository;
-
-    private EntityRepository $stateMachineRepository;
-
-    private EntityRepository $stateMachineStateRepository;
-
-    private SettingService $settingService;
-
-    private OrderTransactionStateHandler $transactionStateHandler;
-
-    private CryptoHandler $cryptoService;
-
     private Context $context;
 
     public function __construct(
-        EntityRepository $orderRepository,
-        EntityRepository $stateMachineRepository,
-        EntityRepository $stateMachineStateRepository,
-        SettingService $settingService,
-        OrderTransactionStateHandler $transactionStateHandler,
-        CryptoHandler $cryptoService
+        private readonly EntityRepository $orderRepository,
+        private readonly EntityRepository $stateMachineRepository,
+        private readonly EntityRepository $stateMachineStateRepository,
+        private readonly OrderTransactionStateHandler $transactionStateHandler,
+        private readonly ClientBuilder $clientBuilder
     ) {
-        $this->orderRepository = $orderRepository;
-        $this->stateMachineRepository = $stateMachineRepository;
-        $this->stateMachineStateRepository = $stateMachineStateRepository;
-        $this->settingService = $settingService;
-        $this->transactionStateHandler = $transactionStateHandler;
-        $this->cryptoService = $cryptoService;
         $this->context = new Context(new SystemSource());
     }
 
@@ -82,7 +56,7 @@ class PaymentService
         }
         $currency = $order->getCurrency()
             ->getIsoCode();
-        $client = $this->getApiClient($order->getSalesChannelId(), $transaction->getOrderTransaction()->getId());
+        $client = $this->clientBuilder->build($order->getSalesChannelId());
         try {
             /**var non-empty-string $orderNumber**/
             $orderNumber = empty($order->getOrderNumber()) ? $order->getId() : $order->getOrderNumber();
@@ -128,7 +102,7 @@ class PaymentService
                     'Missing Twint response for this order:' . $order->getId() . PHP_EOL
                 );
             }
-            $client = $this->getApiClient($order->getSalesChannelId(), $referenceId);
+            $client = $this->clientBuilder->build($order->getSalesChannelId());
             /** @var Order * */
             $twintOrder = $client->monitorOrder(new OrderId(new Uuid($twintApiResponse['id'])));
 
@@ -219,50 +193,6 @@ class PaymentService
         return '';
     }
 
-    /**
-     * @throw PaymentException
-     */
-    public function getApiClient(string $salesChannelId, string $orderTransactionId): Client
-    {
-        $setting = $this->settingService->getSetting($salesChannelId);
-        $merchantId = $setting->getMerchantId();
-        $certificate = $setting->getCertificate();
-        $environment = $setting->isTestMode() ? Environment::TESTING() : Environment::PRODUCTION();
-        if ($merchantId === '' || $merchantId === '0') {
-            throw PaymentException::asyncProcessInterrupted(
-                $orderTransactionId,
-                'Missing merchantId for config' . PHP_EOL
-            );
-        }
-        if ($certificate === []) {
-            throw PaymentException::asyncProcessInterrupted($orderTransactionId, 'Missing certificate:' . PHP_EOL);
-        }
-        try {
-            $pemContent = ($certificate['cert']['encryptedPem'] ?? '') . $this->cryptoService->decrypt(
-                $certificate['pkey'] ?? ''
-            );
-
-            $passphrase = $this->cryptoService->decrypt($certificate['cert']['passphrase'] ?? '');
-            if ($passphrase === '' || $pemContent === '') {
-                throw new Exception('Missing certification/passphrase for certificate');
-            }
-            $client = new Client(
-                CertificateContainer::fromPem(new PemCertificate(new InMemoryStream($pemContent), $passphrase)),
-                MerchantId::fromString($merchantId),
-                Version::latest(),
-                $environment,
-            );
-            $status = $client->checkSystemStatus();
-            if ($status->isOk()) {
-                return $client;
-            }
-
-            throw PaymentException::asyncProcessInterrupted($orderTransactionId, 'API is not available');
-        } catch (Exception $e) {
-            throw PaymentException::asyncProcessInterrupted($orderTransactionId, $e->getMessage());
-        }
-    }
-
     public function isOrderPaid(OrderEntity $order): bool
     {
         $transactions = $order->getTransactions();
@@ -300,6 +230,7 @@ class PaymentService
         if ($stateMachineState === null) {
             return false;
         }
+
         return $stateMachineState->getTechnicalName() === OrderTransactionStates::STATE_CANCELLED;
     }
 }
