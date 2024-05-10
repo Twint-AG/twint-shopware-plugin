@@ -35,6 +35,7 @@
     ],
     "extra": {
         "shopware-plugin-class": "Twint\\TwintPayment",
+        "plugin-icon": "src/Resources/public/plugin.png",
         "copyright": "(c) by Twint 2024 (c) by NFQ",
         "label": {
             "de-DE": "TBU - Twint Payment",

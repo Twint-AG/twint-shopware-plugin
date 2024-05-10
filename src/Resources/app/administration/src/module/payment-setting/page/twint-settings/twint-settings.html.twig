@@ -1,0 +1,55 @@
+{% block twint_payment %}
+    <sw-page class="twint-payment">
+        {% block twint_payment_header %}
+            <template #smart-bar-header>
+                <h2>
+                    {{ $tc('sw-settings.index.title') }}
+                    <sw-icon name="regular-chevron-right-xs" small></sw-icon>
+                    {{ $tc('twint.title') }}
+                </h2>
+            </template>
+        {% endblock %}
+
+        {% block twint_payment_actions %}
+            <template #smart-bar-actions>
+                {% block twint_payment_settings_actions_test %}
+                    <sw-button-process @click="onTest"
+                                       :isLoading="isTesting"
+                                       :processSuccess="isTestSuccessful"
+                                       :disabled="isLoading">
+                        {{ $tc('twint.settings.test') }}
+                    </sw-button-process>
+                {% endblock %}
+
+                {% block twint_payment_settings_actions_save %}
+                    <sw-button-process
+                            class="sw-settings-login-registration__save-action"
+                            :isLoading="isLoading"
+                            :processSuccess="isSaveSuccessful"
+                            :disabled="isLoading || isTesting || !isTestSuccessful"
+                            variant="primary"
+                            @process-finish="saveFinish"
+                            @click="onSave">
+                        {{ $tc('twint.settings.save') }}
+                    </sw-button-process>
+                {% endblock %}
+            </template>
+        {% endblock %}
+
+        {% block twint_payment_settings_content %}
+            <template #content>
+                <sw-card-view>
+                    <sw-system-config
+                            class="twint-config__wrapper"
+                            ref="systemConfig"
+                            sales-channel-switchable
+                            inherit
+                            domain="TwintPayment.settings"
+                            @config-changed="onChanged"
+                    >
+                    </sw-system-config>
+                </sw-card-view>
+            </template>
+        {% endblock %}
+    </sw-page>
+{% endblock %}
