@@ -5,9 +5,7 @@
 
     {% block twint_buy_button %}
         {% if fastButton is defined and fastButton %}
-            <button class="btn btn-secondary w-100" title="{{ fastButton.getName() }}" aria-label="{{ fastButton.getName() }}">
-                {{ fastButton.getName() }}
-            </button>
+            {{ include('@TwintPayment/storefront/component/button/fast-checkout-button.html.twig') }}
         {% endif %}
     {% endblock %}
 
