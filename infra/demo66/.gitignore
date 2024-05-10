@@ -26,3 +26,4 @@ custom/plugins/SwagPayPal/
 /phpunit.xml
 .phpunit.result.cache
 ###< phpunit/phpunit ###
+composer.lock

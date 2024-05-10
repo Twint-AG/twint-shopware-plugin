@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Twint\Core\Util\CertificateHandler;
+use Twint\Core\Util\CredentialValidatorInterface;
 use Twint\Core\Util\CryptoHandler;
 use Twint\Sdk\Certificate\Pkcs12Certificate;
 
@@ -23,9 +24,16 @@ class TwintController extends AbstractController
 {
     private CryptoHandler $encryptor;
 
+    private CredentialValidatorInterface $validator;
+
     public function setEncryptor(CryptoHandler $encryptor): void
     {
         $this->encryptor = $encryptor;
+    }
+
+    public function setValidator(CredentialValidatorInterface $validator): void
+    {
+        $this->validator = $validator;
     }
 
     #[Route(path: '/api/_actions/twint/extract-pem', name: 'api.action.twint.extract_pem', methods: ['POST'])]
@@ -62,5 +70,23 @@ class TwintController extends AbstractController
             'success' => false,
             'message' => 'Please upload an valid file',
         ], 400);
+    }
+
+    #[Route(
+        path: '/api/_actions/twint/validate-api-credential',
+        name: 'api.action.twint.validate_credential',
+        methods: ['POST']
+    )]
+    public function validate(Request $request, Context $context): Response
+    {
+        $certificate = $request->get('cert') ?? [];
+        $merchantId = $request->get('merchantId') ?? '';
+        $testMode = $request->get('testMode') ?? false;
+
+        $valid = $this->validator->validate($certificate, $merchantId, $testMode);
+
+        return $this->json([
+            'success' => $valid,
+        ]);
     }
 }
