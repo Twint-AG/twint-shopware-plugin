@@ -81,6 +81,7 @@
     }
   },
   "require-dev": {
+    "shopware/dev-tools": "^1.3",
     "symfony/stopwatch": "^7.0",
     "symfony/web-profiler-bundle": "^7.0"
   }

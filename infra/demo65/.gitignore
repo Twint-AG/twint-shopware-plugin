@@ -22,3 +22,8 @@ files/asset-manifest.json
 
 custom/plugins/SwagPayPal
 compose.override.yaml
+
+###> phpunit/phpunit ###
+/phpunit.xml
+.phpunit.result.cache
+###< phpunit/phpunit ###

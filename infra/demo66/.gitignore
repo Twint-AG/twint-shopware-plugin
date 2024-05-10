@@ -21,3 +21,8 @@ public/asset-manifest.json
 
 .env.test
 custom/plugins/SwagPayPal/
+
+###> phpunit/phpunit ###
+/phpunit.xml
+.phpunit.result.cache
+###< phpunit/phpunit ###
