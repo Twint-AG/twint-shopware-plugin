@@ -51,7 +51,7 @@ Component.register('twint-certificate', {
 
                     return this.createNotificationError({
                         title: this.$tc('twint.certificateErrorTitle'),
-                        message: this.$tc('twint.errors.' + errorCode),
+                        message: this.$tc('twint.certificateError.' + errorCode),
                         growl: true
                     });
                 }

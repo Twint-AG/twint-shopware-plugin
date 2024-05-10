@@ -1,4 +1,4 @@
-const { Component, Mixin } = Shopware;
+const {Component, Mixin} = Shopware;
 
 Component.extend('twint-merchant-id', 'sw-text-field', {
     mixins: [

@@ -1,19 +1,41 @@
 {
-    "twint": {
-        "validation": {
-            "errorTitle": "TWINT payment validation error",
-            "errorMessage": "There was an error validating the TWINT certificate (selected file and password). Please try again or use a different certification."
-        },
-        "certificateSuccess": "Certificate is an valid TWINT certificate.",
-        "certificateErrorTitle": "Certificate",
-        "merchantErrorTitle": "Merchant ID",
-        "certificateLabel": "Certificate Password (optional)",
-        "certificatePasswordHelpText": "The password for the certificate file is optional. If you have set a password for the certificate file, please enter it here.",
-        "certificateFileLabel": "Select a certificate file (.p12)",
-        "errors": {
-            "INVALID_CREDENTIAL": "Invalid credentials. Please check your certificate and password.",
-            "INVALID_TIME_RANGE": "Invalid time range",
-            "INVALID_ISSUER": "Invalid Issuer; Only allow CH and TWINT AG"
-        }
+  "twint": {
+    "title": "TWINT",
+    "general": {
+      "mainMenuItemGeneral": "TWINT",
+      "descriptionTextModule": "TWINT is a Swiss payment app that allows you to pay in stores, online, and transfer money to friends and family."
+    },
+    "settings": {
+      "titleSuccess": "Success",
+      "test": "Test Credentials",
+      "save": "Save",
+      "titleError": "Error",
+      "messageErrorRequiredMerchantID": "Merchant ID is required",
+      "messageErrorInvalidMerchantID": "Merchant ID has an invalid format. Has to be a UUIDv4",
+      "messageErrorRequiredCertificate": "Certificate is required before saving",
+      "messageTestSuccess": "Credential configuration is valid. You can save it now.",
+      "messageTestError": "Credential configuration is invalid. Please check again: merchant ID, certificate and environment (mode)"
+    },
+    "validation": {
+      "errorTitle": "TWINT configuration error",
+      "errorMessage": "There was an error validating the TWINT certificate (selected file and password). Please try again or use a different certification."
+    },
+    "certificateErrorTitle": "Certificate Error",
+    "merchantErrorTitle": "Merchant ID",
+    "certificateSuccess": "Certificate is an valid TWINT certificate.",
+    "certificateLabel": "Certificate Password",
+    "certificateFileLabel": "Select a certificate file (.p12)",
+    "certificatePasswordHelpText": "The password for the certificate file is optional. If you have set a password for the certificate file, please enter it here.",
+    "certificateError": {
+      "ERROR_INVALID_INPUT": "Certificate file and password are required",
+      "ERROR_INVALID_UNKNOWN": "Something went wrong with the certificate validation. Please try again.",
+      "ERROR_INVALID_CERTIFICATE_FORMAT": "Invalid certificate format",
+      "ERROR_INVALID_PASSPHRASE": "Invalid passphrase",
+      "ERROR_INVALID_ISSUER_COUNTRY": "Invalid issuer country",
+      "ERROR_INVALID_ISSUER_ORGANIZATION": "Invalid issuer organization",
+      "ERROR_INVALID_EXPIRY_DATE": "Invalid expiry date",
+      "ERROR_CERTIFICATE_EXPIRED": "Certificate expired",
+      "ERROR_CERTIFICATE_NOT_YET_VALID": "Certificate not yet valid"
     }
+  }
 }
