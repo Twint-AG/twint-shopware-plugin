@@ -12650,7 +12650,7 @@
             "source": {
                 "type": "git",
                 "url": "https://git.nfq.asia/twint-ag/php-sdk.git",
-                "reference": "8a40b11cfb7cf4131c4a9290fbddcdea628f52b9"
+                "reference": "ad4f356ac845698044d22417e3d3eb4e14924cfb"
             },
             "require": {
                 "azjezz/psl": "^2.5.0",
@@ -12670,7 +12670,6 @@
                 "laminas/laminas-code": "^4.8",
                 "php-soap/wsdl-reader": "^0.10.0",
                 "php-standard-library/phpstan-extension": "^1.0",
-                "php-vcr/php-vcr": "dev-fix-stream-handler-set-option as 1.7.0",
                 "phpstan/phpstan": "^1.10.60",
                 "phpstan/phpstan-strict-rules": "^1.5",
                 "phpunit/phpunit": "^10.5",
@@ -12703,12 +12702,13 @@
             ],
             "authors": [
                 {
-                    "name": "Lars Strojny",
-                    "email": "lars.strojny@nfq.com"
+                    "name": "NFQ",
+                    "email": "global-twint@nfq.com",
+                    "role": "Maintainer"
                 }
             ],
-            "description": "TWINT software development kit for PHP",
-            "time": "2024-04-18T11:34:34+00:00"
+            "description": "The TWINT SDK for PHP",
+            "time": "2024-05-08T00:14:11+00:00"
         },
         {
             "name": "twint/twint",
@@ -12716,11 +12716,20 @@
             "dist": {
                 "type": "path",
                 "url": "/var/www/plugin",
-                "reference": "643b23a290f42226c50ca1af5caf8a69b7d2ee10"
+                "reference": "d0581aaa0158288c31808677b128002034fabd09"
             },
             "require": {
                 "chillerlan/php-qrcode": "4.3.4",
+                "ext-openssl": "*",
                 "twint-ch/twint-sdk": "dev-develop"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^1.10",
+                "phpunit/phpunit": "^10.5",
+                "rector/rector": "^1.0",
+                "slevomat/coding-standard": "^8.15",
+                "symfony/browser-kit": "*",
+                "symplify/easy-coding-standard": "^12.1"
             },
             "type": "shopware-platform-plugin",
             "extra": {
