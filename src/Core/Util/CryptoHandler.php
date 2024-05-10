@@ -138,22 +138,4 @@ class CryptoHandler
 
         return $decodedData;
     }
-
-    public function setPassphraseForPemCertificate(string $cert): array
-    {
-        $ivLen = openssl_cipher_iv_length(self::CIPHERING);
-        if ($ivLen === false) {
-            throw new InvalidArgumentException('Invalid cipher algorithm.');
-        }
-
-        $iv = openssl_random_pseudo_bytes($ivLen);
-
-        $passphrase = openssl_random_pseudo_bytes(16);
-        $encryptedPem = openssl_encrypt($cert, 'aes256', $passphrase, 0, $iv);
-
-        return [
-            'passphrase' => $this->encrypt($passphrase),
-            'encryptedPem' => $encryptedPem,
-        ];
-    }
 }
