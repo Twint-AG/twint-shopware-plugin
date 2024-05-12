@@ -1,0 +1,17 @@
+.payment-method-image {
+    &.twint {
+        max-height: 32px;
+
+        [data-bs-theme="dark"] & {
+            background-color: #262626;
+        }
+    }
+}
+
+.twint-dark {
+    display: none;
+
+    [data-bs-theme="dark"] & {
+        display: block;
+    }
+}
