@@ -8,6 +8,7 @@ use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twint\Core\Setting\Settings;
 use Twint\Sdk\Value\Money;
 
 class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
@@ -32,14 +33,17 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     public function onConfirmPageLoaded(CheckoutConfirmPageLoadedEvent $event): void
     {
         $salesChannelContext = $event->getSalesChannelContext();
-        $currencyCode = $salesChannelContext->getCurrency()
-            ->getIsoCode();
-        if ($currencyCode !== Money::CHF) {
-            foreach ($event->getPage()->getPaymentMethods() as $paymentMethod) {
-                if ($paymentMethod->getHandlerIdentifier() === 'Twint\Core\Handler\TwintRegularPaymentHandler') {
+
+        foreach ($event->getPage()->getPaymentMethods() as $paymentMethod) {
+            if (strpos($paymentMethod->getHandlerIdentifier(), 'Twint\\') !== false) {
+                $currencyCode = $salesChannelContext->getCurrency()
+                    ->getIsoCode();
+
+                if (!in_array($currencyCode, Settings::ALLOWED_CURRENCIES, true)) {
                     $event->getPage()
                         ->getPaymentMethods()
                         ->remove($paymentMethod->getId());
+
                     $session = $event->getRequest()
                         ->getSession();
 
