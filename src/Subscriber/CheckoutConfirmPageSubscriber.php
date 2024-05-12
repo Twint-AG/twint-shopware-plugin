@@ -35,11 +35,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         $salesChannelContext = $event->getSalesChannelContext();
 
         foreach ($event->getPage()->getPaymentMethods() as $paymentMethod) {
-            if ($paymentMethod->getHandlerIdentifier() === 'Twint\Core\Handler\TwintRegularPaymentHandler') {
-                $paymentMethod->setExtensions([
-                    'isTwint' => true,
-                ]);
-
+            if (strpos($paymentMethod->getHandlerIdentifier(), 'Twint\\') !== false) {
                 $currencyCode = $salesChannelContext->getCurrency()
                     ->getIsoCode();
 
