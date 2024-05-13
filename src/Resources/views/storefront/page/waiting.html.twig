@@ -50,7 +50,8 @@
                         <div style="text-align:center">
                             <h2>{{ "twintPayment.waitingPage.headline"|trans({'%orderNumber%': orderNumber}) }}</h2>
                             {% if qrCode %}
-                                <a href="javascript:window.location='{{ link }}'"><img src="{{ qrCode }}" style="width:40%;align:auto" alt="QR-Code"/></a>
+                                {% set href = (link == '#') ? '#' : 'javascript:window.location='.link %}
+                                <a href="{{href}}'"><img src="{{ qrCode }}" style="width:40%;align:auto" alt="QR-Code"/></a>
                             {% endif %}
                         </div>
                     {% endblock %}
