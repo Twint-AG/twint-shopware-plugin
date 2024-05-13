@@ -5,13 +5,24 @@
         <script>
             function reloadPage() {
                 localStorage.setItem('lastReloadTime', Date.now());
-                location.reload();
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/payment/order/{{ orderNumber }}', true);
+                xhr.onload = function () {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        var jsonResponse = JSON.parse(xhr.responseText);
+                        if(jsonResponse.reload){
+                            location.reload();
+                        }
+                    }
+                };
+                xhr.onerror = function () {};
+                xhr.send();
             }
 
             window.onload = function() {
                 var lastReloadTime = localStorage.getItem('lastReloadTime');
                 var currentTime = Date.now();
-                var reloadInterval = 10 * 60 * 1000; // 10 minutes in milliseconds
+                var reloadInterval = 1 * 60 * 1000; // 1 minute to check
                 if (!lastReloadTime || (currentTime - lastReloadTime > reloadInterval)) {
                     reloadPage();
                 }
@@ -39,7 +50,7 @@
                         <div style="text-align:center">
                             <h2>{{ "twintPayment.waitingPage.headline"|trans({'%orderNumber%': orderNumber}) }}</h2>
                             {% if qrCode %}
-                                <img src="{{ qrCode }}" style="width:40%;align:auto" alt="QR-Code"/>
+                                <a href="{{ link }}"><img src="{{ qrCode }}" style="width:40%;align:auto" alt="QR-Code"/></a>
                             {% endif %}
                         </div>
                     {% endblock %}
