@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class CertificateFileValidator
 {
-    public const ALLOWED_EXTENSIONS = ['.p12'];
+    public const ALLOWED_EXTENSIONS = ['p12'];
 
     public const MAX_SIZE = 1024 * 1024; // 1MB
 

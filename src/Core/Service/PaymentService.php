@@ -129,6 +129,34 @@ class PaymentService
         }
     }
 
+    public function reverseOrder(
+        string $twintOrderId,
+        string $orderTransactionId,
+        string $currency,
+        float $amount,
+        string $salesChannelId
+    ): ?Order {
+        try {
+            $client = $this->clientBuilder->build($salesChannelId);
+            /** @var Order * */
+            $twintOrder = $client->monitorOrder(new OrderId(new Uuid($twintOrderId)));
+            if ($twintOrder->status()->equals(OrderStatus::SUCCESS())) {
+                $twintOrder = $client->reverseOrder(
+                    new UnfiledMerchantTransactionReference('R-' . $twintOrderId),
+                    new OrderId(new Uuid($twintOrderId)),
+                    new Money($currency, $amount)
+                );
+                $this->transactionStateHandler->refund($orderTransactionId, $this->context);
+            }
+            return $twintOrder;
+        } catch (Exception $e) {
+            throw PaymentException::asyncProcessInterrupted(
+                $orderTransactionId,
+                'An error occurred during the communication with external payment gateway' . PHP_EOL . $e->getMessage()
+            );
+        }
+    }
+
     public function updateOrderCustomField(string $orderId, array $customFields): void
     {
         $this->orderRepository->update([[
@@ -250,5 +278,42 @@ class PaymentService
             return $payLink;
         }
         return $payLink;
+    }
+
+    /**
+     * Return an order entity, enriched with associations.
+     *
+     * @throws Exception
+     */
+    public function getOrder(string $orderId, Context $context): OrderEntity
+    {
+        $criteria = new Criteria([$orderId]);
+        $criteria->addAssociation('currency');
+        $criteria->addAssociation('addresses');
+        $criteria->addAssociation('shippingAddress');   # important for subscription creation
+        $criteria->addAssociation('billingAddress');    # important for subscription creation
+        $criteria->addAssociation('billingAddress.country');
+        $criteria->addAssociation('orderCustomer');
+        $criteria->addAssociation('orderCustomer.customer');
+        $criteria->addAssociation('orderCustomer.salutation');
+        $criteria->addAssociation('language');
+        $criteria->addAssociation('language.locale');
+        $criteria->addAssociation('lineItems');
+        $criteria->addAssociation('lineItems.product.media');
+        $criteria->addAssociation('deliveries.shippingOrderAddress');
+        $criteria->addAssociation('deliveries.shippingOrderAddress.country');
+        $criteria->addAssociation('deliveries.shippingMethod');
+        $criteria->addAssociation('deliveries.positions.orderLineItem');
+        $criteria->addAssociation('transactions.paymentMethod');
+        $criteria->addAssociation('transactions.paymentMethod.appPaymentMethod.app');
+        $criteria->addAssociation('transactions.stateMachineState');
+
+        $order = $this->orderRepository->search($criteria, $context)
+            ->first();
+
+        if ($order instanceof OrderEntity) {
+            return $order;
+        }
+        throw new Exception($orderId);
     }
 }
