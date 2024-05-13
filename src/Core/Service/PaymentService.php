@@ -29,6 +29,7 @@ use Twint\Sdk\Value\UnfiledMerchantTransactionReference;
 use Twint\Sdk\Value\Uuid;
 use Twint\Util\Method\RegularPaymentMethod;
 use Twint\Util\OrderCustomFieldInstaller;
+use function Psl\Type\string;
 
 class PaymentService
 {
@@ -232,5 +233,22 @@ class PaymentService
         }
 
         return $stateMachineState->getTechnicalName() === OrderTransactionStates::STATE_CANCELLED;
+    }
+
+    public function getPayLink(string $token, string $salesChannelId): string
+    {
+        $payLink = '#';
+        try {
+            $client = $this->clientBuilder->build($salesChannelId);
+            $device = $client->detectDevice(string()->assert($_SERVER['HTTP_USER_AGENT'] ?? ''));
+            if ($device->isAndroid()) {
+                $payLink = 'intent://payment#Intent;action=ch.twint.action.TWINT_PAYMENT;scheme=twint;S.code=' . $token . ';S.startingOrigin=EXTERNAL_WEB_BROWSER;S.browser_fallback_url=;end';
+            } elseif ($device->isIos()) {
+                $payLink = 'applinks/?al_applink_data={"app_action_type": "TWINT_PAYMENT","extras":{"code": "' . $token . '",},"referer_app_link": {"target_url": "", "url": "", "app_name":"EXTERNAL_WEB_BROWSER"}, "version": "6.0" }';
+            }
+        } catch (Exception $e) {
+            return $payLink;
+        }
+        return $payLink;
     }
 }
