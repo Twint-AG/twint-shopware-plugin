@@ -14,6 +14,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Storefront\Controller\StorefrontController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -88,11 +89,43 @@ class PaymentController extends StorefrontController
             );
             $qrcode = (new QRCode($options))->render($twintApiResponse['pairingToken']);
         }
-
         return $this->renderStorefront('@TwintPayment/storefront/page/waiting.html.twig', [
             'orderNumber' => $orderNumber,
             'qrCode' => $qrcode,
             'order' => $order,
+            'link' => $this->paymentService->getPayLink(
+                $twintApiResponse['pairingToken'] ?? '',
+                $order->getSalesChannelId()
+            ),
         ]);
+    }
+
+    #[Route(path: '/payment/order/{orderNumber}', name: 'frontend.twint.order', methods: ['GET'])]
+    public function order(Request $request, Context $context): JsonResponse
+    {
+        $orderNumber = $request->get('orderNumber');
+        $result = [
+            'reload' => false,
+        ];
+        try {
+            $criteria = new Criteria();
+            $criteria->addFilter(new EqualsFilter('orderNumber', $orderNumber));
+            $criteria->addAssociation('transactions.stateMachineState');
+            /** @var OrderEntity|null $order */
+            $order = $this->orderRepository->search($criteria, $context)
+                ->first();
+            if (!empty($order) && ($this->paymentService->isOrderPaid($order) || $this->paymentService->isCancelPaid(
+                $order
+            ))) {
+                $result = [
+                    'reload' => true,
+                ];
+            }
+        } catch (Exception $e) {
+            return new JsonResponse([
+                'reload' => true,
+            ]);
+        }
+        return new JsonResponse($result);
     }
 }
