@@ -22,7 +22,7 @@
     },
     "certificateErrorTitle": "Certificate Error",
     "merchantErrorTitle": "Merchant ID",
-    "certificateSuccess": "Certificate is an valid TWINT certificate.",
+    "certificateSuccess": "Reading certificate successful",
     "certificateLabel": "Certificate Password",
     "certificateFileLabel": "Select a certificate file (.p12)",
     "certificatePasswordHelpText": "The password for the certificate file is optional. If you have set a password for the certificate file, please enter it here.",
