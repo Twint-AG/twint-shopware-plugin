@@ -15,6 +15,12 @@
         <service id="Twint\Core\Util\CredentialValidatorInterface" class="Twint\Core\Util\CredentialValidator">
             <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
         </service>
+
+        <service id="Twint\Core\Service\SettingServiceInterface" class="Twint\Core\Service\SettingService">
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <argument type="service" id="Twint\Core\Util\CredentialValidatorInterface"/>
+            <argument type="service" id="event_dispatcher"/>
+        </service>
         
         <service id="Twint\Storefront\Controller\PaymentController" public="true">
             <argument type="service" id="order.repository"/>
@@ -40,12 +46,6 @@
             <argument type="service" id="service_container"/>
             <argument type="service" id="payment_method.repository"/>
             <argument type="tagged_iterator" tag="twint.method.definition"/>
-        </service>
-
-        <service id="Twint\Core\Service\SettingService">
-            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
-            <argument type="service" id="order.repository"/>
-            <argument type="service" id="sales_channel.repository"/>
         </service>
 
         <service id="Twint\Core\Service\PaymentService">
@@ -101,13 +101,18 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="Twint\Subscriber\SystemConfigSubscriber">
+            <argument type="service" id="Twint\Core\Service\SettingServiceInterface"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="Twint\ExpressCheckout\Util\PaymentMethodUtil">
             <argument type="service" id="Doctrine\DBAL\Connection"/>
         </service>
 
         <service id="Twint\ExpressCheckout\Service\ExpressCheckoutButtonService">
             <argument type="service" id="Twint\ExpressCheckout\Util\PaymentMethodUtil"/>
-            <argument type="service" id="Twint\Core\Service\SettingService"/>
+            <argument type="service" id="Twint\Core\Service\SettingServiceInterface"/>
         </service>
 
         <service id="Twint\ExpressCheckout\Subscriber\ProductPageLoadedSubscriber">
@@ -116,7 +121,7 @@
         </service>
 
         <service id="Twint\Core\Factory\ClientBuilder">
-            <argument type="service" id="Twint\Core\Service\SettingService"/>
+            <argument type="service" id="Twint\Core\Service\SettingServiceInterface"/>
             <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
         </service>
     </services>
