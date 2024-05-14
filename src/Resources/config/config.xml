@@ -26,9 +26,10 @@
         <title>Credentials</title>
         <component name="twint-certificate">
             <name>certificate</name>
-            <label>Certificate*</label>
+            <label>Certificate File</label>
             <label lang="de-DE">Zertifikat Passwort</label>
             <helpText>SwissSign certificate password to allow reading above certificate.</helpText>
+            <required>true</required>
         </component>
     </card>
 

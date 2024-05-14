@@ -30,7 +30,7 @@ Component.register('twint-certificate', {
 
         extractPem() {
             const service = Shopware.Service('twintFileUploadService');
-            if (!this.currentCertFile) {
+            if (!this.currentCertFile || !this.currentPassword || this.currentPassword.length === 0) {
                 return;
             }
 

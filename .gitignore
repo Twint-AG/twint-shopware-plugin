@@ -6,7 +6,7 @@
 **/vendor
 **/dist/**
 build/
-public/static
+**/public/static
 
 phpunit.clover.xml
 phpunit.junit.xml
