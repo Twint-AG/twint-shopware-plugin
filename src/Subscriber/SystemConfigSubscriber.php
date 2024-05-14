@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Twint\Subscriber;
 
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
+use Shopware\Core\System\SalesChannel\Event\SalesChannelProcessCriteriaEvent;
 use Shopware\Core\System\SystemConfig\Event\BeforeSystemConfigMultipleChangedEvent;
 use Shopware\Core\System\SystemConfig\Event\SystemConfigMultipleChangedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 use Twint\Core\Event\AfterUpdateValidatedEvent;
 use Twint\Core\Event\BeforeUpdateValidatedEvent;
 use Twint\Core\Service\SettingServiceInterface;
@@ -31,6 +35,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
             BeforeSystemConfigMultipleChangedEvent::class => 'onBeforeSystemConfigChanged',
             BeforeUpdateValidatedEvent::class => 'onBeforeUpdateValidated',
             AfterUpdateValidatedEvent::class => 'onAfterUpdateValidated',
+            'sales_channel.payment_method.process.criteria' => 'onPaymentMethodCriteriaBuild',
         ];
     }
 
@@ -77,5 +82,23 @@ class SystemConfigSubscriber implements EventSubscriberInterface
     public function onAfterUpdateValidated(AfterUpdateValidatedEvent $event): void
     {
         self::$allowUpdateValidated = false;
+    }
+
+    /**
+     * Remove Twint payment method from the list of active payment methods
+     */
+    public function onPaymentMethodCriteriaBuild(SalesChannelProcessCriteriaEvent $event): void
+    {
+        $channel = $event->getSalesChannelContext()
+            ->getSalesChannelId();
+        $setting = $this->settingService->getSetting($channel);
+        if ($setting->getValidated()) {
+            return;
+        }
+
+        $criteria = $event->getCriteria();
+        $criteria->addFilter(
+            new NotFilter(NotFilter::CONNECTION_AND, [new ContainsFilter('handlerIdentifier', 'Twint')])
+        );
     }
 }

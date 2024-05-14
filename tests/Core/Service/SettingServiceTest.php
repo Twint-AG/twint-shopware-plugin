@@ -8,7 +8,7 @@ use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\Test\TestDefaults;
 use Twint\Core\Model\TwintSettingStruct;
-use Twint\Core\Service\SettingService;
+use Twint\Core\Service\SettingServiceInterface;
 use Twint\Tests\Helper\ServicesTrait;
 
 class SettingServiceTest extends TestCase
@@ -18,7 +18,7 @@ class SettingServiceTest extends TestCase
 
     private SalesChannelContext $salesChannelContext;
 
-    private SettingService $settingService;
+    private SettingServiceInterface $settingService;
 
     /**
      * @return string
@@ -34,7 +34,7 @@ class SettingServiceTest extends TestCase
         /** @var SalesChannelContextFactory $contextFactory */
         $contextFactory = $this->getContainer()->get(SalesChannelContextFactory::class);
         $this->salesChannelContext = $contextFactory->create('', TestDefaults::SALES_CHANNEL);
-        $this->settingService = $this->getContainer()->get(SettingService::class);
+        $this->settingService = $this->getContainer()->get(SettingServiceInterface::class);
     }
     public function testGetSetting(): void
     {
