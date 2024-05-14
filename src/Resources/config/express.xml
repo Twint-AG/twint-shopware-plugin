@@ -2,43 +2,12 @@
 
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/trunk/src/Core/System/SystemConfig/Schema/config.xsd">
-
-    <card>
-        <title>Merchant configurations</title>
-
-        <input-field>
-            <name>merchantId</name>
-            <label>Merchant ID</label>
-            <required>true</required>
-            <placeholder>xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx</placeholder>
-        </input-field>
-
-        <input-field type="bool">
-            <name>testMode</name>
-            <label>Switch to test mode</label>
-            <label lang="de-DE">Zum benutzerdefinierten Abnahmetestmodus wechseln</label>
-            <helpText>Custom Acceptance Test mode (On) / Production Mode (Off)</helpText>
-            <defaultValue>false</defaultValue>
-        </input-field>
-    </card>
-
-    <card>
-        <title>Credentials</title>
-        <component name="twint-certificate">
-            <name>certificate</name>
-            <label>Certificate File</label>
-            <label lang="de-DE">Zertifikat Passwort</label>
-            <helpText>SwissSign certificate password to allow reading above certificate.</helpText>
-            <required>true</required>
-        </component>
-    </card>
-
     <card>
         <title>Display options</title>
 
         <input-field type="multi-select">
             <name>screens</name>
-            <label>Screens</label>
+            <label>Display screens</label>
             <helpText>Screen end-users can see TWINT checkout button.</helpText>
             <options>
                 <option>

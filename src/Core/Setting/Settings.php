@@ -10,15 +10,19 @@ class Settings
 
     public const ENVIRONMENT_TEST = true;
 
-    public const PREFIX = 'TwintPayment.config.';
+    public const PREFIX = 'TwintPayment.';
 
-    public const TEST_MODE = self::PREFIX . 'testMode';
+    public const PREFIX_REGULAR = self::PREFIX . 'settings.';
 
-    public const MERCHANT_ID = self::PREFIX . 'merchantId';
+    public const PREFIX_EXPRESS = self::PREFIX . 'express.';
 
-    public const CERTIFICATE = self::PREFIX . 'certificate';
+    public const TEST_MODE = self::PREFIX_REGULAR . 'testMode';
 
-    public const SCREENS = self::PREFIX . 'screens';
+    public const MERCHANT_ID = self::PREFIX_REGULAR . 'merchantId';
+
+    public const CERTIFICATE = self::PREFIX_REGULAR . 'certificate';
+
+    public const SCREENS = self::PREFIX_EXPRESS . 'screens';
 
     public const ALLOWED_CURRENCIES = ['CHF', 'EUR'];
 

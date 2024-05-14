@@ -47,11 +47,11 @@ export default {
             const salesChannelId = this.$refs.systemConfig.currentSalesChannelId;
 
             if (salesChannelId === null) {
-                return actualConfig.null[`TwintPayment.config.${field}`];
+                return actualConfig.null[`TwintPayment.settings.${field}`];
             }
 
-            return actualConfig[salesChannelId][`TwintPayment.config.${field}`]
-                || defaultConfig[`TwintPayment.config.${field}`];
+            return actualConfig[salesChannelId][`TwintPayment.settings.${field}`]
+                || defaultConfig[`TwintPayment.settings.${field}`];
         },
 
         onSave() {

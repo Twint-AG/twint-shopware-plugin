@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Twint\FastCheckout\Util;
+namespace Twint\ExpressCheckout\Util;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
@@ -23,15 +23,15 @@ class PaymentMethodUtil
     }
 
     /**
-     * Detect if the fast checkout is enabled for the current sales channel.
+     * Detect if the express checkout is enabled for the current sales channel.
      *
      * @throws Exception
      */
-    public function isFastCheckoutEnabled(
+    public function isExpressCheckoutEnabled(
         SalesChannelContext $salesChannelContext,
         ?PaymentMethodCollection $paymentMethods = null
     ): bool {
-        $methodId = $this->getFastCheckoutMethodId();
+        $methodId = $this->getExpressCheckoutMethodId();
         if (!$methodId) {
             return false;
         }
@@ -69,7 +69,7 @@ class PaymentMethodUtil
     /**
      * @throws Exception
      */
-    public function getFastCheckoutMethodId(): ?string
+    public function getExpressCheckoutMethodId(): ?string
     {
         return $this->getPaymentMethodIdByHandler(TwintRegularPaymentHandler::class);
     }
