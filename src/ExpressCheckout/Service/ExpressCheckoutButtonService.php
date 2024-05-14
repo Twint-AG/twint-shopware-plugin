@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Twint\FastCheckout\Service;
+namespace Twint\ExpressCheckout\Service;
 
 use Doctrine\DBAL\Exception;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Twint\Core\Service\SettingService;
 use Twint\Core\Setting\Settings;
-use Twint\FastCheckout\Model\FastCheckoutButton;
-use Twint\FastCheckout\Util\PaymentMethodUtil;
+use Twint\ExpressCheckout\Model\ExpressCheckoutButton;
+use Twint\ExpressCheckout\Util\PaymentMethodUtil;
 
-class FastCheckoutButtonService
+class ExpressCheckoutButtonService
 {
     public function __construct(
         private readonly PaymentMethodUtil $paymentMethodUtil,
@@ -22,10 +22,10 @@ class FastCheckoutButtonService
     /**
      * @throws Exception
      */
-    public function getButton(SalesChannelContext $context, string $screen): ?FastCheckoutButton
+    public function getButton(SalesChannelContext $context, string $screen): ?ExpressCheckoutButton
     {
-        // Check if the fast checkout is enabled
-        $enabled = $this->paymentMethodUtil->isFastCheckoutEnabled($context);
+        // Check if the express checkout is enabled
+        $enabled = $this->paymentMethodUtil->isExpressCheckoutEnabled($context);
         if (!$enabled) {
             return null;
         }
@@ -43,7 +43,7 @@ class FastCheckoutButtonService
             return null;
         }
 
-        return new FastCheckoutButton(
+        return new ExpressCheckoutButton(
             'TWINT Fast Checkout',
             'Fast Checkout Description',
             'https://example.com/image.png',

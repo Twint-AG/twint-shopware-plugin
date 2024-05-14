@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace Twint\Core\Handler;
 
-class TwintRegularPaymentHandler extends AbstractPaymentHandler
+class TwintExpressPaymentHandler extends AbstractPaymentHandler
 {
 }

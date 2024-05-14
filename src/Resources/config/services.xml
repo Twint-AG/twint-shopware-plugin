@@ -32,8 +32,13 @@
             <tag name="twint.method.definition" />
         </service>
 
+        <service id="Twint\Util\Method\ExpressPaymentMethod">
+            <tag name="twint.method.definition" />
+        </service>
+
         <service id="Twint\Util\PaymentMethodRegistry">
             <argument type="service" id="service_container"/>
+            <argument type="service" id="payment_method.repository"/>
             <argument type="tagged_iterator" tag="twint.method.definition"/>
         </service>
 
@@ -96,17 +101,17 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="Twint\FastCheckout\Util\PaymentMethodUtil">
+        <service id="Twint\ExpressCheckout\Util\PaymentMethodUtil">
             <argument type="service" id="Doctrine\DBAL\Connection"/>
         </service>
 
-        <service id="Twint\FastCheckout\Service\FastCheckoutButtonService">
-            <argument type="service" id="Twint\FastCheckout\Util\PaymentMethodUtil"/>
+        <service id="Twint\ExpressCheckout\Service\ExpressCheckoutButtonService">
+            <argument type="service" id="Twint\ExpressCheckout\Util\PaymentMethodUtil"/>
             <argument type="service" id="Twint\Core\Service\SettingService"/>
         </service>
 
-        <service id="Twint\FastCheckout\Subscriber\ProductPageLoadedSubscriber">
-            <argument type="service" id="Twint\FastCheckout\Service\FastCheckoutButtonService" />
+        <service id="Twint\ExpressCheckout\Subscriber\ProductPageLoadedSubscriber">
+            <argument type="service" id="Twint\ExpressCheckout\Service\ExpressCheckoutButtonService" />
             <tag name="kernel.event_subscriber"/>
         </service>
 

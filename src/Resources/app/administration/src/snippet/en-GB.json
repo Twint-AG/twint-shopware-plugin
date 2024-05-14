@@ -1,8 +1,10 @@
 {
   "twint": {
-    "title": "TWINT payment configurations",
+    "title": "TWINT payment",
+    "expressTittle": "TWINT Express Checkout",
     "general": {
-      "mainMenuItemGeneral": "TWINT",
+      "mainMenuItemGeneral": "TWINT payment",
+      "mainMenuItemExpress": "TWINT Express Checkout",
       "descriptionTextModule": "TWINT is a Swiss payment app that allows you to pay in stores, online, and transfer money to friends and family."
     },
     "settings": {

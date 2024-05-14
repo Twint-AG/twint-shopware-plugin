@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Twint\FastCheckout\Model;
+namespace Twint\ExpressCheckout\Model;
 
 use Shopware\Core\Framework\Struct\Struct;
 
-//TODO we need define the properties of the class need for the FastCheckoutButton
-class FastCheckoutButton extends Struct
+//TODO we need define the properties of the class need for the ExpressCheckoutButton
+class ExpressCheckoutButton extends Struct
 {
     private string $name;
 
