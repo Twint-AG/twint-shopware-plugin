@@ -22,6 +22,8 @@ class Settings
 
     public const CERTIFICATE = self::PREFIX_REGULAR . 'certificate';
 
+    public const VALIDATED = self::PREFIX_REGULAR . 'validated';
+
     public const SCREENS = self::PREFIX_EXPRESS . 'screens';
 
     public const ALLOWED_CURRENCIES = ['CHF', 'EUR'];
@@ -47,5 +49,6 @@ class Settings
             self::SCREENS_OPTIONS_CART,
             self::SCREENS_OPTIONS_CART_FLYOUT,
         ],
+        self::VALIDATED => false,
     ];
 }

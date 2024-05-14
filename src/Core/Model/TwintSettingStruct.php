@@ -28,6 +28,8 @@ class TwintSettingStruct extends Struct
      */
     protected $screens;
 
+    protected bool $validated;
+
     public function getMerchantId(): string
     {
         return (string) $this->merchantId;
@@ -74,6 +76,17 @@ class TwintSettingStruct extends Struct
     public function setScreens(array $screens): self
     {
         $this->screens = $screens;
+        return $this;
+    }
+
+    public function getValidated(): bool
+    {
+        return $this->validated;
+    }
+
+    public function setValidated(bool $validated): self
+    {
+        $this->validated = $validated;
         return $this;
     }
 }
