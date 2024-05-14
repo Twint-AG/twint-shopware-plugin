@@ -5,28 +5,19 @@
                 <h2>
                     {{ $tc('sw-settings.index.title') }}
                     <sw-icon name="regular-chevron-right-xs" small></sw-icon>
-                    {{ $tc('twint.title') }}
+                    {{ $tc('twint.expressTittle') }}
                 </h2>
             </template>
         {% endblock %}
 
         {% block twint_payment_actions %}
             <template #smart-bar-actions>
-                {% block twint_payment_settings_actions_test %}
-                    <sw-button-process @click="onTest"
-                                       :isLoading="isTesting"
-                                       :processSuccess="isTestSuccessful"
-                                       :disabled="isLoading">
-                        {{ $tc('twint.settings.test') }}
-                    </sw-button-process>
-                {% endblock %}
-
                 {% block twint_payment_settings_actions_save %}
                     <sw-button-process
                             class="sw-settings-login-registration__save-action"
                             :isLoading="isLoading"
                             :processSuccess="isSaveSuccessful"
-                            :disabled="isLoading || isTesting || !isTestSuccessful"
+                            :disabled="isLoading"
                             variant="primary"
                             @process-finish="saveFinish"
                             @click="onSave">
@@ -44,7 +35,7 @@
                             ref="systemConfig"
                             sales-channel-switchable
                             inherit
-                            domain="TwintPayment.settings"
+                            domain="TwintPayment.express"
                             @config-changed="onChanged"
                     >
                     </sw-system-config>

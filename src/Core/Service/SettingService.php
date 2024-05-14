@@ -40,10 +40,11 @@ class SettingService
         $systemConfigData = $this->systemConfigService->getDomain(self::SYSTEM_CONFIG_DOMAIN, $salesChannelId, true);
 
         foreach ($systemConfigData as $key => $value) {
-            if (stripos($key, self::SYSTEM_CONFIG_DOMAIN) !== false) {
-                $structData[substr($key, strlen(self::SYSTEM_CONFIG_DOMAIN))] = $value;
-            } else {
-                $structData[$key] = $value;
+            $parts = explode('.', $key);
+            $lastPart = end($parts);
+
+            if (!empty($lastPart)) {
+                $structData[$lastPart] = $value;
             }
         }
 

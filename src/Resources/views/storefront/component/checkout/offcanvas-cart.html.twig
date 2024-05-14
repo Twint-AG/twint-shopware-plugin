@@ -1,13 +1,13 @@
 {% sw_extends "@Storefront/storefront/component/checkout/offcanvas-cart.html.twig" %}
 
-{% set fastButton = page.extensions['TwintFastCheckoutButton'] %}
+{% set expressButton = page.extensions['TwintExpressCheckoutButton'] %}
 
 {% block component_offcanvas_cart_actions_checkout %}
     {{ parent() }}
 
     {% block twint_buy_button_plp %}
-        {% if fastButton is defined and fastButton %}
-            {{ include('@TwintPayment/storefront/component/button/fast-checkout-button.html.twig') }}
+        {% if expressButton is defined and expressButton %}
+            {{ include('@TwintPayment/storefront/component/button/express-checkout-button.html.twig') }}
         {% endif %}
     {% endblock %}
 

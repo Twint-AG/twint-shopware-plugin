@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/trunk/src/Core/System/SystemConfig/Schema/config.xsd">
+
+    <card>
+        <title>Environment</title>
+
+        <input-field type="bool">
+            <name>testMode</name>
+            <label>Switch to test mode</label>
+            <label lang="de-DE">Zum benutzerdefinierten Abnahmetestmodus wechseln</label>
+            <helpText>Custom Acceptance Test mode (On) / Production Mode (Off)</helpText>
+            <defaultValue>false</defaultValue>
+        </input-field>
+    </card>
+
+    <card>
+        <title>Credentials</title>
+
+        <input-field>
+            <name>merchantId</name>
+            <label>Merchant ID</label>
+            <required>true</required>
+            <placeholder>xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx</placeholder>
+        </input-field>
+
+        <component name="twint-certificate">
+            <name>certificate</name>
+            <label>Certificate File</label>
+            <label lang="de-DE">Zertifikat Passwort</label>
+            <helpText>SwissSign certificate password to allow reading above certificate.</helpText>
+            <required>true</required>
+        </component>
+    </card>
+</config>
