@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Twint\FastCheckout\Subscriber;
+namespace Twint\ExpressCheckout\Subscriber;
 
 use Shopware\Storefront\Page\Checkout\Cart\CheckoutCartPageLoadedEvent;
 use Shopware\Storefront\Page\Checkout\Offcanvas\OffcanvasCartPageLoadedEvent;
@@ -11,13 +11,13 @@ use Shopware\Storefront\Page\PageLoadedEvent;
 use Shopware\Storefront\Page\Product\ProductPageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Twint\Core\Setting\Settings;
-use Twint\FastCheckout\Model\FastCheckoutButton;
-use Twint\FastCheckout\Service\FastCheckoutButtonService;
+use Twint\ExpressCheckout\Model\ExpressCheckoutButton;
+use Twint\ExpressCheckout\Service\ExpressCheckoutButtonService;
 
 class ProductPageLoadedSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly FastCheckoutButtonService $service
+        private readonly ExpressCheckoutButtonService $service
     ) {
     }
 
@@ -60,8 +60,8 @@ class ProductPageLoadedSubscriber implements EventSubscriberInterface
         $page = $event->getPage();
 
         $button = $this->service->getButton($context, $screen);
-        if ($button instanceof FastCheckoutButton) {
-            $page->addExtension('TwintFastCheckoutButton', $button);
+        if ($button instanceof ExpressCheckoutButton) {
+            $page->addExtension('TwintExpressCheckoutButton', $button);
         }
     }
 }

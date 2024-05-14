@@ -11,11 +11,15 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Twint\Util\Method\AbstractMethod;
+use Twint\Util\Method\ExpressPaymentMethod;
 use Twint\Util\Method\RegularPaymentMethod;
 
 class PaymentMethodRegistry
 {
-    private const PAYMENT_METHODS = [RegularPaymentMethod::class];
+    /**
+     * Need to add manual here due to the fact that the methods are not loaded when the plugin has not installed yet
+     */
+    private const PAYMENT_METHODS = [RegularPaymentMethod::class, ExpressPaymentMethod::class];
 
     /**
      * @var AbstractMethod[]
