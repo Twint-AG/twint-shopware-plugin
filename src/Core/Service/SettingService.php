@@ -61,12 +61,12 @@ class SettingService implements SettingServiceInterface
         $this->eventDispatcher->dispatch(new AfterUpdateValidatedEvent());
     }
 
-    public function getIsoApps(?string $salesChannelId): array
+    public function getIsoApps(?string $saleChannel = null): array
     {
-        if ($this->systemConfigService->get(Settings::TEST_MODE, $salesChannelId)) {
-            $response = @file_get_contents(Settings::TESTING_APP_LIST_URL);
+        if ($this->configService->get(Settings::TEST_MODE, $saleChannel)) {
+            $response = @file_get_contents(Settings::APP_LIST_URL_TESTING);
         } else {
-            $response = @file_get_contents(Settings::PRODUCTION_APP_LIST_URL);
+            $response = @file_get_contents(Settings::APP_LIST_URL_PRODUCTION);
         }
         if (!($response === '' || $response === '0' || $response === false)) {
             $apps = json_decode($response, true);

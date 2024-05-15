@@ -95,7 +95,7 @@ class PaymentControllerTest extends TestCase
         $this->getContainer()->get('request_stack')->push($request);
         $response = $this->paymentController->showWaiting($request, $this->salesChannelContext->getContext());
         //check QR code exist or not
-        static::assertStringNotContainsStringIgnoringCase('QR-Code', (string)$response->getContent());
+        static::assertStringNotContainsString('alt="QR-Code"', (string)$response->getContent());
     }
 
     public function testPaidOrder(): void

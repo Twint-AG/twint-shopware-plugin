@@ -9,7 +9,8 @@
             "cancelPayment": "Die Zahlung wurde storniert"
         },
         "waitingPage" : {
-            "headline": "Bitte scannen Sie zur Bezahlung der Bestellung : %orderNumber% den QR-Code mit der Twint App"
+            "headline": "Bitte scannen Sie zur Bezahlung der Bestellung : %orderNumber% den QR-Code mit der Twint App",
+            "description": "Oder geben Sie den Code manuell ein"
         },
         "appSelectorModal": {
             "title": "Bitte wählen Sie die App zur Bezahlung aus"
