@@ -41,7 +41,7 @@ class PaymentService
         private readonly EntityRepository $stateMachineStateRepository,
         private readonly OrderTransactionStateHandler $transactionStateHandler,
         private readonly ClientBuilder $clientBuilder,
-        private readonly SettingService $settingService
+        private readonly SettingServiceInterface $settingService
     ) {
         $this->context = new Context(new SystemSource());
     }

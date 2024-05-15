@@ -11,4 +11,6 @@ interface SettingServiceInterface
     public function getSetting(?string $salesChannel = null): TwintSettingStruct;
 
     public function validateCredential(?string $saleChannel = null): void;
+
+    public function getIsoApps(?string $saleChannel = null): array;
 }
