@@ -10,6 +10,9 @@
         },
         "waitingPage" : {
             "headline": "Please use the Twint app to scan the QR code for pay the : %orderNumber% order"
+        },
+        "appSelectorModal": {
+            "title": "Please select the app for payment"
         }
     }
 }
