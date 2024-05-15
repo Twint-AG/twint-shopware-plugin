@@ -26,7 +26,7 @@ class Settings
 
     public const SCREENS = self::PREFIX_EXPRESS . 'screens';
 
-    public const ALLOWED_CURRENCIES = ['CHF', 'EUR'];
+    public const ALLOWED_CURRENCIES = ['CHF'];
 
     // Screen options
     public const SCREENS_OPTIONS_PLP = 'PLP';
@@ -38,10 +38,6 @@ class Settings
     public const SCREENS_OPTIONS_CART_FLYOUT = 'CART_FLYOUT';
 
     public const ONLY_PICK_ORDERS_FROM_MINUTES = 30;
-
-    public const APP_LIST_URL_TESTING = 'https://app.scheme-pat.twint.ch/appSwitch/v1/configs';
-
-    public const APP_LIST_URL_PRODUCTION = 'https://app.scheme.twint.ch/appSwitch/v1/configs';
 
     public const DEFAULT_VALUES = [
         self::TEST_MODE => self::ENVIRONMENT_PROD,
