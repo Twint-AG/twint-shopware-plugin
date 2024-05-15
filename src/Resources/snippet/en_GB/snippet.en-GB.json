@@ -9,7 +9,8 @@
             "cancelPayment": "The payment got cancel"
         },
         "waitingPage" : {
-            "headline": "Please use the Twint app to scan the QR code for pay the : %orderNumber% order"
+            "headline": "Please use the Twint app to scan the QR code for pay the : %orderNumber% order",
+            "description": "Or manually type the code"
         },
         "appSelectorModal": {
             "title": "Please select the app for payment"
