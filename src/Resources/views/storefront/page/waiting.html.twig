@@ -32,6 +32,15 @@
         <div class="checkout">
             {% block page_checkout_container %}
                 <div class="checkout-container">
+                    {% if payLinks is defined and payLinks.android is defined  %}
+                        <script>
+                            window.location = '{{ payLinks.android[0] }}'
+                        </script>
+                    {% elseif payLinks is defined and payLinks.ios is defined %}
+                        {% sw_include '@Storefront/storefront/page/app-selector-modal.html.twig' with {
+                            payLinks: payLinks.ios
+                        } %}
+                    {% endif %}
                     {% block page_checkout_main %}
                         <div class="checkout-main">
                             {% block base_flashbags_checkout %}
@@ -49,10 +58,17 @@
                     {% block page_checkout_additional %}
                         <div style="text-align:center">
                             <h2>{{ "twintPayment.waitingPage.headline"|trans({'%orderNumber%': orderNumber}) }}</h2>
-                            {% if qrCode %}
-                                {% set href = (link == '#') ? '#' : 'javascript:window.location='~link %}
-                                <a href="{{href}}'"><img src="{{ qrCode }}" style="width:40%;align:auto" alt="QR-Code"/></a>
-                            {% endif %}
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    {% if qrCode %}
+                                        <img src="{{ qrCode }}" style="width:40%;align:auto" alt="QR-Code"/>
+                                    {% endif %}
+                                </div>
+                                <div class="col-sm-6" style="text-align:left;display:table;">
+                                    <h1  style="display:table-cell; vertical-align:middle">{{ pairingToken }}</h1>
+                                </div>
+                            </div>
+
                         </div>
                     {% endblock %}
 
