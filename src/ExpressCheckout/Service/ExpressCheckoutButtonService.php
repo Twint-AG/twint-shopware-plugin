@@ -24,6 +24,17 @@ class ExpressCheckoutButtonService
      */
     public function getButton(SalesChannelContext $context, string $screen): ?ExpressCheckoutButton
     {
+        $settings = $this->settingService->getSetting($context->getSalesChannel()->getId());
+        // Check if the credentials are validated
+        if (!$settings->getValidated()) {
+            return null;
+        }
+
+        $expressCheckoutMethodId = $this->paymentMethodUtil->getExpressCheckoutMethodId();
+        if (!in_array($expressCheckoutMethodId, $context->getSalesChannel()->getPaymentMethodIds() ?? [], true)) {
+            return null;
+        }
+
         // Check if the express checkout is enabled
         $enabled = $this->paymentMethodUtil->isExpressCheckoutEnabled($context);
         if (!$enabled) {
@@ -34,12 +45,6 @@ class ExpressCheckoutButtonService
         $currency = $context->getCurrency()
             ->getIsoCode();
         if (!in_array($currency, Settings::ALLOWED_CURRENCIES, true)) {
-            return null;
-        }
-
-        $settings = $this->settingService->getSetting($context->getSalesChannel()->getId());
-        // Check if the credentials are validated
-        if (!$settings->getValidated()) {
             return null;
         }
 
