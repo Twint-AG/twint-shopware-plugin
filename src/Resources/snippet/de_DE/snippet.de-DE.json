@@ -9,11 +9,12 @@
             "cancelPayment": "Die Zahlung wurde storniert"
         },
         "waitingPage" : {
-            "headline": "Bitte scannen Sie zur Bezahlung der Bestellung : %orderNumber% den QR-Code mit der Twint App",
-            "description": "Oder geben Sie den Code manuell ein"
+            "step1": "Öffnen Sie die TWINT App Ihrer Bank auf Ihrem Smartphone.",
+            "step2": "Tippen Sie auf des OR Code Symbol.",
+            "step3": "Richten Sie Ihre Smartphone Kamera auf den OH Code. Oder wählen Sie den Reiter «Code» und geben Sie den Zahiencode ein."
         },
         "appSelectorModal": {
-            "title": "Bitte wählen Sie die App zur Bezahlung aus"
+            "title": "Wählen Sie Ihre TWINT-App"
         }
     }
 }

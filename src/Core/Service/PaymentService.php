@@ -40,8 +40,7 @@ class PaymentService
         private readonly EntityRepository $stateMachineRepository,
         private readonly EntityRepository $stateMachineStateRepository,
         private readonly OrderTransactionStateHandler $transactionStateHandler,
-        private readonly ClientBuilder $clientBuilder,
-        private readonly SettingServiceInterface $settingService
+        private readonly ClientBuilder $clientBuilder
     ) {
         $this->context = new Context(new SystemSource());
     }
@@ -274,11 +273,11 @@ class PaymentService
                 $payLinks['android'] = 'intent://payment#Intent;action=ch.twint.action.TWINT_PAYMENT;scheme=twint;S.code =' . $token . ';S.startingOrigin=EXTERNAL_WEB_BROWSER;S.browser_fallback_url=;end';
             } elseif ($device->isIos()) {
                 $appList = [];
-                $apps = $this->settingService->getIsoApps($salesChannelId);
+                $apps = $client->getIosAppSchemes();
                 foreach ($apps as $app) {
                     $appList[] = [
-                        'name' => $app['displayName'],
-                        'link' => $app['issuerUrlScheme'] . 'applinks/?al_applink_data={"app_action_type":"TWINT_PAYMENT","extras": {"code": "' . $token . '",},"referer_app_link": {"target_url": "", "url": "", "app_name": "EXTERNAL_WEB_BROWSER"}, "version": "6.0"}',
+                        'name' => $app->displayName(),
+                        'link' => $app->scheme() . 'applinks/?al_applink_data={"app_action_type":"TWINT_PAYMENT","extras": {"code": "' . $token . '",},"referer_app_link": {"target_url": "", "url": "", "app_name": "EXTERNAL_WEB_BROWSER"}, "version": "6.0"}',
                     ];
                 }
                 $payLinks['ios'] = $appList;
