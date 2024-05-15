@@ -7,10 +7,11 @@ namespace Twint\Subscriber;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
 use Shopware\Core\System\SalesChannel\Event\SalesChannelProcessCriteriaEvent;
+use Shopware\Core\System\SystemConfig\Event\BeforeSystemConfigChangedEvent;
 use Shopware\Core\System\SystemConfig\Event\BeforeSystemConfigMultipleChangedEvent;
+use Shopware\Core\System\SystemConfig\Event\SystemConfigChangedEvent;
 use Shopware\Core\System\SystemConfig\Event\SystemConfigMultipleChangedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 use Twint\Core\Event\AfterUpdateValidatedEvent;
 use Twint\Core\Event\BeforeUpdateValidatedEvent;
 use Twint\Core\Service\SettingServiceInterface;
@@ -30,16 +31,49 @@ class SystemConfigSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents(): array
     {
-        return [
-            SystemConfigMultipleChangedEvent::class => 'onSystemConfigChanged',
-            BeforeSystemConfigMultipleChangedEvent::class => 'onBeforeSystemConfigChanged',
+        $subcribers = [
             BeforeUpdateValidatedEvent::class => 'onBeforeUpdateValidated',
             AfterUpdateValidatedEvent::class => 'onAfterUpdateValidated',
             'sales_channel.payment_method.process.criteria' => 'onPaymentMethodCriteriaBuild',
         ];
+
+        if (class_exists(BeforeSystemConfigMultipleChangedEvent::class)) {
+            $subcribers[SystemConfigMultipleChangedEvent::class] = 'onMultipleSystemConfigChanged';
+            $subcribers[BeforeSystemConfigMultipleChangedEvent::class] = 'onBeforeMultipleSystemConfigChanged';
+        } else {
+            $subcribers[BeforeSystemConfigChangedEvent::class] = 'onBeforeSystemConfigChanged';
+            $subcribers[SystemConfigChangedEvent::class] = 'onSystemConfigChanged';
+        }
+
+        return $subcribers;
     }
 
-    public function onSystemConfigChanged(SystemConfigMultipleChangedEvent $event): void
+    public function onSystemConfigChanged(SystemConfigChangedEvent $event): void
+    {
+        $channel = $event->getSalesChannelId();
+        $key = $event->getKey();
+        if (in_array($key, [Settings::CERTIFICATE, Settings::MERCHANT_ID, Settings::TEST_MODE], true)) {
+            // Need to read the config values from the database and validate the credentials
+            // While user is updating any of the Twint settings
+            $this->settingService->validateCredential($channel);
+        }
+    }
+
+    public function onBeforeSystemConfigChanged(BeforeSystemConfigChangedEvent $event): void
+    {
+        if (self::$allowUpdateValidated) {
+            return;
+        }
+
+        $key = $event->getKey();
+        if ($key === Settings::VALIDATED) {
+            // The event doesn't allow to remove the key from the config array then need to reset the value via data from database
+            $setting = $this->settingService->getSetting($event->getSalesChannelId());
+            $event->setValue($setting->getValidated());
+        }
+    }
+
+    public function onMultipleSystemConfigChanged(SystemConfigMultipleChangedEvent $event): void
     {
         $channel = $event->getSalesChannelId();
 
@@ -60,7 +94,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
      *      "TwintPayment.settings.validated": true // This value should not be updated via API call
      * }
      */
-    public function onBeforeSystemConfigChanged(BeforeSystemConfigMultipleChangedEvent $event): void
+    public function onBeforeMultipleSystemConfigChanged(BeforeSystemConfigMultipleChangedEvent $event): void
     {
         if (self::$allowUpdateValidated) {
             return;
