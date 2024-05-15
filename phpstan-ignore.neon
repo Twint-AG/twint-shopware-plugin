@@ -1,6 +1,41 @@
 parameters:
 	ignoreErrors:
 		-
-		    message: "#^Parameter \\#1 \\$value of class Twint\\\\Sdk\\\\Value\\\\UnfiledMerchantTransactionReference constructor expects non\\-empty\\-string, string given\\.$#"
-		    count: 1
-		    path: src/Service/PaymentService.php
+			message: "#^Call to method getConfig\\(\\) on an unknown class Shopware\\\\Core\\\\System\\\\SystemConfig\\\\Event\\\\BeforeSystemConfigMultipleChangedEvent\\.$#"
+			count: 1
+			path: src/Subscriber/SystemConfigSubscriber.php
+
+		-
+			message: "#^Call to method getConfig\\(\\) on an unknown class Shopware\\\\Core\\\\System\\\\SystemConfig\\\\Event\\\\SystemConfigMultipleChangedEvent\\.$#"
+			count: 1
+			path: src/Subscriber/SystemConfigSubscriber.php
+
+		-
+			message: "#^Call to method getSalesChannelId\\(\\) on an unknown class Shopware\\\\Core\\\\System\\\\SystemConfig\\\\Event\\\\BeforeSystemConfigMultipleChangedEvent\\.$#"
+			count: 1
+			path: src/Subscriber/SystemConfigSubscriber.php
+
+		-
+			message: "#^Call to method getSalesChannelId\\(\\) on an unknown class Shopware\\\\Core\\\\System\\\\SystemConfig\\\\Event\\\\SystemConfigMultipleChangedEvent\\.$#"
+			count: 1
+			path: src/Subscriber/SystemConfigSubscriber.php
+
+		-
+			message: "#^Call to method setValue\\(\\) on an unknown class Shopware\\\\Core\\\\System\\\\SystemConfig\\\\Event\\\\BeforeSystemConfigMultipleChangedEvent\\.$#"
+			count: 1
+			path: src/Subscriber/SystemConfigSubscriber.php
+
+		-
+			message: "#^Class Shopware\\\\Core\\\\System\\\\SystemConfig\\\\Event\\\\SystemConfigMultipleChangedEvent not found\\.$#"
+			count: 1
+			path: src/Subscriber/SystemConfigSubscriber.php
+
+		-
+			message: "#^Parameter \\$event of method Twint\\\\Subscriber\\\\SystemConfigSubscriber\\:\\:onBeforeMultipleSystemConfigChanged\\(\\) has invalid type Shopware\\\\Core\\\\System\\\\SystemConfig\\\\Event\\\\BeforeSystemConfigMultipleChangedEvent\\.$#"
+			count: 1
+			path: src/Subscriber/SystemConfigSubscriber.php
+
+		-
+			message: "#^Parameter \\$event of method Twint\\\\Subscriber\\\\SystemConfigSubscriber\\:\\:onMultipleSystemConfigChanged\\(\\) has invalid type Shopware\\\\Core\\\\System\\\\SystemConfig\\\\Event\\\\SystemConfigMultipleChangedEvent\\.$#"
+			count: 1
+			path: src/Subscriber/SystemConfigSubscriber.php
