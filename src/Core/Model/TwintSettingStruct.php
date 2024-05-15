@@ -28,7 +28,7 @@ class TwintSettingStruct extends Struct
      */
     protected $screens;
 
-    protected bool $validated;
+    protected bool $validated = false;
 
     public function getMerchantId(): string
     {

@@ -1,3 +1,5 @@
+includes:
+    - phpstan-ignore.neon
 parameters:
     level: 8
     treatPhpDocTypesAsCertain: false
@@ -22,3 +24,9 @@ parameters:
 
     bootstrapFiles:
         - bin/static-analyze-autoloader.php
+
+    ignoreErrors:
+        - '#Class Shopware\Core\System\SystemConfig\Event\SystemConfigMultipleChangedEvent not found#'
+        - '#Class SystemConfigMultipleChangedEvent not found#'
+        - '#Class BeforeSystemConfigChangedEvent not found#'
+        - '#Class SystemConfigChangedEvent not found#'
