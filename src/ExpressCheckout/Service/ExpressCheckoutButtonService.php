@@ -6,7 +6,7 @@ namespace Twint\ExpressCheckout\Service;
 
 use Doctrine\DBAL\Exception;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Twint\Core\Service\SettingService;
+use Twint\Core\Service\SettingServiceInterface;
 use Twint\Core\Setting\Settings;
 use Twint\ExpressCheckout\Model\ExpressCheckoutButton;
 use Twint\ExpressCheckout\Util\PaymentMethodUtil;
@@ -15,7 +15,7 @@ class ExpressCheckoutButtonService
 {
     public function __construct(
         private readonly PaymentMethodUtil $paymentMethodUtil,
-        private readonly SettingService $settingService
+        private readonly SettingServiceInterface $settingService,
     ) {
     }
 
@@ -37,8 +37,13 @@ class ExpressCheckoutButtonService
             return null;
         }
 
-        // Check if the screens are allowed
         $settings = $this->settingService->getSetting($context->getSalesChannel()->getId());
+        // Check if the credentials are validated
+        if (!$settings->getValidated()) {
+            return null;
+        }
+
+        // Check if the screens are allowed
         if (!in_array($screen, $settings->getScreens(), true)) {
             return null;
         }
