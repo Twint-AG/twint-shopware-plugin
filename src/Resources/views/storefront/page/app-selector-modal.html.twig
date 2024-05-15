@@ -1,0 +1,22 @@
+<!-- Modal -->
+<div class="modal fade" id="appSelector" tabindex="-1" role="dialog" aria-labelledby="appSelectorModalCenterTitle"
+     aria-hidden="true" data-app-selector>
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ 'twintPayment.appSelectorModal.title' | trans | raw }}</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    {% for payLink in payLinks %}
+                    <div class="col-sm-6">
+                        <label for="name" class="form-label">
+                            <a href="javascript:window.location='{{ payLink.link }}'">{{ payLink.name }}</a>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
