@@ -60,18 +60,4 @@ class SettingService implements SettingServiceInterface
         $this->configService->set(Settings::VALIDATED, $valid, $saleChannel);
         $this->eventDispatcher->dispatch(new AfterUpdateValidatedEvent());
     }
-
-    public function getIsoApps(?string $saleChannel = null): array
-    {
-        if ($this->configService->get(Settings::TEST_MODE, $saleChannel)) {
-            $response = @file_get_contents(Settings::APP_LIST_URL_TESTING);
-        } else {
-            $response = @file_get_contents(Settings::APP_LIST_URL_PRODUCTION);
-        }
-        if (!($response === '' || $response === '0' || $response === false)) {
-            $apps = json_decode($response, true);
-            return $apps['appSwitchConfigList'] ?? $apps;
-        }
-        return [];
-    }
 }
