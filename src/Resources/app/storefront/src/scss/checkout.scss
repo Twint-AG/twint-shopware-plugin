@@ -1,0 +1,43 @@
+.checkout-qr-code{
+  .qr-head{
+    text-align: center;
+  }
+  .qr-total-summary{
+    text-align: center;
+    h2{
+      text-align: center;
+      background: black;
+      color: white;
+      display: inline
+    }
+  }
+  .qr-body{
+    text-align:center;
+    width: 50%;
+    margin: auto;
+    .qr-container{
+      text-align:right;
+      display:table;
+      img{
+        width:100%;
+        align:auto;
+      }
+    }
+    .token-container{
+      ext-align:left;
+      display:table;
+      > div{
+        display:table-cell;
+        vertical-align:middle
+      }
+      h2{
+        display: inline;
+        vertical-align: middle;
+        background-color: gray;
+        display: inline;
+        color: white;
+        letter-spacing: 5px;
+      }
+    }
+  }
+}
