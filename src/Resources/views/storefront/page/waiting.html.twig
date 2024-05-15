@@ -22,7 +22,7 @@
             window.onload = function() {
                 var lastReloadTime = localStorage.getItem('lastReloadTime');
                 var currentTime = Date.now();
-                var reloadInterval = 1 * 60 * 1000; // 1 minute to check
+                var reloadInterval = 10 * 1000; // 10 second to check
                 if (!lastReloadTime || (currentTime - lastReloadTime > reloadInterval)) {
                     reloadPage();
                 }
@@ -30,8 +30,69 @@
             };
         </script>
         <div class="checkout">
-            {% block page_checkout_container %}
-                <div class="checkout-container">
+            {% block page_qr_waiting_container %}
+                <div class="qr-waiting-container">
+                    <div class="row nav">
+                        <div>
+                            <a href="http://www.twint.ch/" target="_blank"><div class="twint-logo"></div></a>
+                        </div>
+                    </div>
+
+                    <div id="amount-container" class="row section">
+                        <div class="wrap">
+                            <div class="amount-header text-center text-uppercase">
+                                <span class="value">{{ order.price.rawTotal|currency }}{% if order.price.taxStatus == "gross" %}{% endif %}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row qrCode">
+                        <div class="row grey-bg text-center">
+                            <div class="wrap">
+                                <div class="credentials">
+                                    <div class="credentials-box credential-qrcode text-center text-uppercase float-lt">
+                                        <div class="credentials-item qr">
+                                            {% if qrCode %}
+                                                <img src="{{ qrCode }}" alt="QR-Code"/>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="credentials-box credential-token text-center text-uppercase">
+                                        <div class="credentials-item token">
+                                            {% for char in pairingToken|split('') %}
+                                                <p class="credential-number">{{ char }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="description-box">
+
+                                <div class="description-item">
+                                    <div class="description-image">
+                                        <div class="description-icon icon-app"></div>
+                                    </div>
+                                    <div class="description-text">{{ "twintPayment.waitingPage.step1"|trans() }} </div>
+                                </div>
+                                <div class="description-item">
+                                    <div class="description-image">
+                                        <div class="description-icon icon-pay"></div>
+                                    </div>
+                                    <div class="description-text">{{ "twintPayment.waitingPage.step2"|trans() }}</div>
+                                </div>
+                                <div class="description-item">
+                                    <div class="description-image">
+                                        <div class="description-icon-cam icon-cam"></div>
+                                    </div>
+                                    <div class="description-text">{{ "twintPayment.waitingPage.step3"|trans() }}</div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
                     {% if payLinks is defined and payLinks.android is defined  %}
                         <script>
                             window.location = '{{ payLinks.android[0] }}'
@@ -41,48 +102,6 @@
                             payLinks: payLinks.ios
                         } %}
                     {% endif %}
-                    {% block page_checkout_main %}
-                        <div class="checkout-main">
-                            {% block base_flashbags_checkout %}
-                                <div class="flashbags">
-                                    {% for type, messages in app.flashes %}
-                                        {% sw_include '@Storefront/storefront/utilities/alert.html.twig' with { type: type, list: messages } %}
-                                    {% endfor %}
-                                </div>
-                            {% endblock %}
-
-                            {% block page_checkout_main_content %}{% endblock %}
-                        </div>
-                    {% endblock %}
-
-                    {% block page_checkout_additional %}
-                        <div class="checkout-qr-code">
-                            <h2 class="qr-head">{{ "twintPayment.waitingPage.headline"|trans({'%orderNumber%': orderNumber}) }}</h2>
-                            <div class="qr-total-summary">
-                                <h2>
-                                    {{ order.price.rawTotal|currency }}{% if order.price.taxStatus == "gross" %}{% endif %}
-                                </h2>
-                            </div>
-                            <div class="qr-body">
-                                <div class="row">
-                                    <div class="col-sm-6 qr-container">
-                                        {% if qrCode %}
-                                            <img src="{{ qrCode }}" alt="QR-Code"/>
-                                        {% endif %}
-                                    </div>
-                                    <div class="col-sm-6 token-container" style="t">
-                                        <div>
-                                            <h2>{{ pairingToken }}</h2>
-                                        </div>
-
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <h3>{{ "twintPayment.waitingPage.description"|trans() }}</h3>
-                                </div>
-                            </div>
-                        </div>
-                    {% endblock %}
                 </div>
             {% endblock %}
         </div>

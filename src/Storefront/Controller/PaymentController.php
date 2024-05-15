@@ -20,6 +20,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Twint\Core\Service\PaymentService;
 use Twint\Core\Util\CryptoHandler;
+use Twint\Sdk\Value\Order;
+use Twint\Sdk\Value\OrderStatus;
 use Twint\Util\OrderCustomFieldInstaller;
 
 #[Route(defaults: [
@@ -112,6 +114,7 @@ class PaymentController extends StorefrontController
             $criteria = new Criteria();
             $criteria->addFilter(new EqualsFilter('orderNumber', $orderNumber));
             $criteria->addAssociation('transactions.stateMachineState');
+            $criteria->addAssociation('currency');
             /** @var OrderEntity|null $order */
             $order = $this->orderRepository->search($criteria, $context)
                 ->first();
@@ -121,10 +124,24 @@ class PaymentController extends StorefrontController
                 $result = [
                     'reload' => true,
                 ];
+            } elseif (!empty($order)) {
+                $twintOrder = $this->paymentService->checkOrderStatus($order);
+                if (!$twintOrder instanceof Order) {
+                    $result = [
+                        'reload' => false,
+                    ];
+                } elseif ($twintOrder instanceof Order && $twintOrder->status()->equals(
+                    OrderStatus::SUCCESS()
+                ) || $twintOrder->status()
+                    ->equals(OrderStatus::FAILURE())) {
+                    $result = [
+                        'reload' => true,
+                    ];
+                }
             }
         } catch (Exception $e) {
             return new JsonResponse([
-                'reload' => true,
+                'reload' => false,
             ]);
         }
         return new JsonResponse($result);

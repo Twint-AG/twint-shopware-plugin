@@ -1,43 +1,191 @@
-.checkout-qr-code{
-  .qr-head{
-    text-align: center;
-  }
-  .qr-total-summary{
-    text-align: center;
-    h2{
-      text-align: center;
-      background: black;
-      color: white;
-      display: inline
-    }
-  }
-  .qr-body{
-    text-align:center;
-    width: 50%;
+.qr-waiting-container{
+  .twint-logo {
+    background: url("/bundles/twintpayment/assets/twint_logo.png");
+    background-repeat: no-repeat;
+    background-size: 140px 53px;
+    width: 140px;
+    height: 53px;
+    display: block;
+    vertical-align: middle;
     margin: auto;
-    .qr-container{
-      text-align:right;
-      display:table;
-      img{
-        width:100%;
-        align:auto;
+  }
+  .section {
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    float: left;
+  }
+  .wrap {
+    width: 95%;
+    margin: 0 auto;
+    position: relative;
+    padding: 0;
+    height: inherit;
+  }
+  #amount-container{
+    height: 140px;
+    .amount-header{
+      vertical-align: middle;
+      position: relative;
+      top: 40%;
+    }
+    .value {
+      color: white;
+      font-size: 54px;
+      line-height: 36px;
+      font-weight: bold;
+      background-color: black;
+      padding: 9px 26px;
+      margin-top: 20px;
+    }
+  }
+  .qrCode{
+    .grey-bg {
+      background-color: whitesmoke;
+    }
+    .credentials {
+      position: relative;
+      display: inline-block;
+      overflow: hidden;
+      padding-top: 10px;
+      .credentials-box {
+        position: relative;
+        display: inline-block;
+        padding: 0 20px 0px 20px;
+        .credentials-item {
+          background-color: #fefefe;
+          vertical-align: middle;
+          position: relative;
+          height: 300px;
+          width: 300px;
+          margin: 0 auto;
+          float: left;
+          .credential-number {
+            background-color: #cdcccc;
+            font-size: 36px;
+            font-weight: normal;
+            color: black;
+            height: 54px;
+            width: 44px;
+            line-height: 56px;
+            position: relative;
+            display: inline-block;
+            top: 50%;
+            -webkit-transform: translateY(-50%);
+            -ms-transform: translateY(-50%);
+            transform: translateY(-50%);
+            margin: 0 auto;
+          }
+        }
       }
     }
-    .token-container{
-      ext-align:left;
-      display:table;
-      > div{
-        display:table-cell;
-        vertical-align:middle
+    .description-box {
+      width: 800px;
+      margin: 0 auto;
+      margin-top: 40px;
+      .description-item {
+        position: relative;
+        display: inline-block;
+        width: 234px;
+        vertical-align: top;
+        padding: 0 15px;
+        .description-image {
+          width: 100%;
+          display: inline-block;
+          height: 60px;
+          text-align: center;
+          .description-icon {
+            background-repeat: no-repeat;
+            background-size: 46px 46px;
+            width: 46px;
+            height: 46px;
+            display: inline-block;
+            vertical-align: middle;
+            margin-top: -10px;
+            position: relative;
+          }
+          .description-icon-cam {
+            background-repeat: no-repeat;
+            background-size: 62px 42px;
+            width: 62px;
+            height: 42px;
+            display: inline-block;
+            vertical-align: middle;
+            margin-top: -10px;
+            position: relative;
+          }
+          .icon-app {
+            background: url("/bundles/twintpayment/assets/twint_logo.png");
+            background-repeat: no-repeat;
+            background-size: 116px 46px;
+            width: 43px;
+            margin-top: -4px;
+            border-radius: 10px;
+          }
+          .icon-pay {
+            background: url("/bundles/twintpayment/assets/twint-icon-qr_code.svg");
+            margin-top: -5px;
+          }
+          .icon-cam {
+            background: url("/bundles/twintpayment/assets/twint-icon-camera.svg");
+            margin-top: 0px;
+            height: 42px;
+            width: 59px;
+          }
+        }
+        .description-text {
+          text-align: center;
+        }
       }
-      h2{
-        display: inline;
-        vertical-align: middle;
-        background-color: gray;
-        display: inline;
-        color: white;
-        letter-spacing: 5px;
-      }
+    }
+  }
+}
+.appChooserArea{
+  .app-logos-container {
+    margin: 0 auto;
+    margin-bottom: 32px;
+    width: 250px;
+    display: grid;
+    grid-template-columns: 60px 60px 60px;
+    grid-gap: 32px;
+    grid-row-gap: 24px;
+
+    .bank-ubs {
+      background: url("/bundles/twintpayment/assets/apps/ubs.svg") no-repeat;
+      background-size: 60px 60px;
+      height: 60px;
+      width: 60px;
+    }
+    .bank-raiffeisen {
+      background: url("/bundles/twintpayment/assets/apps/raiffeisen.svg") no-repeat;
+      background-size: 60px 60px;
+      height: 60px;
+      width: 60px;
+    }
+    .bank-pf {
+      background: url("/bundles/twintpayment/assets/apps/pf.svg") no-repeat;
+      background-size: 60px 60px;
+      height: 60px;
+      width: 60px;
+    }
+    .bank-zkb {
+      background: url("/bundles/twintpayment/assets/apps/zkb.svg") no-repeat;
+      background-size: 60px 60px;
+      height: 60px;
+      width: 60px;
+    }
+    .bank-cs {
+      background: url("/bundles/twintpayment/assets/apps/cs.svg") no-repeat;
+      background-size: 60px 60px;
+      height: 60px;
+      width: 60px;
+    }
+    .bank-bcv {
+      background: url("/bundles/twintpayment/assets/apps/bcv.svg") no-repeat;
+      background-size: 60px 60px;
+      height: 60px;
+      width: 60px;
     }
   }
 }
