@@ -92,8 +92,9 @@ class PaymentController extends StorefrontController
         return $this->renderStorefront('@TwintPayment/storefront/page/waiting.html.twig', [
             'orderNumber' => $orderNumber,
             'qrCode' => $qrcode,
+            'pairingToken' => $twintApiResponse['pairingToken'] ?? '',
             'order' => $order,
-            'link' => $this->paymentService->getPayLink(
+            'payLinks' => $this->paymentService->getPayLinks(
                 $twintApiResponse['pairingToken'] ?? '',
                 $order->getSalesChannelId()
             ),

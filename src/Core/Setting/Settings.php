@@ -37,6 +37,10 @@ class Settings
 
     public const ONLY_PICK_ORDERS_FROM_MINUTES = 30;
 
+    public const TESTING_APP_LIST_URL = 'https://app.scheme-pat.twint.ch/appSwitch/v1/configs';
+
+    public const PRODUCTION_APP_LIST_URL = 'https://app.scheme.twint.ch/appSwitch/v1/configs';
+
     public const DEFAULT_VALUES = [
         self::TEST_MODE => self::ENVIRONMENT_PROD,
         self::MERCHANT_ID => '',

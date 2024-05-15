@@ -10,6 +10,9 @@
         },
         "waitingPage" : {
             "headline": "Bitte scannen Sie zur Bezahlung der Bestellung : %orderNumber% den QR-Code mit der Twint App"
+        },
+        "appSelectorModal": {
+            "title": "Bitte wählen Sie die App zur Bezahlung aus"
         }
     }
 }

@@ -84,4 +84,18 @@ class SettingService
     {
         $this->systemConfigService->delete(self::SYSTEM_CONFIG_DOMAIN . $key, $salesChannelId);
     }
+
+    public function getIsoApps(?string $salesChannelId): array
+    {
+        if ($this->systemConfigService->get(Settings::TEST_MODE, $salesChannelId)) {
+            $response = @file_get_contents(Settings::TESTING_APP_LIST_URL);
+        } else {
+            $response = @file_get_contents(Settings::PRODUCTION_APP_LIST_URL);
+        }
+        if (!($response === '' || $response === '0' || $response === false)) {
+            $apps = json_decode($response, true);
+            return $apps['appSwitchConfigList'] ?? $apps;
+        }
+        return [];
+    }
 }

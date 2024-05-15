@@ -40,7 +40,8 @@ class PaymentService
         private readonly EntityRepository $stateMachineRepository,
         private readonly EntityRepository $stateMachineStateRepository,
         private readonly OrderTransactionStateHandler $transactionStateHandler,
-        private readonly ClientBuilder $clientBuilder
+        private readonly ClientBuilder $clientBuilder,
+        private readonly SettingService $settingService
     ) {
         $this->context = new Context(new SystemSource());
     }
@@ -263,21 +264,29 @@ class PaymentService
         return $stateMachineState->getTechnicalName() === OrderTransactionStates::STATE_CANCELLED;
     }
 
-    public function getPayLink(string $token, string $salesChannelId): string
+    public function getPayLinks(string $token, string $salesChannelId): array
     {
-        $payLink = '#';
+        $payLinks = [];
         try {
             $client = $this->clientBuilder->build($salesChannelId);
             $device = $client->detectDevice(string()->assert($_SERVER['HTTP_USER_AGENT'] ?? ''));
             if ($device->isAndroid()) {
-                $payLink = 'intent://payment#Intent;action=ch.twint.action.TWINT_PAYMENT;scheme=twint;S.code =' . $token . ';S.startingOrigin=EXTERNAL_WEB_BROWSER;S.browser_fallback_url=;end';
+                $payLinks['android'] = 'intent://payment#Intent;action=ch.twint.action.TWINT_PAYMENT;scheme=twint;S.code =' . $token . ';S.startingOrigin=EXTERNAL_WEB_BROWSER;S.browser_fallback_url=;end';
             } elseif ($device->isIos()) {
-                $payLink = 'twint-issuer1://applinks/?al_applink_data={"app_action_type":"TWINT_PAYMENT","extras": {"code": "' . $token . '",},"referer_app_link": {"target_url": "", "url": "", "app_name": "EXTERNAL_WEB_BROWSER"}, "version": "6.0"}';
+                $appList = [];
+                $apps = $this->settingService->getIsoApps($salesChannelId);
+                foreach ($apps as $app) {
+                    $appList[] = [
+                        'name' => $app['displayName'],
+                        'link' => $app['issuerUrlScheme'] . 'applinks/?al_applink_data={"app_action_type":"TWINT_PAYMENT","extras": {"code": "' . $token . '",},"referer_app_link": {"target_url": "", "url": "", "app_name": "EXTERNAL_WEB_BROWSER"}, "version": "6.0"}',
+                    ];
+                }
+                $payLinks['ios'] = $appList;
             }
         } catch (Exception $e) {
-            return $payLink;
+            return $payLinks;
         }
-        return $payLink;
+        return $payLinks;
     }
 
     /**
