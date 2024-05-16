@@ -12,25 +12,22 @@
 
         {% block twint_payment_actions %}
             <template #smart-bar-actions>
-                {% block twint_payment_settings_actions_test %}
-                    <sw-button-process @click="onTest"
-                                       :isLoading="isTesting"
-                                       :processSuccess="isTestSuccessful"
-                                       :disabled="isLoading">
-                        {{ $tc('twint.settings.test') }}
-                    </sw-button-process>
-                {% endblock %}
-
                 {% block twint_payment_settings_actions_save %}
                     <sw-button-process
                             class="sw-settings-login-registration__save-action"
                             :isLoading="isLoading"
                             :processSuccess="isSaveSuccessful"
-                            :disabled="isLoading || isTesting || !isTestSuccessful"
+                            :disabled="isLoading || isTesting"
                             variant="primary"
                             @process-finish="saveFinish"
-                            @click="onSave">
-                        {{ $tc('twint.settings.save') }}
+                            @click="onTest"
+                            >
+                        <span v-if="isTesting">
+                            {{ $tc('twint.settings.button.testing') }}
+                        </span>
+                        <span v-if="!isTesting">
+                            {{ $tc('twint.settings.button.save') }}
+                        </span>
                     </sw-button-process>
                 {% endblock %}
             </template>

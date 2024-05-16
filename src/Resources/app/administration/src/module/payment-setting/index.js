@@ -35,19 +35,20 @@ Shopware.Module.register('twint-payment', {
 
     settingsItem: [
         {
-            name: 'twint-payment',
-            to: 'twint.payment.index',
-            label: 'twint.general.mainMenuItemGeneral',
+            name: 'twint-payment-express',
+            to: 'twint.payment.express',
+            label: 'twint.express.menuItem',
             group: 'plugins',
             iconComponent: 'twint-payment-plugin-icon',
             backgroundEnabled: false
         },
         {
-            name: 'twint-express-payment',
-            to: 'twint.payment.express',
-            label: 'twint.general.mainMenuItemExpress',
+            name: 'twint-payment',
+            to: 'twint.payment.index',
+            label: 'twint.general.menuItem',
             group: 'plugins',
             iconComponent: 'twint-payment-plugin-icon',
             backgroundEnabled: false
-        }],
+        }
+    ],
 });

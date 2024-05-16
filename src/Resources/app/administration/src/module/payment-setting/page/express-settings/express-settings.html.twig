@@ -5,7 +5,7 @@
                 <h2>
                     {{ $tc('sw-settings.index.title') }}
                     <sw-icon name="regular-chevron-right-xs" small></sw-icon>
-                    {{ $tc('twint.expressTittle') }}
+                    {{ $tc('twint.express.title') }}
                 </h2>
             </template>
         {% endblock %}
@@ -21,7 +21,7 @@
                             variant="primary"
                             @process-finish="saveFinish"
                             @click="onSave">
-                        {{ $tc('twint.settings.save') }}
+                        {{ $tc('twint.settings.button.save') }}
                     </sw-button-process>
                 {% endblock %}
             </template>
