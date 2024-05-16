@@ -4,7 +4,9 @@
     {{ parent() }}
     {% block twint_buy_button %}
         {% if expressButton is defined and expressButton %}
-            {{ include('@TwintPayment/storefront/component/button/express-checkout-button.html.twig') }}
+            <div class="col-12">
+                {{ include('@TwintPayment/storefront/component/button/express-checkout-button.html.twig') }}
+            </div>
         {% endif %}
     {% endblock %}
 {% endblock %}
