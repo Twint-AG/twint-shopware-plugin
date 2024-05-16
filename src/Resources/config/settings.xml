@@ -10,7 +10,10 @@
             <name>testMode</name>
             <label>Switch to test mode</label>
             <label lang="de-DE">Zum benutzerdefinierten Abnahmetestmodus wechseln</label>
+
             <helpText>Custom Acceptance Test mode (On) / Production Mode (Off)</helpText>
+            <helpText lang="de-DE">Custom Acceptance Test mode (On) / Production Mode (Off)</helpText>
+
             <defaultValue>false</defaultValue>
         </input-field>
     </card>
@@ -29,7 +32,9 @@
             <name>certificate</name>
             <label>Certificate File</label>
             <label lang="de-DE">Zertifikat Passwort</label>
+
             <helpText>SwissSign certificate password to allow reading above certificate.</helpText>
+            <helpText lang="de-DE">SwissSign certificate password to allow reading above certificate.</helpText>
             <required>true</required>
         </component>
     </card>

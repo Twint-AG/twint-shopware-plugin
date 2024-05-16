@@ -37,10 +37,6 @@ export default {
             this.isSaveSuccessful = false;
         },
 
-        testFinish() {
-            this.isTestSuccessful = false;
-        },
-
         getConfigValue(field) {
             const actualConfig = this.$refs.systemConfig.actualConfigData;
             const defaultConfig = actualConfig.null;
@@ -50,8 +46,12 @@ export default {
                 return actualConfig.null[`TwintPayment.settings.${field}`];
             }
 
-            return actualConfig[salesChannelId][`TwintPayment.settings.${field}`]
-                || defaultConfig[`TwintPayment.settings.${field}`];
+            let value =  actualConfig[salesChannelId][`TwintPayment.settings.${field}`];
+            if(value === undefined || value === null) {
+                value = defaultConfig[`TwintPayment.settings.${field}`];
+            }
+
+            return value;
         },
 
         onSave() {
@@ -83,8 +83,8 @@ export default {
 
             if (!merchantId || merchantId.trim() === '') {
                 this.createNotificationError({
-                    title: this.$tc('twint.settings.titleError'),
-                    message: this.$tc('twint.settings.messageErrorRequiredMerchantID')
+                    title: this.$tc('twint.settings.merchantId.error.title'),
+                    message: this.$tc('twint.settings.merchantId.error.required')
                 });
 
                 isValid = false;
@@ -92,8 +92,8 @@ export default {
 
             if (isValid && !this.isValidUUIDv4(merchantId)) {
                 this.createNotificationError({
-                    title: this.$tc('twint.settings.titleError'),
-                    message: this.$tc('twint.settings.messageErrorInvalidMerchantID')
+                    title: this.$tc('twint.settings.merchantId.error.title'),
+                    message: this.$tc('twint.settings.merchantId.error.invalidFormat')
                 });
 
                 isValid = false;
@@ -101,8 +101,8 @@ export default {
 
             if (!certificate) {
                 this.createNotificationError({
-                    title: this.$tc('twint.settings.titleError'),
-                    message: this.$tc('twint.settings.messageErrorRequiredCertificate')
+                    title: this.$tc('twint.settings.merchantId.error.title'),
+                    message: this.$tc('twint.settings.certificate.error.required')
                 });
 
                 isValid = false;
@@ -132,15 +132,12 @@ export default {
                 const success = response.success ?? false;
 
                 if (success) {
-                    this.createNotificationSuccess({
-                        title: this.$tc('twint.settings.titleSuccess'),
-                        message: this.$tc('twint.settings.messageTestSuccess')
-                    });
                     this.isTestSuccessful = true;
+                    this.onSave();
                 } else {
                     this.createNotificationError({
-                        title: this.$tc('twint.settings.titleError'),
-                        message: this.$tc('twint.settings.messageTestError')
+                        title: this.$tc('twint.settings.testCredentials.error.title'),
+                        message: this.$tc('twint.settings.testCredentials.error.message')
                     });
                 }
             }).finally((errorResponse) => {

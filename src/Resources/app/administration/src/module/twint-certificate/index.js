@@ -37,8 +37,8 @@ Component.register('twint-certificate', {
             service.uploadFile(this.currentCertFile, this.currentPassword ?? '').then((res) => {
                 this.updateCertificate(res.data.data);
                 this.createNotification({
-                    title: "Success",
-                    message: this.$tc('twint.certificateSuccess'),
+                    title: this.$tc('twint.settings.certificate.success.title'),
+                    message: this.$tc('twint.settings.certificate.success.message'),
                     growl: true
                 }).then(r => {
 
@@ -50,16 +50,16 @@ Component.register('twint-certificate', {
                     let errorCode = err.response.data.errorCode;
 
                     return this.createNotificationError({
-                        title: this.$tc('twint.certificateErrorTitle'),
-                        message: this.$tc('twint.certificateError.' + errorCode),
+                        title: this.$tc('twint.settings.certificate.error.title'),
+                        message: this.$tc('twint.settings.certificate.error.' + errorCode),
                         growl: true
                     });
                 }
 
                 // Generic error handling
                 this.createNotificationError({
-                    title: this.$tc('twint.certificateErrorTitle'),
-                    message: this.$tc('twint.validation.errorMessage'),
+                    title: this.$tc('twint.settings.certificate.error.title'),
+                    message: this.$tc('twint.settings.certificate.error.general'),
                     growl: true
                 });
             })

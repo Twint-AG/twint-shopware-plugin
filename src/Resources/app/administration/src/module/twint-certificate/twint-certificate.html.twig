@@ -8,7 +8,7 @@
                 required
         >
             <template #caption-label>
-                {{ $tc('twint.certificateFileLabel') }}
+                {{ $tc('twint.settings.certificate.placeholder') }}
             </template>
         </sw-file-input>
 
@@ -16,9 +16,11 @@
                 v-model:value="currentPassword"
                 :entity-collection="null"
                 class="twint-config-field"
-                :label="$tc('twint.certificateLabel')"
-                :help-text="$tc('twint.certificatePasswordHelpText')"
-                @blur="updatePassword">
+                :label="$tc('twint.settings.certificate.password.label')"
+                :help-text="$tc('twint.settings.certificate.password.helpText')"
+                @blur="updatePassword"
+                required
+        >
             <template #suffix>
                 {% block twint_certificate_password_suffix_block %}
                     <sw-icon name="regular-low-vision" size="22px"></sw-icon>

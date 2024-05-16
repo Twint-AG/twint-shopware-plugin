@@ -1,43 +1,61 @@
 {
   "twint": {
-    "title": "TWINT payment",
-    "expressTittle": "TWINT Express Checkout",
+    "title": "TWINT credentials",
+    "express": {
+      "title": "TWINT Express Checkout",
+      "menuItem": "TWINT Express Checkout"
+    },
     "general": {
-      "mainMenuItemGeneral": "TWINT payment",
-      "mainMenuItemExpress": "TWINT Express Checkout",
+      "menuItem": "TWINT credentials",
       "descriptionTextModule": "TWINT is a Swiss payment app that allows you to pay in stores, online, and transfer money to friends and family."
     },
     "settings": {
-      "titleSuccess": "Success",
-      "test": "Test Credentials",
-      "save": "Save",
-      "titleError": "Error",
-      "messageErrorRequiredMerchantID": "Merchant ID is required",
-      "messageErrorInvalidMerchantID": "Merchant ID has an invalid format. Has to be a UUIDv4",
-      "messageErrorRequiredCertificate": "Certificate is required before saving",
-      "messageTestSuccess": "Credential configuration is valid. You can save it now.",
-      "messageTestError": "Credential configuration is invalid. Please check again: merchant ID, certificate and environment (mode)"
-    },
-    "validation": {
-      "errorTitle": "TWINT configuration error",
-      "errorMessage": "There was an error validating the TWINT certificate (selected file and password). Please try again or use a different certification."
-    },
-    "certificateErrorTitle": "Certificate Error",
-    "merchantErrorTitle": "Merchant ID",
-    "certificateSuccess": "Reading certificate successful",
-    "certificateLabel": "Certificate Password",
-    "certificateFileLabel": "Select a certificate file (.p12)",
-    "certificatePasswordHelpText": "The password for the certificate file is optional. If you have set a password for the certificate file, please enter it here.",
-    "certificateError": {
-      "ERROR_INVALID_INPUT": "Certificate file and password are required",
-      "ERROR_INVALID_UNKNOWN": "Something went wrong with the certificate validation. Please try again.",
-      "ERROR_INVALID_CERTIFICATE_FORMAT": "Invalid certificate format",
-      "ERROR_INVALID_PASSPHRASE": "Invalid passphrase",
-      "ERROR_INVALID_ISSUER_COUNTRY": "Invalid issuer country",
-      "ERROR_INVALID_ISSUER_ORGANIZATION": "Invalid issuer organization",
-      "ERROR_INVALID_EXPIRY_DATE": "Invalid expiry date",
-      "ERROR_CERTIFICATE_EXPIRED": "Certificate expired",
-      "ERROR_CERTIFICATE_NOT_YET_VALID": "Certificate not yet valid"
+      "button": {
+        "save": "Save",
+        "testing": "Verifying credentials ..."
+      },
+      "testCredentials": {
+        "error": {
+          "title": "Credential Error",
+          "message": "Credential configuration is invalid. Please check again: merchant ID, certificate and environment (mode)"
+        }
+      },
+      "merchantId": {
+        "label": "Merchant ID",
+        "placeholder": "Enter your merchant ID",
+        "helpText": "The merchant ID provided by TWINT",
+        "error" : {
+          "title": "Merchant ID",
+          "invalidFormat": "Merchant ID has an invalid format. Has to be a UUIDv4",
+          "required": "Merchant ID is required"
+        }
+      },
+      "certificate": {
+        "placeholder": "Select a certificate file (.p12)",
+        "error": {
+          "title": "Certificate Error",
+          "message": "There was an error reading the certificate. Please try again.",
+          "general": "There was an error reading the certificate. Please try again.",
+          "required": "Certificate file is required",
+          "ERROR_INVALID_INPUT": "Certificate file and password are required",
+          "ERROR_INVALID_UNKNOWN": "Something went wrong with the certificate validation. Please try again.",
+          "ERROR_INVALID_CERTIFICATE_FORMAT": "Invalid certificate format",
+          "ERROR_INVALID_PASSPHRASE": "Invalid passphrase",
+          "ERROR_INVALID_ISSUER_COUNTRY": "Invalid issuer country",
+          "ERROR_INVALID_ISSUER_ORGANIZATION": "Invalid issuer organization",
+          "ERROR_INVALID_EXPIRY_DATE": "Invalid expiry date",
+          "ERROR_CERTIFICATE_EXPIRED": "Certificate expired",
+          "ERROR_CERTIFICATE_NOT_YET_VALID": "Certificate not yet valid"
+        },
+        "success": {
+          "title": "Certificate Success",
+          "message": "Reading certificate successful"
+        },
+        "password": {
+          "label": "Certificate Password",
+          "helpText": "The password for the certificate file"
+        }
+      }
     }
   }
 }
