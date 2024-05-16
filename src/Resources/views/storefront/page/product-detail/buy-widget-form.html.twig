@@ -1,0 +1,10 @@
+{% sw_extends "@Storefront/storefront/page/product-detail/buy-widget-form.html.twig" %}
+{% set expressButton = page.extensions['TwintExpressCheckoutButton'] %}
+{% block page_product_detail_buy_button_container %}
+    {{ parent() }}
+    {% block twint_buy_button %}
+        {% if expressButton is defined and expressButton %}
+            {{ include('@TwintPayment/storefront/component/button/express-checkout-button.html.twig') }}
+        {% endif %}
+    {% endblock %}
+{% endblock %}
