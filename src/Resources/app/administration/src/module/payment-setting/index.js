@@ -6,7 +6,7 @@ Shopware.Component.register('express-settings', () => import('./page/express-set
 Shopware.Module.register('twint-payment', {
     type: 'plugin',
     name: 'TwintPayment',
-    title: 'twint.general.mainMenuItemGeneral',
+    title: 'twint.title',
     description: 'twint.general.descriptionTextModule',
     version: '1.0.0',
     targetVersion: '1.0.0',
