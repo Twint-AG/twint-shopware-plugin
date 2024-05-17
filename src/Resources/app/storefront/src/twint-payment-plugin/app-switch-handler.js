@@ -10,9 +10,9 @@ export default class AppSwitchHandler extends Plugin {
         appSelector: '#logo-container',
         appLinkSelector: "#app-chooser",
         qrCodeSelector: ".qr-code-mobile",
-        lastReloadTimeKey: "lastReloadTime", //second
+        lastReloadTimeKey: "lastReloadTime",
         appCountDownInterval: 10, //second
-        intervalCheck: 10
+        intervalCheck: 10, //second
     };
 
     init() {
@@ -24,6 +24,7 @@ export default class AppSwitchHandler extends Plugin {
         this.bankSelectors = DomAccess.querySelectorAll(this.appSelector, '.bank-logo', false);
         this.orderNumber = this.pageSelector.getAttribute('data-order-number');
         this.isMobile = this.pageSelector.getAttribute('data-mobile');
+        this.isAndroidMobile = this.pageSelector.getAttribute('data-is-android-device');
         this.statusOrderEndpoint = '/payment/order/' + this.orderNumber;
         this._registerEvents();
     }
@@ -51,24 +52,38 @@ export default class AppSwitchHandler extends Plugin {
         this.reloadPageInterval = setInterval(() => {
             this.reloadPage(this);
         }, reloadInterval);
-        if(this.isMobile){
-            this.countDownInterval = setInterval(() => {
-                this.appCountDown(this);
+
+        if(this.isMobile && this.isAndroidMobile){
+            let link = this.pageSelector.getAttribute('data-android-link');
+            window.location.replace(link);
+            const checkLocation = setInterval(() => {
+                if (window.location.href !== link) {
+                    this.showMobileQrCode();
+                }
+                clearInterval(checkLocation);
             }, this.options.appCountDownInterval * 1000);
         }
     }
     onClickBank(event, object) {
         event.preventDefault();
         var link = object.getAttribute('data-link');
-        if(link){
-            window.location = link;
-        }
+        this.openAppBank(link);
     }
     onChangeAppList(event) {
         const select = event.target;
         let link = select.options[select.selectedIndex].value;
+        this.openAppBank(link);
+    }
+    openAppBank(link) {
         if(link){
-            window.location = link;
+            window.location.replace(link);
+            const checkLocation = setInterval(() => {
+                if (window.location.href !== link) {
+                    console.log('Navigation unsuccessful');
+                    this.showMobileQrCode();
+                }
+                clearInterval(checkLocation);
+            }, this.options.appCountDownInterval * 1000);
         }
     }
     reloadPage() {
@@ -84,8 +99,7 @@ export default class AppSwitchHandler extends Plugin {
             } catch (e) {}
         }, 'application/json', true);
     }
-    appCountDown() {
+    showMobileQrCode() {
         this.qrCodeSelector.style['display'] = 'block';
-        clearInterval(this.countDownInterval);
     }
 }
