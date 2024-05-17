@@ -4,15 +4,19 @@
     {% block page_qr_waiting %}
         {% set isAndroidDevice = false %}
         {% set isIosDevice = false %}
+        {% set androidLink = '' %}
         {% if payLinks.android is defined%}
             {% set isAndroidDevice = true %}
         {% endif %}
         {% if payLinks.ios is defined%}
             {% set isIosDevice = true %}
         {% endif %}
+        {% if isAndroidDevice and payLinks.android %}
+            {% set androidLink = payLinks.android %}
+        {% endif %}
         <div class="checkout">
             {% block page_qr_waiting_container %}
-                <div class="qr-waiting-container" data-order-number="{{ orderNumber }}" data-mobile="{{ isAndroidDevice or isIosDevice }}">
+                <div class="qr-waiting-container" data-order-number="{{ orderNumber }}" data-mobile="{{ isAndroidDevice or isIosDevice }}" data-is-android-device="{{ isAndroidDevice }}" data-android-link="{{ payLinks.android }}">
                     {% block page_qr_waiting_logo %}
                     <div class="row nav" style="{% if isAndroidDevice or isIosDevice %}display:none{% endif %}">
                         <div>
@@ -158,11 +162,6 @@
                             </div>
                         </div>
                         {% endblock %}
-                        {% if isAndroidDevice  %}
-                            <script>
-                                window.location = '{{ payLinks.android }}'
-                            </script>
-                        {% endif %}
                     </div>
                 </div>
             {% endblock %}
