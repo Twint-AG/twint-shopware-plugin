@@ -103,7 +103,10 @@ class PaymentController extends StorefrontController
         ]);
     }
 
-    #[Route(path: '/payment/order/{orderNumber}', name: 'frontend.twint.order', methods: ['GET'])]
+    #[Route(path: '/payment/order/{orderNumber}', name: 'frontend.twint.order', defaults: [
+        'XmlHttpRequest' => true,
+        'csrf_protected' => false,
+    ], methods: ['GET'])]
     public function order(Request $request, Context $context): JsonResponse
     {
         $orderNumber = $request->get('orderNumber');

@@ -13,8 +13,11 @@
             "step2": "Tap the QR Code icon.",
             "step3": "Point your smartphone camera at the QR code. Or select the “Code” tab and enter the number code."
         },
-        "appSelectorModal": {
-            "title": "Choose your TWINT app"
+        "appSelector": {
+            "title": "Choose your TWINT app",
+            "otherBankOption": "Other bank",
+            "enterCode" : "Or enter this code<br>in your app:",
+            "switchLinkLabel": "Switch to the app now"
         }
     }
 }
