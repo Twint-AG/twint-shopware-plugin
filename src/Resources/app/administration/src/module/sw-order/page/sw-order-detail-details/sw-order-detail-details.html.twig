@@ -1,0 +1,61 @@
+{% block sw_order_detail_details %}
+
+    {% parent %}
+
+    {% block twint_transaction_log_modal %}
+        <twint-transaction-logs-modal
+                v-if="showTwintTransactionLogModal"
+                :order="order"
+                :is-loading="isLoading"
+                @modal-close="showTwintTransactionLogModal = false"
+        />
+    {% endblock %}
+
+{% endblock %}
+
+{% block sw_order_detail_details_payment %}
+    <sw-order-details-state-card
+            v-if="transaction"
+            :title="$tc('sw-order.detailsTab.labelTransactionCard')"
+            :order="order"
+            :entity="transaction"
+            :state-label="$tc('sw-order.stateCard.headlineTransactionState')"
+            :disabled="!acl.can('order.editor')"
+            @show-status-history="showStateHistoryModal = true"
+            @show-twint-transaction-logs="showTwintTransactionLogModal = true"
+            @save-edits="onSaveEdits"
+    >
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_order_detail_details_payment_billing_address %}
+            <sw-order-address-selection
+                    class="sw-order-detail-details__billing-address"
+                    type="billing"
+                    :address="billingAddress"
+                    :address-id="selectedBillingAddressId"
+                    :disabled="!acl.can('order.editor')"
+                    :label="$tc('sw-order.createBase.detailsBody.labelBillingAddress')"
+                    @change-address="onChangeOrderAddress"
+            />
+        {% endblock %}
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_order_detail_details_payment_method_select %}
+            <sw-entity-single-select
+                    {% if VUE3 %}
+                        v-model:value="transaction.paymentMethodId"
+                    {% else %}
+                        v-model="transaction.paymentMethodId"
+                    {% endif %}
+                    entity="payment_method"
+                    label-property="distinguishableName"
+                    disabled
+                    :criteria="paymentMethodCriteria"
+                    :label="$tc('sw-order.createBase.detailsFooter.labelPaymentMethod')"
+                    :placeholder="$tc('sw-order.createBase.detailsFooter.placeholderPaymentMethod')"
+                    show-clearable-button
+            />
+        {% endblock %}
+
+    </sw-order-details-state-card>
+{% endblock %}

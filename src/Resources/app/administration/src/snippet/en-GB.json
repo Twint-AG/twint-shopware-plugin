@@ -1,6 +1,7 @@
 {
   "twint": {
-    "title": "TWINT Payment",
+    "name": "TWINT payment",
+    "title": "TWINT payment",
     "express": {
       "title": "TWINT Express Checkout",
       "menuItem": "TWINT Express Checkout"
@@ -55,6 +56,12 @@
           "label": "Certificate Password",
           "helpText": "Please enter the password for the certificate"
         }
+      }
+    },
+    "order": {
+      "stateCard": {
+        "label": "Payment has been processed by TWINT",
+        "showTransactionLogModal": "Show transaction logs"
       }
     }
   }
