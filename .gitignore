@@ -4,7 +4,6 @@
 
 **/var
 **/vendor
-**/dist/**
 build/
 **/public/static
 
