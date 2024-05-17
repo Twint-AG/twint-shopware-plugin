@@ -20,6 +20,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 use Twint\Core\Factory\ClientBuilder;
+use Twint\Core\Handler\TransactionLog\TransactionLogWriterInterface;
 use Twint\Core\Setting\Settings;
 use Twint\Sdk\Value\Money;
 use Twint\Sdk\Value\Order;
@@ -40,7 +41,8 @@ class PaymentService
         private readonly EntityRepository $stateMachineRepository,
         private readonly EntityRepository $stateMachineStateRepository,
         private readonly OrderTransactionStateHandler $transactionStateHandler,
-        private readonly ClientBuilder $clientBuilder
+        private readonly ClientBuilder $clientBuilder,
+        private readonly TransactionLogWriterInterface $transactionLogWriter
     ) {
         $this->context = new Context(new SystemSource());
     }
@@ -74,6 +76,17 @@ class PaymentService
                 $transaction->getOrderTransaction()
                     ->getId(),
                 'An error occurred during the communication with API gateway' . PHP_EOL . $e->getMessage()
+            );
+        } finally {
+            $this->transactionLogWriter->write(
+                $order->getId(),
+                $transaction->getOrderTransaction()
+                    ->getId(),
+                'request',
+                'response',
+                'soapRequest',
+                'soapResponse',
+                'exception'
             );
         }
     }
