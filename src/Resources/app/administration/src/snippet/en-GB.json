@@ -1,6 +1,6 @@
 {
   "twint": {
-    "title": "TWINT credentials",
+    "title": "TWINT payment",
     "express": {
       "title": "TWINT Express Checkout",
       "menuItem": "TWINT Express Checkout"
