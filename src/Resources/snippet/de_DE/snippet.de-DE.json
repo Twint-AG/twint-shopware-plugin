@@ -13,8 +13,11 @@
             "step2": "Tippen Sie auf des OR Code Symbol.",
             "step3": "Richten Sie Ihre Smartphone Kamera auf den OH Code. Oder wählen Sie den Reiter «Code» und geben Sie den Zahiencode ein."
         },
-        "appSelectorModal": {
-            "title": "Wählen Sie Ihre TWINT-App"
+        "appSelector": {
+            "title": "Wählen Sie Ihre TWINT-App",
+            "otherBankOption": "Andere Bank",
+            "enterCode" : "Oder geben Sie diesen Code<br>in Ihre App ein:",
+            "switchLinkLabel": "Jetzt zur App wechseln"
         }
     }
 }
