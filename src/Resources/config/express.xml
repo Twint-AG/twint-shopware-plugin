@@ -9,8 +9,8 @@
             <name>screens</name>
             <label>Display screens</label>
             <label lang="de-DE">Display screens</label>
-            <helpText>Screen end-users can see TWINT checkout button.</helpText>
-            <helpText lang="de-DE">Screen end-users can see TWINT checkout button.</helpText>
+            <helpText>Users can see TWINT checkout button</helpText>
+            <helpText lang="de-DE">Users can see TWINT checkout button</helpText>
             <options>
                 <option>
                     <id>PDP</id>
