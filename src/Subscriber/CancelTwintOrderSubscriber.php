@@ -74,7 +74,9 @@ class CancelTwintOrderSubscriber implements EventSubscriberInterface
                         $order->getSalesChannelId()
                     );
                     if ($twintOrder instanceof Order) {
-                        $this->logger->info('Reverse for order number : ' . $order->getOrderNumber() . ' successful !');
+                        $this->logger->info(
+                            sprintf('TWINT order "%s" is reversed successfully!', $order->getOrderNumber())
+                        );
                     }
                 }
             }
