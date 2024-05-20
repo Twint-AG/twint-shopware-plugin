@@ -1,14 +1,10 @@
 {% sw_extends "@Storefront/storefront/component/checkout/offcanvas-cart.html.twig" %}
 
-{% set expressButton = page.extensions['TwintExpressCheckoutButton'] %}
-
 {% block component_offcanvas_cart_actions_checkout %}
     {{ parent() }}
 
     {% block twint_buy_button_plp %}
-        {% if expressButton is defined and expressButton %}
-            {{ include('@TwintPayment/storefront/component/button/express-checkout-button.html.twig') }}
-        {% endif %}
+        {{ isTwintExpress('CART_FLYOUT') ? include('@TwintPayment/storefront/component/button/express-checkout-button.html.twig') : '' }}
     {% endblock %}
 
 {% endblock %}
