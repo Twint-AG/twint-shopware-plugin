@@ -1,6 +1,6 @@
 {
     "name": "twint/twint",
-    "description": "TBU - Twint payment plugin",
+    "description": "TBU - Twint Payment plugin",
     "type": "shopware-platform-plugin",
     "version": "0.0.1",
     "license": "MIT",
