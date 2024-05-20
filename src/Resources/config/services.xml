@@ -113,6 +113,7 @@
         <service id="Twint\ExpressCheckout\Service\ExpressCheckoutButtonService">
             <argument type="service" id="Twint\ExpressCheckout\Util\PaymentMethodUtil"/>
             <argument type="service" id="Twint\Core\Service\SettingServiceInterface"/>
+            <argument type="service" id="Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRoute"/>
         </service>
 
         <service id="Twint\ExpressCheckout\Subscriber\ProductPageLoadedSubscriber">
@@ -123,6 +124,12 @@
         <service id="Twint\Core\Factory\ClientBuilder">
             <argument type="service" id="Twint\Core\Service\SettingServiceInterface"/>
             <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
+        </service>
+
+        <service id="twint.twig_extension"
+                 class="Twint\Extension\TwintExtension"
+                 public="false">
+            <tag name="twig.extension" />
         </service>
     </services>
 </container>
