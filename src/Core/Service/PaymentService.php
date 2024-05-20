@@ -62,7 +62,7 @@ class PaymentService
             /**var non-empty-string $orderNumber**/
             $orderNumber = empty($order->getOrderNumber()) ? $order->getId() : $order->getOrderNumber();
             if ($orderNumber === '') {
-                throw PaymentException::asyncProcessInterrupted($orderNumber, 'Missing order number' . PHP_EOL);
+                throw PaymentException::asyncProcessInterrupted($orderNumber, 'Order number missing' . PHP_EOL);
             }
             /** @var Order * */
             return $client->startOrder(
@@ -73,7 +73,7 @@ class PaymentService
             throw PaymentException::asyncProcessInterrupted(
                 $transaction->getOrderTransaction()
                     ->getId(),
-                'An error occurred during the communication with external payment gateway' . PHP_EOL . $e->getMessage()
+                'An error occurred during the communication with API gateway' . PHP_EOL . $e->getMessage()
             );
         }
     }
@@ -100,7 +100,7 @@ class PaymentService
             if (empty($twintApiResponse) || empty($twintApiResponse['id'])) {
                 throw PaymentException::asyncProcessInterrupted(
                     $referenceId,
-                    'Missing Twint response for this order:' . $order->getId() . PHP_EOL
+                    'Missing TWINT response for this order:' . $order->getId() . PHP_EOL
                 );
             }
             $client = $this->clientBuilder->build($order->getSalesChannelId());
@@ -124,7 +124,7 @@ class PaymentService
         } catch (Exception $e) {
             throw PaymentException::asyncProcessInterrupted(
                 $order->getId(),
-                'An error occurred during the communication with external payment gateway' . PHP_EOL . $e->getMessage()
+                'An error occurred during the communication with API gateway' . PHP_EOL . $e->getMessage()
             );
         }
     }
@@ -152,7 +152,7 @@ class PaymentService
         } catch (Exception $e) {
             throw PaymentException::asyncProcessInterrupted(
                 $orderTransactionId,
-                'An error occurred during the communication with external payment gateway' . PHP_EOL . $e->getMessage()
+                'An error occurred during the communication with API gateway' . PHP_EOL . $e->getMessage()
             );
         }
     }

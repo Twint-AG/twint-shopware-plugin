@@ -53,7 +53,7 @@
         },
         "password": {
           "label": "Zertifikatspasswort",
-          "helpText": "Das Passwort für die Zertifikatsdatei"
+          "helpText": "Das Passwort für die Zertifikatsdatei "
         }
       }
     }

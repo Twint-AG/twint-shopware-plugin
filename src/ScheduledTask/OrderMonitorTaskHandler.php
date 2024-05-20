@@ -45,11 +45,15 @@ class OrderMonitorTaskHandler extends ScheduledTaskHandler
                     $this->paymentService->checkOrderStatus($order);
                 } catch (Exception $e) {
                     $this->logger->error(
-                        'Could not update the order status:' . $e->getMessage() . 'Error Code:' . $e->getCode()
+                        sprintf(
+                            'TWINT order status cannot be updated: %s with error code: %s',
+                            $e->getMessage(),
+                            $e->getCode()
+                        )
                     );
                 }
             }
         }
-        $this->logger->info('cron ran successfully');
+        $this->logger->info('Cron ran successfully');
     }
 }
