@@ -126,7 +126,9 @@ class SystemConfigSubscriber implements EventSubscriberInterface
     {
         $criteria = $event->getCriteria();
         $criteria->addFilter(
-            new NotFilter(NotFilter::CONNECTION_AND, [new ContainsFilter('handlerIdentifier', TwintExpressPaymentHandler::class)])
+            new NotFilter(NotFilter::CONNECTION_AND, [
+                new ContainsFilter('handlerIdentifier', TwintExpressPaymentHandler::class),
+            ])
         );
 
         $channel = $event->getSalesChannelContext()
