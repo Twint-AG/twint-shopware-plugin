@@ -1,10 +1,12 @@
 {% sw_extends "@Storefront/storefront/component/buy-widget/buy-widget-form.html.twig" %}
-{% set expressButton = page.extensions['TwintExpressCheckoutButton'] %}
+
 {% block buy_widget_buy_button_container %}
     {{ parent() }}
     {% block twint_buy_button %}
-        {% if expressButton is defined and expressButton %}
+        {% if isTwintExpress('PDP') %}
+            <div class="col-12">
             {{ include('@TwintPayment/storefront/component/button/express-checkout-button.html.twig') }}
+            </div>
         {% endif %}
     {% endblock %}
 {% endblock %}
