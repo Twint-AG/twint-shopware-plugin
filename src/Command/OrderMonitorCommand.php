@@ -27,27 +27,33 @@ class OrderMonitorCommand extends Command
     protected function configure(): void
     {
         $this->setName('twint:order-monitor:scan');
-        $this->setDescription('Scan all pending orders for checking');
+        $this->setDescription('Check all pending TWINT orders for updates');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
-        $style->info('Start to scan all pending orders for checking');
+        $style->info('Start scanning all pending TWINT orders for updates');
         $pendingOrders = $this->paymentService->getPendingOrders();
         if (count($pendingOrders) > 0) {
-            $style->info('' . sprintf('These total: %d orders are going to process soon !', count($pendingOrders)));
+            $style->info(sprintf('These total: %d TWINT orders will be processed', count($pendingOrders)));
             foreach ($pendingOrders as $order) {
                 if ($order instanceof OrderEntity) {
                     $style->info('Process for order ' . $order->getOrderNumber());
                     try {
                         $twintOrder = $this->paymentService->checkOrderStatus($order);
                         if ($twintOrder instanceof Order) {
-                            $style->success('Update order ' . $order->getOrderNumber() . ' successful!');
+                            $style->success(
+                                sprintf('TWINT order "%s" was updated successfully!', $order->getOrderNumber())
+                            );
                         }
                     } catch (Exception $e) {
                         $style->error(
-                            'Could not update the order status:' . $e->getMessage() . 'Error Code:' . $e->getCode()
+                            sprintf(
+                                'TWINT order status cannot be updated: %s with error code: %s',
+                                $e->getMessage(),
+                                $e->getCode()
+                            )
                         );
                     }
                 }

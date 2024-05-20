@@ -51,7 +51,7 @@ class TwintController extends AbstractController
             if ($certificate instanceof Pkcs12Certificate) {
                 return $this->json([
                     'success' => true,
-                    'message' => 'Extract certificate successfully',
+                    'message' => 'Certificate validation successful ',
                     'data' => [
                         'certificate' => $this->encryptor->encrypt($certificate->content()),
                         'passphrase' => $this->encryptor->encrypt($certificate->passphrase()),
@@ -61,14 +61,14 @@ class TwintController extends AbstractController
 
             return $this->json([
                 'success' => false,
-                'message' => 'Invalid certificate file',
+                'message' => 'Invalid certificate file ',
                 'errorCode' => $certificate,
             ], 400);
         }
 
         return $this->json([
             'success' => false,
-            'message' => 'Please upload an valid file',
+            'message' => 'Please upload a valid certificate file ',
         ], 400);
     }
 

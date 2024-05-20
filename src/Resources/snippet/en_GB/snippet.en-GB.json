@@ -1,23 +1,23 @@
 {
     "twintPayment": {
         "error": {
-            "invalidPaymentError": "The  %name%  got removed due the missing %currency% currency",
-            "orderNotFound": "The order is not found"
+            "invalidPaymentError": "Missing %currency% currency. %name%  is removed.",
+            "orderNotFound": "This order cannot be found"
         },
         "message": {
-            "successPayment": "The payment is successfully",
-            "cancelPayment": "The payment got cancel"
+            "successPayment": "Your payment is successful",
+            "cancelPayment": "The payment is cancelled"
         },
         "waitingPage" : {
-            "step1": "Open your bank’s TWINT app on your smartphone.",
-            "step2": "Tap the QR Code icon.",
-            "step3": "Point your smartphone camera at the QR code. Or select the “Code” tab and enter the number code."
+            "step1": "Open your bank's TWINT App on your smartphone",
+            "step2": "Tap the QR code",
+            "step3": "Scan the QR code with the App, or select the “Code” tab and enter the code"
         },
         "appSelector": {
-            "title": "Choose your TWINT app",
-            "otherBankOption": "Other bank",
-            "enterCode" : "Or enter this code<br>in your app:",
-            "switchLinkLabel": "Switch to the app now"
+            "title": "Choose your TWINT App",
+            "otherBankOption": "Other banks",
+            "enterCode" : "Or enter this code<br>in your App:",
+            "switchLinkLabel": "Switch to the TWINT App now"
         }
     }
 }

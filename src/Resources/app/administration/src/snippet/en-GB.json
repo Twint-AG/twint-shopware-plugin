@@ -1,13 +1,13 @@
 {
   "twint": {
-    "title": "TWINT payment",
+    "title": "TWINT Payment",
     "express": {
       "title": "TWINT Express Checkout",
       "menuItem": "TWINT Express Checkout"
     },
     "general": {
-      "menuItem": "TWINT credentials",
-      "descriptionTextModule": "TWINT is a Swiss payment app that allows you to pay in stores, online, and transfer money to friends and family."
+      "menuItem": "TWINT Credentials",
+      "descriptionTextModule": "TWINT is a Swiss payment app that allows you to pay in stores and online shops digitally and cashlessly"
     },
     "settings": {
       "button": {
@@ -17,43 +17,43 @@
       "testCredentials": {
         "error": {
           "title": "Credential Error",
-          "message": "Credential configuration is invalid. Please check again: merchant ID, certificate and environment (mode)"
+          "message": "Invalid credentials. Please check again: Merchant ID, certificate and environment (mode)"
         }
       },
       "merchantId": {
         "label": "Merchant ID",
-        "placeholder": "Enter your merchant ID",
-        "helpText": "The merchant ID provided by TWINT",
+        "placeholder": "Enter your Merchant ID",
+        "helpText": "The Merchant ID is provided by TWINT",
         "error" : {
           "title": "Merchant ID",
-          "invalidFormat": "Merchant ID has an invalid format. Has to be a UUIDv4",
+          "invalidFormat": "Invalid Merchant ID. Merchant ID needs to be a UUIDv4",
           "required": "Merchant ID is required"
         }
       },
       "certificate": {
-        "placeholder": "Select a certificate file (.p12)",
+        "placeholder": "Upload a certificate file (.p12)",
         "error": {
-          "title": "Certificate Error",
-          "message": "There was an error reading the certificate. Please try again.",
-          "general": "There was an error reading the certificate. Please try again.",
+          "title": "Invalid Certificate",
+          "message": "An error occurred reading the certificate. Please try again ",
+          "general": "An error occurred reading the certificate. Please try again",
           "required": "Certificate file is required",
           "ERROR_INVALID_INPUT": "Certificate file and password are required",
-          "ERROR_INVALID_UNKNOWN": "Something went wrong with the certificate validation. Please try again.",
+          "ERROR_INVALID_UNKNOWN": "Certificate cannot be validated. Please try again",
           "ERROR_INVALID_CERTIFICATE_FORMAT": "Invalid certificate format",
           "ERROR_INVALID_PASSPHRASE": "Invalid passphrase",
           "ERROR_INVALID_ISSUER_COUNTRY": "Invalid issuer country",
           "ERROR_INVALID_ISSUER_ORGANIZATION": "Invalid issuer organization",
           "ERROR_INVALID_EXPIRY_DATE": "Invalid expiry date",
           "ERROR_CERTIFICATE_EXPIRED": "Certificate expired",
-          "ERROR_CERTIFICATE_NOT_YET_VALID": "Certificate not yet valid"
+          "ERROR_CERTIFICATE_NOT_YET_VALID": "Certificate is not yet valid"
         },
         "success": {
-          "title": "Certificate Success",
-          "message": "Reading certificate successful"
+          "title": "Certificate validation successful",
+          "message": "Your certificate is successfully validated"
         },
         "password": {
           "label": "Certificate Password",
-          "helpText": "The password for the certificate file"
+          "helpText": "Please enter the password for the certificate"
         }
       }
     }
