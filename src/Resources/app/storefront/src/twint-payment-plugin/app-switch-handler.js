@@ -79,7 +79,6 @@ export default class AppSwitchHandler extends Plugin {
             window.location.replace(link);
             const checkLocation = setInterval(() => {
                 if (window.location.href !== link) {
-                    console.log('Navigation unsuccessful');
                     this.showMobileQrCode();
                 }
                 clearInterval(checkLocation);
