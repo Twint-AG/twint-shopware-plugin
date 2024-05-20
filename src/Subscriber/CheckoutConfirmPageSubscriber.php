@@ -8,6 +8,8 @@ use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twint\Core\Handler\TwintExpressPaymentHandler;
+use Twint\Core\Handler\TwintRegularPaymentHandler;
 use Twint\Core\Setting\Settings;
 use Twint\Sdk\Value\Money;
 
@@ -34,28 +36,35 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     {
         $salesChannelContext = $event->getSalesChannelContext();
 
-        foreach ($event->getPage()->getPaymentMethods() as $paymentMethod) {
-            if (strpos($paymentMethod->getHandlerIdentifier(), 'Twint\\') !== false) {
-                $currencyCode = $salesChannelContext->getCurrency()
-                    ->getIsoCode();
-
-                if (!in_array($currencyCode, Settings::ALLOWED_CURRENCIES, true)) {
+        foreach ($event->getPage()->getPaymentMethods() as $method) {
+            $identifier = $method->getHandlerIdentifier();
+            switch ($identifier) {
+                case TwintExpressPaymentHandler::class:
                     $event->getPage()
                         ->getPaymentMethods()
-                        ->remove($paymentMethod->getId());
+                        ->remove($method->getId());
+                    break;
 
-                    $session = $event->getRequest()
-                        ->getSession();
+                case TwintRegularPaymentHandler::class:
+                    $currencyCode = $salesChannelContext->getCurrency()
+                        ->getIsoCode();
 
-                    if ($session instanceof FlashBagAwareSessionInterface) {
-                        $session->getFlashBag()
-                            ->add('danger', $this->translator->trans('twintPayment.error.invalidPaymentError', [
-                                '%name%' => $paymentMethod->getName(),
-                                '%currency%' => Money::CHF,
-                            ]));
-                        break;
+                    if (!in_array($currencyCode, Settings::ALLOWED_CURRENCIES, true)) {
+                        $event->getPage()
+                            ->getPaymentMethods()
+                            ->remove($method->getId());
+
+                        $session = $event->getRequest()
+                            ->getSession();
+
+                        if ($session instanceof FlashBagAwareSessionInterface) {
+                            $session->getFlashBag()
+                                ->add('danger', $this->translator->trans('twintPayment.error.invalidPaymentError', [
+                                    '%name%' => $method->getName(),
+                                    '%currency%' => Money::CHF,
+                                ]));
+                        }
                     }
-                }
             }
         }
     }
