@@ -65,7 +65,6 @@ export default class AppSwitchHandler extends Plugin {
         }
     }
     onClickBank(event, object) {
-        event.preventDefault();
         var link = object.getAttribute('data-link');
         this.openAppBank(link);
     }
