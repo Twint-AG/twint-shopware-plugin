@@ -35,7 +35,7 @@ export default class AppSwitchHandler extends Plugin {
     _registerEvents() {
         if (this.bankSelectors) {
             this.bankSelectors.forEach((object) => {
-                object.addEventListener('click', (event) => {
+                object.addEventListener('touchend', (event) => {
                     this.onClickBank(event, object);
                 });
             });
