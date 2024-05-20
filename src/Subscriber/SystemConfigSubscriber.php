@@ -14,7 +14,6 @@ use Shopware\Core\System\SystemConfig\Event\SystemConfigMultipleChangedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Twint\Core\Event\AfterUpdateValidatedEvent;
 use Twint\Core\Event\BeforeUpdateValidatedEvent;
-use Twint\Core\Handler\TwintExpressPaymentHandler;
 use Twint\Core\Service\SettingServiceInterface;
 use Twint\Core\Setting\Settings;
 
@@ -124,13 +123,6 @@ class SystemConfigSubscriber implements EventSubscriberInterface
      */
     public function onPaymentMethodCriteriaBuild(SalesChannelProcessCriteriaEvent $event): void
     {
-        $criteria = $event->getCriteria();
-        $criteria->addFilter(
-            new NotFilter(NotFilter::CONNECTION_AND, [
-                new ContainsFilter('handlerIdentifier', TwintExpressPaymentHandler::class),
-            ])
-        );
-
         $channel = $event->getSalesChannelContext()
             ->getSalesChannelId();
         $setting = $this->settingService->getSetting($channel);
@@ -138,6 +130,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $criteria = $event->getCriteria();
         $criteria->addFilter(
             new NotFilter(NotFilter::CONNECTION_AND, [new ContainsFilter('handlerIdentifier', 'Twint')])
         );
