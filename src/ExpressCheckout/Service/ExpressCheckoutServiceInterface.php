@@ -10,5 +10,6 @@ use Symfony\Component\HttpFoundation\Request;
 interface ExpressCheckoutServiceInterface
 {
     public function pairing(SalesChannelContext $context, Request $request): mixed;
+
     public function monitoring(string $pairingUUid, SalesChannelContext $context): mixed;
 }

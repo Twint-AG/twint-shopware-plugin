@@ -22,13 +22,13 @@ class CustomerRegisterService
     ) {
     }
 
-//    public function register(SalesChannelContext $context): Entity
-//    {
-//        $customerData = $this->generateCustomerData($context);
-//        $customer = $this->customerRepository->create([$customerData], $context->getContext());
-//
-//        return $customer;
-//    }
+    //    public function register(SalesChannelContext $context): Entity
+    //    {
+    //        $customerData = $this->generateCustomerData($context);
+    //        $customer = $this->customerRepository->create([$customerData], $context->getContext());
+    //
+    //        return $customer;
+    //    }
 
     /**
      * @throws Exception
