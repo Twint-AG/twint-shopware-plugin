@@ -34,9 +34,6 @@ class PaymentController extends StorefrontController
         private CryptoHandler $cryptoService,
         private PaymentService $paymentService
     ) {
-        $this->orderRepository = $orderRepository;
-        $this->cryptoService = $cryptoService;
-        $this->paymentService = $paymentService;
     }
 
     #[Route(path: '/payment/waiting/{orderNumber}', name: 'frontend.twint.waiting', methods: ['GET'])]

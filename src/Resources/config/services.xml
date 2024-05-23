@@ -24,6 +24,7 @@
         
         <service id="Twint\Storefront\Controller\PaymentController" public="true">
             <argument type="service" id="order.repository"/>
+            <argument type="service" id="Twint\ExpressCheckout\Loader\ParingLoader"/>
             <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
             <argument type="service" id="Twint\Core\Service\PaymentService" />
             <call method="setContainer">
@@ -32,6 +33,24 @@
             <call method="setTwig">
                 <argument type="service" id="twig"/>
             </call>
+        </service>
+
+        <service id="Twint\Storefront\Controller\CheckoutController" public="true">
+            <argument type="service" id="twint.service.express.checkout"/>
+            <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
+            <argument type="service" id="Twint\ExpressCheckout\Loader\ParingLoader"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+            <call method="setTwig">
+                <argument type="service" id="twig"/>
+            </call>
+        </service>
+
+
+        <service id="Twint\ExpressCheckout\Loader\ParingLoader">
+            <argument type="service" id="twint_pairing.repository"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\CartPersister"/>
         </service>
 
         <service id="Twint\Util\Method\RegularPaymentMethod">
@@ -116,6 +135,26 @@
             <argument type="service" id="Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRoute"/>
         </service>
 
+        <service id="twint.service.express.checkout" class="Twint\ExpressCheckout\Service\ExpressCheckoutService">
+            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\LineItemFactoryRegistry"/>
+            <argument type="service" id="Shopware\Core\Checkout\Shipping\SalesChannel\SortedShippingMethodRoute"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\Delivery\DeliveryBuilder"/>
+            <argument type="service" id="Twint\ExpressCheckout\Service\ExpressPaymentService"/>
+        </service>
+
+        <service id="Twint\ExpressCheckout\Service\ExpressPaymentService">
+            <argument type="service" id="Twint\Core\Factory\ClientBuilder"/>
+            <argument type="service" id="twint_pairing.repository"/>
+        </service>
+
+        <service id="Twint\ExpressCheckout\Service\CustomerRegisterService">
+            <argument type="service" id="Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface"/>
+            <argument type="service" id="customer.repository"/>
+            <argument type="service" id="Twint\ExpressCheckout\Util\PaymentMethodUtil"/>
+        </service>
+
         <service id="Twint\ExpressCheckout\Subscriber\ProductPageLoadedSubscriber">
             <argument type="service" id="Twint\ExpressCheckout\Service\ExpressCheckoutButtonService" />
             <tag name="kernel.event_subscriber"/>
@@ -130,6 +169,10 @@
                  class="Twint\Extension\TwintExtension"
                  public="false">
             <tag name="twig.extension" />
+        </service>
+
+        <service id="Twint\Core\DataAbstractionLayer\Entity\Pairing\TwintPairingDefinition">
+            <tag name="shopware.entity.definition" entity="twint_transaction_log"/>
         </service>
     </services>
 </container>
