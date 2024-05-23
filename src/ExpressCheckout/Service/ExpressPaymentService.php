@@ -40,20 +40,18 @@ class ExpressPaymentService
             $methods
         );
 
-        if ($pairing instanceof InteractiveFastCheckoutCheckIn) {
-            $this->pairingRepository->create([
-                [
-                    'id' => $pairing->pairingUuid()
-                        ->__toString(),
-                    'cart' => $cart,
-                    'cartToken' => $cart->getToken(),
-                    'status' => (string) $pairing->pairingStatus(),
-                    'token' => (string) $pairing->pairingToken(),
-                    'shippingMethodId' => null,
-                    'customerData' => null,
-                ],
-            ], $context->getContext());
-        }
+        $this->pairingRepository->create([
+            [
+                'id' => $pairing->pairingUuid()
+                    ->__toString(),
+                'cart' => $cart,
+                'cartToken' => $cart->getToken(),
+                'status' => (string) $pairing->pairingStatus(),
+                'token' => (string) $pairing->pairingToken(),
+                'shippingMethodId' => null,
+                'customerData' => null,
+            ],
+        ], $context->getContext());
 
         return $pairing;
     }
