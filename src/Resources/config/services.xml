@@ -24,7 +24,6 @@
         
         <service id="Twint\Storefront\Controller\PaymentController" public="true">
             <argument type="service" id="order.repository"/>
-            <argument type="service" id="Twint\ExpressCheckout\Loader\ParingLoader"/>
             <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
             <argument type="service" id="Twint\Core\Service\PaymentService" />
             <call method="setContainer">
