@@ -16,9 +16,8 @@ class ParingLoader
 {
     public function __construct(
         private EntityRepository $pairingRepository,
-        private CartPersister    $cartPersister
-    )
-    {
+        private CartPersister $cartPersister
+    ) {
     }
 
     public function load(string $pairingId, SalesChannelContext $context): TwintPairingEntity

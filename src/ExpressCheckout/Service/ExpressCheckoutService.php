@@ -26,14 +26,13 @@ use Twint\Sdk\Value\ShippingMethods;
 class ExpressCheckoutService implements ExpressCheckoutServiceInterface
 {
     public function __construct(
-        private readonly CartService                 $cartService,
-        private readonly LineItemFactoryRegistry     $itemFactoryRegistry,
+        private readonly CartService $cartService,
+        private readonly LineItemFactoryRegistry $itemFactoryRegistry,
         private readonly AbstractShippingMethodRoute $shippingMethodRoute,
-        private readonly EventDispatcherInterface    $eventDispatcher,
-        private readonly DeliveryBuilder             $deliveryBuilder,
-        private readonly ExpressPaymentService       $paymentService
-    )
-    {
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly DeliveryBuilder $deliveryBuilder,
+        private readonly ExpressPaymentService $paymentService
+    ) {
     }
 
     /**
@@ -67,10 +66,9 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
                 ?->getTotalPrice();
 
             $options[] = new ShippingMethod(
-                new ShippingMethodId(
-                    $method->getId()
-                ), $method->getName() ?? 'Default Shipping Method'
-                , Money::CHF($amount ?? 0)
+                new ShippingMethodId($method->getId()),
+                $method->getName() ?? 'Default Shipping Method',
+                Money::CHF($amount ?? 0)
             );
         }
 
