@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Twint\Core\Service\PaymentService;
 use Twint\Core\Util\CryptoHandler;
-use Twint\Sdk\Value\PairingToken;
+use Twint\Sdk\Value\NumericPairingToken;
 use Twint\Util\OrderCustomFieldInstaller;
 
 abstract class AbstractPaymentHandler implements AsynchronousPaymentHandlerInterface
@@ -56,7 +56,7 @@ abstract class AbstractPaymentHandler implements AsynchronousPaymentHandlerInter
                     ->__toString(),
                 'transactionStatus' => $twintOrder->transactionStatus()
                     ->__toString(),
-                'pairingToken' => $twintOrder->pairingToken() instanceof PairingToken ? $twintOrder->pairingToken()
+                'pairingToken' => $twintOrder->pairingToken() instanceof NumericPairingToken ? $twintOrder->pairingToken()
                     ->__toString() : '',
                 'merchantTransactionReference' => $twintOrder->merchantTransactionReference()
                     ->__toString(),

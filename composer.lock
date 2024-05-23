@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bd59a1ac182f6b6a98ee92b4a316234e",
+    "content-hash": "494c309f6bcb846be5112cadbc5fe57b",
     "packages": [
         {
             "name": "azjezz/psl",
@@ -1511,16 +1511,16 @@
         },
         {
             "name": "php-soap/wsdl",
-            "version": "1.8.0",
+            "version": "1.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-soap/wsdl.git",
-                "reference": "467e77107963a56df330c1ac578d20e641b4d16a"
+                "reference": "31adf0621e47db7f91152be15423be2a839a66f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-soap/wsdl/zipball/467e77107963a56df330c1ac578d20e641b4d16a",
-                "reference": "467e77107963a56df330c1ac578d20e641b4d16a",
+                "url": "https://api.github.com/repos/php-soap/wsdl/zipball/31adf0621e47db7f91152be15423be2a839a66f3",
+                "reference": "31adf0621e47db7f91152be15423be2a839a66f3",
                 "shasum": ""
             },
             "require": {
@@ -1560,7 +1560,7 @@
             "description": "Deals with WSDLs",
             "support": {
                 "issues": "https://github.com/php-soap/wsdl/issues",
-                "source": "https://github.com/php-soap/wsdl/tree/1.8.0"
+                "source": "https://github.com/php-soap/wsdl/tree/1.9.0"
             },
             "funding": [
                 {
@@ -1568,7 +1568,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2024-03-15T13:00:08+00:00"
+            "time": "2024-05-17T13:43:29+00:00"
         },
         {
             "name": "php-soap/wsdl-reader",
@@ -1683,16 +1683,16 @@
         },
         {
             "name": "phpro/soap-client",
-            "version": "3.2.0",
+            "version": "3.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpro/soap-client.git",
-                "reference": "05bded4ca8b46c463de1337f256bb9763532e0b5"
+                "reference": "66eb9620084ea08f5dca1170bcd099d5b156c2d4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpro/soap-client/zipball/05bded4ca8b46c463de1337f256bb9763532e0b5",
-                "reference": "05bded4ca8b46c463de1337f256bb9763532e0b5",
+                "url": "https://api.github.com/repos/phpro/soap-client/zipball/66eb9620084ea08f5dca1170bcd099d5b156c2d4",
+                "reference": "66eb9620084ea08f5dca1170bcd099d5b156c2d4",
                 "shasum": ""
             },
             "require": {
@@ -1747,7 +1747,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpro/soap-client/issues",
-                "source": "https://github.com/phpro/soap-client/tree/3.2.0"
+                "source": "https://github.com/phpro/soap-client/tree/3.3.0"
             },
             "funding": [
                 {
@@ -1755,7 +1755,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2024-04-26T13:34:45+00:00"
+            "time": "2024-05-21T17:03:36+00:00"
         },
         {
             "name": "psr/clock",
@@ -1962,20 +1962,20 @@
         },
         {
             "name": "psr/http-factory",
-            "version": "1.0.2",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/http-factory.git",
-                "reference": "e616d01114759c4c489f93b099585439f795fe35"
+                "reference": "2b4765fddfe3b508ac62f829e852b1501d3f6e8a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/http-factory/zipball/e616d01114759c4c489f93b099585439f795fe35",
-                "reference": "e616d01114759c4c489f93b099585439f795fe35",
+                "url": "https://api.github.com/repos/php-fig/http-factory/zipball/2b4765fddfe3b508ac62f829e852b1501d3f6e8a",
+                "reference": "2b4765fddfe3b508ac62f829e852b1501d3f6e8a",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.0.0",
+                "php": ">=7.1",
                 "psr/http-message": "^1.0 || ^2.0"
             },
             "type": "library",
@@ -1999,7 +1999,7 @@
                     "homepage": "https://www.php-fig.org/"
                 }
             ],
-            "description": "Common interfaces for PSR-7 HTTP message factories",
+            "description": "PSR-17: Common interfaces for PSR-7 HTTP message factories",
             "keywords": [
                 "factory",
                 "http",
@@ -2011,9 +2011,9 @@
                 "response"
             ],
             "support": {
-                "source": "https://github.com/php-fig/http-factory/tree/1.0.2"
+                "source": "https://github.com/php-fig/http-factory"
             },
-            "time": "2023-04-10T20:10:41+00:00"
+            "time": "2024-04-15T12:06:14+00:00"
         },
         {
             "name": "psr/http-message",
@@ -3560,11 +3560,11 @@
         },
         {
             "name": "twint-ch/twint-sdk",
-            "version": "dev-develop",
+            "version": "dev-dev/fast-checkout",
             "source": {
                 "type": "git",
                 "url": "https://git.nfq.asia/twint-ag/php-sdk.git",
-                "reference": "ad4f356ac845698044d22417e3d3eb4e14924cfb"
+                "reference": "2fba11c0d4baea28bd686585bb8061ae68167d07"
             },
             "require": {
                 "azjezz/psl": "^2.5.0",
@@ -3575,7 +3575,7 @@
                 "php": ">=8.1",
                 "php-soap/engine": "^2.4.0",
                 "php-soap/psr18-transport": "^1.5.0",
-                "phpro/soap-client": "^3.1.1",
+                "phpro/soap-client": "^3.3.0",
                 "psr/clock": "^1.0",
                 "webimpress/safe-writer": "^2.0"
             },
@@ -3584,17 +3584,18 @@
                 "laminas/laminas-code": "^4.8",
                 "php-soap/wsdl-reader": "^0.10.0",
                 "php-standard-library/phpstan-extension": "^1.0",
-                "phpstan/phpstan": "^1.10.60",
+                "phpstan/phpstan": "^1.11.1",
                 "phpstan/phpstan-strict-rules": "^1.5",
                 "phpunit/phpunit": "^10.5",
+                "roave/better-reflection": "^6.25.0",
                 "slevomat/coding-standard": "^8.14",
                 "symfony/clock": "^6.4",
                 "symfony/dotenv": "^6.4",
                 "symfony/event-dispatcher": "^6.4",
+                "symfony/finder": "^6.4",
                 "symplify/easy-coding-standard": "^12.1",
                 "wiremock-php/wiremock-php": "dev-cloud-support as 2.39.0"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "files": [
@@ -3622,7 +3623,7 @@
                 }
             ],
             "description": "The TWINT SDK for PHP",
-            "time": "2024-05-08T00:14:11+00:00"
+            "time": "2024-05-22T09:44:34+00:00"
         },
         {
             "name": "veewee/xml",
@@ -4249,16 +4250,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.10.67",
+            "version": "1.11.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "16ddbe776f10da6a95ebd25de7c1dbed397dc493"
+                "reference": "e524358f930e41a2b4cca1320e3b04fc26b39e0b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/16ddbe776f10da6a95ebd25de7c1dbed397dc493",
-                "reference": "16ddbe776f10da6a95ebd25de7c1dbed397dc493",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/e524358f930e41a2b4cca1320e3b04fc26b39e0b",
+                "reference": "e524358f930e41a2b4cca1320e3b04fc26b39e0b",
                 "shasum": ""
             },
             "require": {
@@ -4303,7 +4304,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-04-16T07:22:02+00:00"
+            "time": "2024-05-15T08:00:59+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -4729,21 +4730,21 @@
         },
         {
             "name": "rector/rector",
-            "version": "1.0.4",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "6e04d0eb087aef707fa0c5686d33d6ff61f4a555"
+                "reference": "556509e2dcf527369892b7d411379c4a02f31859"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/6e04d0eb087aef707fa0c5686d33d6ff61f4a555",
-                "reference": "6e04d0eb087aef707fa0c5686d33d6ff61f4a555",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/556509e2dcf527369892b7d411379c4a02f31859",
+                "reference": "556509e2dcf527369892b7d411379c4a02f31859",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.2|^8.0",
-                "phpstan/phpstan": "^1.10.57"
+                "phpstan/phpstan": "^1.11"
             },
             "conflict": {
                 "rector/rector-doctrine": "*",
@@ -4776,7 +4777,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/1.0.4"
+                "source": "https://github.com/rectorphp/rector/tree/1.1.0"
             },
             "funding": [
                 {
@@ -4784,7 +4785,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-04-05T09:01:07+00:00"
+            "time": "2024-05-18T09:40:27+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -5769,16 +5770,16 @@
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "3.9.2",
+            "version": "3.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
-                "reference": "aac1f6f347a5c5ac6bc98ad395007df00990f480"
+                "reference": "57e09801c2fbae2d257b8b75bebb3deeb7e9deb2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/aac1f6f347a5c5ac6bc98ad395007df00990f480",
-                "reference": "aac1f6f347a5c5ac6bc98ad395007df00990f480",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/57e09801c2fbae2d257b8b75bebb3deeb7e9deb2",
+                "reference": "57e09801c2fbae2d257b8b75bebb3deeb7e9deb2",
                 "shasum": ""
             },
             "require": {
@@ -5845,20 +5846,20 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2024-04-23T20:25:34+00:00"
+            "time": "2024-05-20T08:11:32+00:00"
         },
         {
             "name": "symfony/browser-kit",
-            "version": "7.1.x-dev",
+            "version": "v7.0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/browser-kit.git",
-                "reference": "8b10797d3158deaaf1edd84588d0ed33ca95eb08"
+                "reference": "0a48e67a7975c07d8cc0661fbbdddce56c58425e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/browser-kit/zipball/8b10797d3158deaaf1edd84588d0ed33ca95eb08",
-                "reference": "8b10797d3158deaaf1edd84588d0ed33ca95eb08",
+                "url": "https://api.github.com/repos/symfony/browser-kit/zipball/0a48e67a7975c07d8cc0661fbbdddce56c58425e",
+                "reference": "0a48e67a7975c07d8cc0661fbbdddce56c58425e",
                 "shasum": ""
             },
             "require": {
@@ -5897,7 +5898,7 @@
             "description": "Simulates the behavior of a web browser, allowing you to make requests, click on links and submit forms programmatically",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/browser-kit/tree/7.1"
+                "source": "https://github.com/symfony/browser-kit/tree/v7.0.7"
             },
             "funding": [
                 {
@@ -5913,7 +5914,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-04-18T09:32:20+00:00"
+            "time": "2024-04-18T09:29:19+00:00"
         },
         {
             "name": "symfony/dom-crawler",
@@ -6094,8 +6095,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "twint-ch/twint-sdk": 20,
-        "symfony/browser-kit": 20
+        "twint-ch/twint-sdk": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

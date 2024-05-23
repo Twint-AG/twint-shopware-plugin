@@ -1,4 +1,4 @@
-image: shivammathur/node:latest
+image: shivammathur/node:jammy
 
 variables:
   COMPOSER_ALLOW_SUPERUSER: "1"
