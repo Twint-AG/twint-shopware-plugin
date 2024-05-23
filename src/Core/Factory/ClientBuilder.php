@@ -59,7 +59,7 @@ class ClientBuilder
             $client = new Client(
                 CertificateContainer::fromPkcs12(new Pkcs12Certificate(new InMemoryStream($cert), $passphrase)),
                 MerchantId::fromString($merchantId),
-                Version::latest(),
+                Version::next(),
                 $environment,
             );
 
