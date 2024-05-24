@@ -42,8 +42,9 @@ class ExpressPaymentService
 
         $this->pairingRepository->create([
             [
-                'id' => $pairing->pairingUuid()
-                    ->__toString(),
+                'id' => (string) $pairing->pairingUuid(),
+                'salesChannelId' => $context->getSalesChannel()
+                    ->getId(),
                 'cart' => $cart,
                 'cartToken' => $cart->getToken(),
                 'status' => (string) $pairing->pairingStatus(),
@@ -59,9 +60,9 @@ class ExpressPaymentService
     /**
      * @throws SdkError
      */
-    public function monitoring(string $pairingUUid, SalesChannelContext $context): FastCheckoutState
+    public function monitoring(string $pairingUUid, string $channelId): FastCheckoutState
     {
-        $client = $this->clientBuilder->build($context->getSalesChannel()->getId());
+        $client = $this->clientBuilder->build($channelId);
 
         return $client->monitorFastCheckOutCheckIn(PairingUuid::fromString($pairingUUid));
     }

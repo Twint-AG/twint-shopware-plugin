@@ -3,61 +3,34 @@
 <container xmlns="http://symfony.com/schema/dic/services"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
-
+    <imports>
+        <import resource="./parts/controller.xml"/>
+        <import resource="./parts/subscriber.xml"/>
+        <import resource="./parts/scheduler.xml"/>
+        <import resource="./parts/command.xml"/>
+        <import resource="./parts/handler.xml"/>
+        <import resource="./parts/dal.xml"/>
+        <import resource="./parts/monitoring.xml"/>
+        <import resource="./parts/express_checkout.xml"/>
+    </imports>
     <services>
-        <service id="Twint\Core\Handler\TwintRegularPaymentHandler" class="Twint\Core\Handler\TwintRegularPaymentHandler">
-            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
-            <argument type="service" id="Twint\Core\Service\PaymentService"/>
-            <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
-            <tag name="shopware.payment.method.async"/>
-        </service>
 
         <service id="Twint\Core\Util\CredentialValidatorInterface" class="Twint\Core\Util\CredentialValidator">
             <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
         </service>
 
         <service id="Twint\Core\Service\SettingServiceInterface" class="Twint\Core\Service\SettingService">
-            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
             <argument type="service" id="Twint\Core\Util\CredentialValidatorInterface"/>
             <argument type="service" id="event_dispatcher"/>
         </service>
-        
-        <service id="Twint\Storefront\Controller\PaymentController" public="true">
-            <argument type="service" id="order.repository"/>
-            <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
-            <argument type="service" id="Twint\Core\Service\PaymentService" />
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-            <call method="setTwig">
-                <argument type="service" id="twig"/>
-            </call>
-        </service>
-
-        <service id="Twint\Storefront\Controller\CheckoutController" public="true">
-            <argument type="service" id="twint.service.express.checkout"/>
-            <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
-            <argument type="service" id="Twint\ExpressCheckout\Loader\ParingLoader"/>
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-            <call method="setTwig">
-                <argument type="service" id="twig"/>
-            </call>
-        </service>
-
-
-        <service id="Twint\ExpressCheckout\Loader\ParingLoader">
-            <argument type="service" id="twint_pairing.repository"/>
-            <argument type="service" id="Shopware\Core\Checkout\Cart\CartPersister"/>
-        </service>
 
         <service id="Twint\Util\Method\RegularPaymentMethod">
-            <tag name="twint.method.definition" />
+            <tag name="twint.method.definition"/>
         </service>
 
         <service id="Twint\Util\Method\ExpressPaymentMethod">
-            <tag name="twint.method.definition" />
+            <tag name="twint.method.definition"/>
         </service>
 
         <service id="Twint\Util\PaymentMethodRegistry">
@@ -70,93 +43,13 @@
             <argument type="service" id="order.repository"/>
             <argument type="service" id="state_machine.repository"/>
             <argument type="service" id="state_machine_state.repository"/>
-            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
+            <argument type="service"
+                      id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Twint\Core\Factory\ClientBuilder"/>
-        </service>
-
-        <service id="Twint\Command\OrderMonitorCommand">
-            <argument type="service" id="Twint\Core\Service\PaymentService" />
-            <tag name="console.command" />
-        </service>
-
-        <service id="Twint\ScheduledTask\OrderMonitorTask">
-            <tag name="shopware.scheduled.task"/>
-        </service>
-
-        <service id="Twint\ScheduledTask\OrderMonitorTaskHandler">
-            <argument type="service" id="scheduled_task.repository"/>
-            <argument type="service" id="Twint\Core\Service\PaymentService" />
-            <argument type="service" id="logger"/>
-            <tag name="messenger.message_handler"/>
-        </service>
-
-        <service id="Twint\Administration\Controller\TwintController" public="true">
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-            <call method="setEncryptor">
-                <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
-            </call>
-            <call method="setValidator">
-                <argument type="service" id="Twint\Core\Util\CredentialValidatorInterface"/>
-            </call>
-            <tag name="controller.service_arguments"/>
         </service>
 
         <service id="Twint\Core\Util\CryptoHandler" public="true">
             <argument>%env(APP_SECRET)%</argument>
-        </service>
-
-        <service id="Twint\Subscriber\CheckoutConfirmPageSubscriber">
-            <argument type="service" id="translator" />
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="Twint\Subscriber\CancelTwintOrderSubscriber">
-            <argument type="service" id="Twint\Core\Service\PaymentService" />
-            <argument type="service" id="logger"/>
-            <argument>%kernel.shopware_version%</argument>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="Twint\Subscriber\SystemConfigSubscriber">
-            <argument type="service" id="Twint\Core\Service\SettingServiceInterface"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="Twint\ExpressCheckout\Util\PaymentMethodUtil">
-            <argument type="service" id="Doctrine\DBAL\Connection"/>
-        </service>
-
-        <service id="Twint\ExpressCheckout\Service\ExpressCheckoutButtonService">
-            <argument type="service" id="Twint\ExpressCheckout\Util\PaymentMethodUtil"/>
-            <argument type="service" id="Twint\Core\Service\SettingServiceInterface"/>
-            <argument type="service" id="Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRoute"/>
-        </service>
-
-        <service id="twint.service.express.checkout" class="Twint\ExpressCheckout\Service\ExpressCheckoutService">
-            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
-            <argument type="service" id="Shopware\Core\Checkout\Cart\LineItemFactoryRegistry"/>
-            <argument type="service" id="Shopware\Core\Checkout\Shipping\SalesChannel\SortedShippingMethodRoute"/>
-            <argument type="service" id="event_dispatcher"/>
-            <argument type="service" id="Shopware\Core\Checkout\Cart\Delivery\DeliveryBuilder"/>
-            <argument type="service" id="Twint\ExpressCheckout\Service\ExpressPaymentService"/>
-        </service>
-
-        <service id="Twint\ExpressCheckout\Service\ExpressPaymentService">
-            <argument type="service" id="Twint\Core\Factory\ClientBuilder"/>
-            <argument type="service" id="twint_pairing.repository"/>
-        </service>
-
-        <service id="Twint\ExpressCheckout\Service\CustomerRegisterService">
-            <argument type="service" id="Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface"/>
-            <argument type="service" id="customer.repository"/>
-            <argument type="service" id="Twint\ExpressCheckout\Util\PaymentMethodUtil"/>
-        </service>
-
-        <service id="Twint\ExpressCheckout\Subscriber\ProductPageLoadedSubscriber">
-            <argument type="service" id="Twint\ExpressCheckout\Service\ExpressCheckoutButtonService" />
-            <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="Twint\Core\Factory\ClientBuilder">
@@ -167,11 +60,7 @@
         <service id="twint.twig_extension"
                  class="Twint\Extension\TwintExtension"
                  public="false">
-            <tag name="twig.extension" />
-        </service>
-
-        <service id="Twint\Core\DataAbstractionLayer\Entity\Pairing\TwintPairingDefinition">
-            <tag name="shopware.entity.definition" entity="twint_transaction_log"/>
+            <tag name="twig.extension"/>
         </service>
     </services>
 </container>

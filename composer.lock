@@ -1336,16 +1336,16 @@
         },
         {
             "name": "php-soap/engine",
-            "version": "2.7.0",
+            "version": "2.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-soap/engine.git",
-                "reference": "5455dc5ade9f0c507ad955121db15ee88489efc7"
+                "reference": "789fb1c79f6a6681c76e3de0e8e2ddf4a55a1b02"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-soap/engine/zipball/5455dc5ade9f0c507ad955121db15ee88489efc7",
-                "reference": "5455dc5ade9f0c507ad955121db15ee88489efc7",
+                "url": "https://api.github.com/repos/php-soap/engine/zipball/789fb1c79f6a6681c76e3de0e8e2ddf4a55a1b02",
+                "reference": "789fb1c79f6a6681c76e3de0e8e2ddf4a55a1b02",
                 "shasum": ""
             },
             "require": {
@@ -1376,7 +1376,7 @@
             "description": "SOAP engine design",
             "support": {
                 "issues": "https://github.com/php-soap/engine/issues",
-                "source": "https://github.com/php-soap/engine/tree/2.7.0"
+                "source": "https://github.com/php-soap/engine/tree/2.8.0"
             },
             "funding": [
                 {
@@ -1384,7 +1384,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2024-04-02T13:59:23+00:00"
+            "time": "2024-05-24T10:16:08+00:00"
         },
         {
             "name": "php-soap/ext-soap-engine",
@@ -1572,16 +1572,16 @@
         },
         {
             "name": "php-soap/wsdl-reader",
-            "version": "0.10.0",
+            "version": "0.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-soap/wsdl-reader.git",
-                "reference": "535251d71d22a48b894e4a2a72fe5e06d6a7bc19"
+                "reference": "758e2b64ac0fdc7e382d80c6c0a4ae40254c5183"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-soap/wsdl-reader/zipball/535251d71d22a48b894e4a2a72fe5e06d6a7bc19",
-                "reference": "535251d71d22a48b894e4a2a72fe5e06d6a7bc19",
+                "url": "https://api.github.com/repos/php-soap/wsdl-reader/zipball/758e2b64ac0fdc7e382d80c6c0a4ae40254c5183",
+                "reference": "758e2b64ac0fdc7e382d80c6c0a4ae40254c5183",
                 "shasum": ""
             },
             "require": {
@@ -1589,7 +1589,7 @@
                 "ext-dom": "*",
                 "goetas-webservices/xsd-reader": "^0.4.1",
                 "php": "~8.1.0 || ~8.2.0 || ~8.3.0",
-                "php-soap/engine": "^2.6",
+                "php-soap/engine": "^2.8",
                 "php-soap/wsdl": "^1.4",
                 "symfony/console": "^5.4 || ^6.0 || ^7.0",
                 "veewee/xml": "^2.6 || ^3.0"
@@ -1620,7 +1620,7 @@
             "description": "A WSDL reader in PHP",
             "support": {
                 "issues": "https://github.com/php-soap/wsdl-reader/issues",
-                "source": "https://github.com/php-soap/wsdl-reader/tree/0.10.0"
+                "source": "https://github.com/php-soap/wsdl-reader/tree/0.11.0"
             },
             "funding": [
                 {
@@ -1628,7 +1628,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2024-04-02T13:51:57+00:00"
+            "time": "2024-05-24T10:29:07+00:00"
         },
         {
             "name": "php-soap/xml",
@@ -3564,7 +3564,7 @@
             "source": {
                 "type": "git",
                 "url": "https://git.nfq.asia/twint-ag/php-sdk.git",
-                "reference": "2fba11c0d4baea28bd686585bb8061ae68167d07"
+                "reference": "b069cef36d341d9bc8d40027fbba42c40622f350"
             },
             "require": {
                 "azjezz/psl": "^2.5.0",
@@ -3593,7 +3593,7 @@
                 "symfony/dotenv": "^6.4",
                 "symfony/event-dispatcher": "^6.4",
                 "symfony/finder": "^6.4",
-                "symplify/easy-coding-standard": "^12.1",
+                "symplify/easy-coding-standard": "^12.1.14",
                 "wiremock-php/wiremock-php": "dev-cloud-support as 2.39.0"
             },
             "type": "library",
@@ -3623,7 +3623,7 @@
                 }
             ],
             "description": "The TWINT SDK for PHP",
-            "time": "2024-05-22T09:44:34+00:00"
+            "time": "2024-05-22T16:17:33+00:00"
         },
         {
             "name": "veewee/xml",
