@@ -8,6 +8,7 @@ use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
+use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class TwintPairingEntity extends Entity
 {
@@ -25,7 +26,21 @@ class TwintPairingEntity extends Entity
 
     protected ?ShippingMethodEntity $shippingMethod = null;
 
+    protected ?SalesChannelEntity $salesChannel;
+
+    protected string $salesChannelId;
+
     protected ?object $customerData = null;
+
+    public function getSalesChannelId(): string
+    {
+        return $this->salesChannelId;
+    }
+
+    public function getSalesChannel(): ?SalesChannelEntity
+    {
+        return $this->salesChannel;
+    }
 
     public function getCart(): ?Cart
     {
@@ -92,8 +107,13 @@ class TwintPairingEntity extends Entity
         return $this->customerData;
     }
 
-    public function setCustomerData(object $value): void
+    public function setCustomerData(object $value = null): void
     {
         $this->customerData = $value;
+    }
+
+    public function setPairingStatus(string $status): void
+    {
+        $this->status = $status;
     }
 }

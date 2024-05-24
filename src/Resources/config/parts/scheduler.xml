@@ -1,0 +1,31 @@
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="Twint\ExpressCheckout\ScheduledTask\PairingMonitorTask">
+            <tag name="shopware.scheduled.task"/>
+        </service>
+
+        <service id="Twint\ExpressCheckout\ScheduledTask\PairingMonitorTaskHandler">
+            <argument type="service" id="scheduled_task.repository"/>
+            <argument type="service" id="logger"/>
+            <call method="setMonitoringService">
+                <argument type="service" id="Twint\ExpressCheckout\Service\Monitoring\MonitoringService"/>
+            </call>
+            <tag name="messenger.message_handler"/>
+        </service>
+
+        <service id="Twint\ScheduledTask\OrderMonitorTask">
+            <tag name="shopware.scheduled.task"/>
+        </service>
+
+        <service id="Twint\ScheduledTask\OrderMonitorTaskHandler">
+            <argument type="service" id="scheduled_task.repository"/>
+            <argument type="service" id="Twint\Core\Service\PaymentService"/>
+            <argument type="service" id="logger"/>
+            <tag name="messenger.message_handler"/>
+        </service>
+
+    </services>
+</container>
