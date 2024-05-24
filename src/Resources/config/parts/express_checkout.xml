@@ -1,0 +1,46 @@
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="Twint\ExpressCheckout\Repository\PairingRepository">
+            <argument type="service" id="twint_pairing.repository"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\CartPersister"/>
+        </service>
+
+        <service id="Twint\ExpressCheckout\Util\PaymentMethodUtil">
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
+        </service>
+
+        <service id="Twint\ExpressCheckout\Service\ExpressCheckoutButtonService">
+            <argument type="service" id="Twint\ExpressCheckout\Util\PaymentMethodUtil"/>
+            <argument type="service" id="Twint\Core\Service\SettingServiceInterface"/>
+            <argument type="service" id="Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRoute"/>
+        </service>
+
+        <service id="twint.service.express.checkout" class="Twint\ExpressCheckout\Service\ExpressCheckoutService">
+            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\LineItemFactoryRegistry"/>
+            <argument type="service" id="Shopware\Core\Checkout\Shipping\SalesChannel\SortedShippingMethodRoute"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\Delivery\DeliveryBuilder"/>
+            <argument type="service" id="Twint\ExpressCheckout\Service\ExpressPaymentService"/>
+            <argument type="service" id="Twint\ExpressCheckout\Repository\PairingRepository"/>
+        </service>
+
+        <service id="Twint\ExpressCheckout\Service\ExpressPaymentService">
+            <argument type="service" id="Twint\Core\Factory\ClientBuilder"/>
+            <argument type="service" id="twint_pairing.repository"/>
+        </service>
+
+        <service id="Twint\ExpressCheckout\Service\Monitoring\CustomerRegisterService">
+            <argument type="service"
+                      id="Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface"/>
+            <argument type="service" id="customer.repository"/>
+            <argument type="service" id="Twint\ExpressCheckout\Util\PaymentMethodUtil"/>
+            <argument type="service" id="salutation.repository"/>
+        </service>
+
+    </services>
+</container>

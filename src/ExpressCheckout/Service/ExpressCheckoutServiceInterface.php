@@ -12,4 +12,6 @@ interface ExpressCheckoutServiceInterface
     public function pairing(SalesChannelContext $context, Request $request): mixed;
 
     public function monitoring(string $pairingUUid, SalesChannelContext $context): mixed;
+
+    public function getOpenedPairings(): mixed;
 }

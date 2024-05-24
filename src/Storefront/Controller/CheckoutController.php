@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Twint\Core\Util\CryptoHandler;
-use Twint\ExpressCheckout\Loader\ParingLoader;
+use Twint\ExpressCheckout\Repository\PairingRepository;
 use Twint\ExpressCheckout\Service\ExpressCheckoutServiceInterface;
 
 #[Route(defaults: [
@@ -24,7 +24,7 @@ class CheckoutController extends StorefrontController
     public function __construct(
         private readonly ExpressCheckoutServiceInterface $checkoutService,
         private CryptoHandler $cryptoService,
-        private readonly ParingLoader $paringLoader,
+        private readonly PairingRepository $paringLoader,
     ) {
     }
 
