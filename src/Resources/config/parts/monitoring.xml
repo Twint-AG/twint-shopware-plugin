@@ -1,0 +1,21 @@
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="Twint\ExpressCheckout\Service\Monitoring\MonitoringService">
+            <argument type="service" id="Twint\ExpressCheckout\Repository\PairingRepository"/>
+            <argument type="service" id="Twint\ExpressCheckout\Service\ExpressPaymentService"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
+            <argument type="service" id="Shopware\Core\System\SalesChannel\Context\CachedSalesChannelContextFactory"/>
+            <argument type="service" id="Twint\ExpressCheckout\Service\Monitoring\CustomerRegisterService"/>
+            <argument type="service" id="Twint\ExpressCheckout\Util\PaymentMethodUtil"/>
+            <argument type="service" id="order.repository"/>
+            <argument type="service"
+                      id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
+
+        </service>
+
+    </services>
+</container>

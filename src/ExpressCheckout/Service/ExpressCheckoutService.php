@@ -17,6 +17,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Event\RouteRequest\ShippingMethodRouteRequestEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Twint\ExpressCheckout\Repository\PairingRepository;
 use Twint\Sdk\Exception\SdkError;
 use Twint\Sdk\Value\Money;
 use Twint\Sdk\Value\ShippingMethod;
@@ -31,7 +32,8 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
         private readonly AbstractShippingMethodRoute $shippingMethodRoute,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly DeliveryBuilder $deliveryBuilder,
-        private readonly ExpressPaymentService $paymentService
+        private readonly ExpressPaymentService $paymentService,
+        private readonly PairingRepository $loader
     ) {
     }
 
@@ -50,7 +52,7 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
 
     public function monitoring(string $pairingUUid, SalesChannelContext $context): mixed
     {
-        return $this->paymentService->monitoring($pairingUUid, $context);
+        return $this->paymentService->monitoring($pairingUUid, $context->getSalesChannel()->getId());
     }
 
     private function buildShippingOptions(Cart $cart, EntityCollection $methods, SalesChannelContext $context): mixed
@@ -106,5 +108,10 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
         $lineItems = $this->getLineItems($items, $context);
 
         return $this->cartService->add($cart, $lineItems, $context);
+    }
+
+    public function getOpenedPairings(): mixed
+    {
+        return $this->loader->loadInProcessPairings();
     }
 }
