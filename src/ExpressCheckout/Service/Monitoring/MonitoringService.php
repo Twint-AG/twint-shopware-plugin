@@ -25,6 +25,7 @@ use Twint\Sdk\Exception\SdkError;
 use Twint\Sdk\Value\FastCheckoutCheckIn;
 use Twint\Sdk\Value\FastCheckoutState;
 use Twint\Sdk\Value\PairingStatus;
+use Twint\Sdk\Value\ShippingMethodId;
 
 class MonitoringService
 {
@@ -61,6 +62,7 @@ class MonitoringService
                 $this->markPairingAsDone($pairing);
             } catch (Throwable $e) {
                 $this->markPairingAsError($pairing);
+                echo $e->getMessage();
                 throw $e;
             }
         }
@@ -114,9 +116,12 @@ class MonitoringService
         $data = [
             'id' => $pairingEntity->getUniqueIdentifier(),
             'status' => (string) $state->pairingStatus(),
-            'shippingMethodId' => $state->shippingMethodId() ?? null,
             'customerData' => $state->customerData(),
         ];
+
+        if ($state->shippingMethodId() instanceof ShippingMethodId) {
+            $data['shippingMethodId'] = (string) $state->shippingMethodId();
+        }
 
         return $this->pairingRepository->update([$data]);
     }
@@ -129,15 +134,16 @@ class MonitoringService
         switch ($state->pairingStatus()) {
             case PairingStatus::PAIRING_IN_PROGRESS:
             case PairingStatus::NO_PAIRING:
+            case PairingStatus::PAIRING_ACTIVE:
                 if ($state instanceof FastCheckoutCheckIn) {
                     $this->handlePaid($entity, $state);
                 }
 
                 break;
 
-            case PairingStatus::PAIRING_ACTIVE:
-                $this->handleCanceled();
-                break;
+                //            case PairingStatus::PAIRING_ACTIVE:
+                //                $this->handleCanceled();
+                //                break;
 
                 //            case PairingStatus::PAIRING_IN_PROGRESS:
                 //                //do nothing
@@ -173,7 +179,7 @@ class MonitoringService
         //Create new context for the customer
         $this->createContext($channelId, [
             'customerId' => $customerEntity->getId(),
-            'shippingMethodId' => $state->shippingMethodId(),
+            'shippingMethodId' => (string) $state->shippingMethodId(),
             'shippingAddressId' => $customerData['defaultShippingAddressId'], //TODO
             'paymentMethodId' => $this->paymentMethodUtil->getExpressCheckoutMethodId(),
         ]);
@@ -214,9 +220,5 @@ class MonitoringService
         }
 
         $this->transactionStateHandler->paid($transaction->getId(), $context->getContext());
-    }
-
-    private function handleCanceled(): void
-    {
     }
 }
