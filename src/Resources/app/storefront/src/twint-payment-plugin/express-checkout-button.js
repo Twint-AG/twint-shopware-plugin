@@ -7,6 +7,8 @@ export default class ExpressCheckoutButton extends Plugin {
         formSelector: 'form'
     };
 
+    loadingPopup = null;
+
     _init() {
         this.checking = false;
         this.client = new HttpClient();
@@ -57,11 +59,20 @@ export default class ExpressCheckoutButton extends Plugin {
         this.el.addEventListener('click', this.onClick.bind(this));
     }
 
+    getLoadingPopup() {
+        if(!this.loadingPopup) {
+            this.loadingPopup = window.PluginManager.getPluginInstanceFromElement(document.querySelector('#twint-loading-popup'), 'TwintLoadingPopup');
+        }
+
+        return this.loadingPopup;
+    }
+
     onClick(event) {
         if(this.checking) return ;
         this.checking = true;
 
         this.client.abort();
+        this.getLoadingPopup().show();
         this.client.post('/twint/express-checkout', JSON.stringify(this.getLineItems()), this.onFinish.bind(this));
 
         event.stopPropagation();
@@ -71,6 +82,7 @@ export default class ExpressCheckoutButton extends Plugin {
 
     onFinish(responseText, request) {
         this.checking = false;
+        this.getLoadingPopup().hide();
         if(request.status === 200) {
             const response = JSON.parse(responseText);
             window.location.href = this.baseUrl() + response.redirectUrl
