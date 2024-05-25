@@ -4,7 +4,8 @@ import HttpClient from "src/service/http-client.service";
 export default class ExpressCheckoutButton extends Plugin {
 
     static options = {
-        formSelector: 'form'
+        formSelector: 'form',
+        useCart:false
     };
 
     loadingPopup = null;
@@ -12,12 +13,18 @@ export default class ExpressCheckoutButton extends Plugin {
     _init() {
         this.checking = false;
         this.client = new HttpClient();
-        this.form = this.el.closest(this.options.formSelector);
+        if (!this.options.useCart) {
+            this.form = this.el.closest(this.options.formSelector);
+        }
 
         this._registerEvents();
     }
 
     getLineItems(){
+        if(this.options.useCart) {
+            return [];
+        }
+
         // Create a FormData object from the form
         const formData = new FormData(this.form);
         const item = {};
@@ -32,7 +39,7 @@ export default class ExpressCheckoutButton extends Plugin {
                     switch (match[1]) {
                         case 'stackable':
                         case 'removable':
-                            value = value == '1';
+                            value = value === '1';
                             break;
 
                         case 'quantity':
@@ -73,7 +80,10 @@ export default class ExpressCheckoutButton extends Plugin {
 
         this.client.abort();
         this.getLoadingPopup().show();
-        this.client.post('/twint/express-checkout', JSON.stringify(this.getLineItems()), this.onFinish.bind(this));
+        this.client.post('/twint/express-checkout', JSON.stringify({
+            lineItems: this.getLineItems(),
+            useCart: this.options.useCart
+        }), this.onFinish.bind(this));
 
         event.stopPropagation();
         event.preventDefault();
