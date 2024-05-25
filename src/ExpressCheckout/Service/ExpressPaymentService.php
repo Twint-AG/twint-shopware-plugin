@@ -35,7 +35,7 @@ class ExpressPaymentService
         $client = $this->clientBuilder->build($context->getSalesChannel()->getId());
 
         $pairing = $client->requestFastCheckOutCheckIn(
-            Money::CHF($cart->getPrice()->getTotalPrice()),
+            Money::CHF($cart->getPrice()->getPositionPrice()),
             new CustomerDataScopes(...CustomerDataScopes::all()),
             $methods
         );

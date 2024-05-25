@@ -28,6 +28,7 @@
             <argument type="service" id="Shopware\Core\Checkout\Cart\Delivery\DeliveryBuilder"/>
             <argument type="service" id="Twint\ExpressCheckout\Service\ExpressPaymentService"/>
             <argument type="service" id="Twint\ExpressCheckout\Repository\PairingRepository"/>
+            <argument type="service" id="Shopware\Core\System\SalesChannel\Context\CachedSalesChannelContextFactory"/>
         </service>
 
         <service id="Twint\ExpressCheckout\Service\ExpressPaymentService">
