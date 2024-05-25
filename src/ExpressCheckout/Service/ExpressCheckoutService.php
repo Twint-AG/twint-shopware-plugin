@@ -69,11 +69,6 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
     /**
      * Hard to cart calculate shipping costs for each shipping method
      * Shopware forces to set shipping method to SalesChannelContext
-     *
-     * @param Cart $cart
-     * @param EntityCollection $methods
-     * @param SalesChannelContext $context
-     * @return mixed
      */
     private function buildShippingOptions(Cart $cart, EntityCollection $methods, SalesChannelContext $context): mixed
     {
@@ -88,7 +83,8 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
 
                 $context = $this->contextFactory->create(
                     $context->getToken(),
-                    $context->getSalesChannel()->getId(),
+                    $context->getSalesChannel()
+                        ->getId(),
                     $session
                 );
             }
