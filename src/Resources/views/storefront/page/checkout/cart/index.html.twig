@@ -4,7 +4,9 @@
     {{ parent() }}
 
     {% block twint_buy_button_cart %}
-        {{ isTwintExpress('CART') ? include('@TwintPayment/storefront/component/button/express-checkout-button.html.twig') : '' }}
+        {{ isTwintExpress('CART') ? include('@TwintPayment/storefront/component/button/express-checkout-button.html.twig', {
+            'useCart': true,
+        }) : '' }}
     {% endblock %}
 
 {% endblock %}

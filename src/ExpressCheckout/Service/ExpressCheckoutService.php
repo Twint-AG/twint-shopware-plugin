@@ -13,6 +13,7 @@ use Shopware\Core\Checkout\Shipping\ShippingMethodCollection;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\System\SalesChannel\Context\AbstractSalesChannelContextFactory;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Event\RouteRequest\ShippingMethodRouteRequestEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -33,7 +34,8 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly DeliveryBuilder $deliveryBuilder,
         private readonly ExpressPaymentService $paymentService,
-        private readonly PairingRepository $loader
+        private readonly PairingRepository $loader,
+        private AbstractSalesChannelContextFactory $contextFactory,
     ) {
     }
 
@@ -42,7 +44,16 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
      */
     public function pairing(SalesChannelContext $context, Request $request): mixed
     {
-        $cart = $this->createCart($context, $request->getPayload()->all());
+        $payload = $request->getPayload()
+            ->all();
+
+        $useCart = $payload['useCart'] ?? false;
+        if ($useCart) {
+            $cart = $this->cartService->getCart($context->getToken(), $context);
+        } else {
+            $cart = $this->createCart($context, $payload['lineItems'] ?? []);
+        }
+
         $methods = $this->getShippingMethods($context, $request);
 
         $options = $this->buildShippingOptions($cart, $methods, $context);
@@ -55,13 +66,31 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
         return $this->paymentService->monitoring($pairingUUid, $context->getSalesChannel()->getId());
     }
 
+    /**
+     * Hard to cart calculate shipping costs for each shipping method
+     * Shopware forces to set shipping method to SalesChannelContext
+     */
     private function buildShippingOptions(Cart $cart, EntityCollection $methods, SalesChannelContext $context): mixed
     {
         $options = [];
+        /** @var ShippingMethodEntity $method */
         foreach ($methods as $method) {
-            /** @var ShippingMethodEntity $method */
             $cart->setDeliveries($this->deliveryBuilder->buildByUsingShippingMethod($cart, $method, $context));
+            if ($context->getShippingMethod()->getId() !== $method->getId()) {
+                $session = [
+                    'shippingMethodId' => $method->getId(),
+                ];
+
+                $context = $this->contextFactory->create(
+                    $context->getToken(),
+                    $context->getSalesChannel()
+                        ->getId(),
+                    $session
+                );
+            }
+
             $cart = $this->cartService->recalculate($cart, $context);
+
             $amount = $cart->getDeliveries()
                 ->getShippingCosts()
                 ->first()

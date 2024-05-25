@@ -17,7 +17,7 @@
                     <div id="amount-container" class="row section">
                         <div class="wrap">
                             <div class="amount-header text-center text-uppercase">
-                                <span class="value">{{ cart.price.totalPrice|currency }}{% if cart.price.taxStatus == "gross" %}{% endif %}</span>
+                                <span class="value">{{ cart.price.positionPrice|currency }}{% if cart.price.taxStatus == "gross" %}{% endif %}</span>
                             </div>
                         </div>
                     </div>
