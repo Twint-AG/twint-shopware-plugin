@@ -1,170 +1,31 @@
 {% sw_extends '@Storefront/storefront/base.html.twig' %}
 
 {% block base_content %}
-    {% block page_qr_waiting %}
-        {% set isAndroidDevice = false %}
-        {% set isIosDevice = false %}
-        {% set androidLink = '' %}
-        {% if payLinks.android is defined%}
-            {% set isAndroidDevice = true %}
-        {% endif %}
-        {% if payLinks.ios is defined%}
-            {% set isIosDevice = true %}
-        {% endif %}
-        {% if isAndroidDevice and payLinks.android %}
-            {% set androidLink = payLinks.android %}
-        {% endif %}
-        <div class="checkout">
-            {% block page_qr_waiting_container %}
-                <div class="qr-waiting-container"  data-mobile="{{ isAndroidDevice or isIosDevice }}" data-is-android-device="{{ isAndroidDevice }}" data-android-link="{{ payLinks.android }}">
-                    {% block page_qr_waiting_logo %}
-                    <div class="row nav" style="{% if isAndroidDevice or isIosDevice %}display:none{% endif %}">
-                        <div>
-                            <a href="http://www.twint.ch/" target="_blank"><div class="twint-logo"></div></a>
-                        </div>
-                    </div>
-                    {% endblock %}
-                    {% block page_qr_waiting_amount %}
-                    <div id="amount-container" class="row section">
-                        <div class="wrap">
-                            <div class="amount-header text-center text-uppercase">
-                                <span class="value">{{ cart.price.totalPrice|currency }}{% if cart.price.taxStatus == "gross" %}{% endif %}</span>
-                            </div>
-                        </div>
-                    </div>
-                    {% endblock %}
-                    {% block page_qr_waiting_desktop %}
-                    <div class="section qr-code" style="{% if isAndroidDevice or isIosDevice %}display:none{% endif %}">
-                        <div class="qr-row grey-bg text-center">
-                            <div class="wrap">
-                                <div class="credentials">
-                                    {% block page_qr_waiting_desktop_qr_code %}
-                                    <div class="credentials-box credential-qrcode">
-                                        <div class="credentials-item qr">
-                                            {% if qrCode %}
-                                                <img src="{{ qrCode }}" alt="QR-Code"/>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    {% endblock %}
-                                    {% block page_qr_waiting_desktop_token %}
-                                    <div class="credentials-box credential-token text-center text-uppercase">
-                                        <div class="credentials-item token">
-                                            {% for char in pairingToken|split('') %}
-                                                <p class="credential-number">{{ char }}</p>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                    {% endblock %}
-                                </div>
-                            </div>
-                        </div>
-                        {% block page_qr_waiting_desktop_guide %}
-                        <div class="row">
-                            <div class="description-box">
-                                <div class="description-item">
-                                    <div class="description-image">
-                                        <div class="description-icon icon-app"></div>
-                                    </div>
-                                    <div class="description-text">{{ "twintPayment.waitingPage.step1"|trans() }} </div>
-                                </div>
-                                <div class="description-item">
-                                    <div class="description-image">
-                                        {% sw_icon 'mobile' style {'pack':'default', 'size': '3x'} %}
-                                    </div>
-                                    <div class="description-text">{{ "twintPayment.waitingPage.step2"|trans() }}</div>
-                                </div>
-                                <div class="description-item">
-                                    <div class="description-image">
-                                        {% sw_icon 'photocamera' style {'pack': 'default', 'size': '3x'} %}
-                                    </div>
-                                    <div class="description-text">{{ "twintPayment.waitingPage.step3"|trans() }}</div>
-                                </div>
+    {% set isAndroidDevice = false %}
+    {% set isIosDevice = false %}
+    {% set androidLink = '' %}
+    {% if payLinks.android is defined%}
+        {% set isAndroidDevice = true %}
+    {% endif %}
+    {% if payLinks.ios is defined%}
+        {% set isIosDevice = true %}
+    {% endif %}
+    {% if isAndroidDevice and payLinks.android %}
+        {% set androidLink = payLinks.android %}
+    {% endif %}
 
-                            </div>
-                        </div>
-                        {% endblock %}
-                    </div>
-                    {% endblock %}
-                    <div class="section page app-chooser-area" style="{% if not isAndroidDevice and not isIosDevice %}display:none{% endif %}" data-app-selector >
-                        {% block page_qr_waiting_ios_app_selector %}
-                        <div id="app-chooser-container" style="{% if isAndroidDevice %}display:none{% endif %}">
-                            <div class="app-chooser-title">{{ 'twintPayment.appSelector.title'|trans() }}</div>
-                            {% set prefinedApps = {
-                                'UBS TWINT' : 'bank-ubs',
-                                'Raiffeisen TWINT' : 'bank-raiffeisen',
-                                'PostFinance TWINT' : 'bank-pf',
-                                'ZKB TWINT' :'bank-zkb',
-                                'Credit Suisse TWINT' : 'bank-cs',
-                                'BCV TWINT' : 'bank-bcv',
-                            } %}
-                            <div class="app-logos-container" id="logo-container">
-                                {% for payLink in payLinks.ios %}
-                                    {% if payLink.name in prefinedApps|keys %}
-                                        <div class="bank-logo {{ prefinedApps[payLink.name] }}" data-link="{{ payLink.link }}"></div>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-
-                            <div class="row text-center">
-                                <div>
-                                    <select class="app-chooser" id="app-chooser">
-                                        <option value="">{{ "twintPayment.appSelector.otherBankOption"|trans() }}</option>
-                                        {% for payLink in payLinks.ios %}
-                                            {% if payLink.name not in prefinedApps|keys %}
-                                                <option value="{{ payLink.link }}">{{ payLink.name }}</option>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        {% endblock %}
-                        {% if isAndroidDevice  %}
-                        <div class="text-center">
-                            <a class="btn btn-dark switch-to-app" href="javascript:window.location = '{{ payLinks.android }}'">
-                                {{ "twintPayment.appSelector.switchLinkLabel"|trans() }}
-                            </a>
-                        </div>
-                        {% endif %}
-                        {% block page_qr_waiting_mobile_code %}
-                        <div class="qr-row grey-bg text-center qr-code-mobile" style="{% if isAndroidDevice or isIosDevice %}display:none{% endif %}">
-                            <div class="wrap">
-                                <div class="credentials">
-                                    {% block page_qr_waiting_mobile_qr_code %}
-                                        <div class="credentials-box credential-qrcode">
-                                            <div class="credentials-item qr">
-                                                {% if qrCode %}
-                                                    <img src="{{ qrCode }}" alt="QR-Code"/>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    {% endblock %}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row text-center">
-                            <div class="alternative-text">{{ "twintPayment.appSelector.enterCode"|trans()|raw}}</div>
-                        </div>
-                        <div class="qr-row grey-bg text-center">
-                            <div class="wrap">
-                                <div class="credentials">
-                                    {% block page_qr_waiting_mobile_qr_token %}
-                                    <div class="credentials-box credential-token text-center text-uppercase">
-                                        <div class="credentials-item token">
-                                            {% for char in pairingToken|split('') %}
-                                                <p class="credential-number">{{ char }}</p>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                    {% endblock %}
-                                </div>
-                            </div>
-                        </div>
-                        {% endblock %}
-                    </div>
-                </div>
-            {% endblock %}
-        </div>
-    {% endblock %}
+    {{ include('@TwintPayment/storefront/component/payment/payment-qr.html.twig',
+        {
+            qrCode: qrCode,
+            androidLink: androidLink,
+            isAndroidDevice: isAndroidDevice,
+            isIosDevice: isIosDevice,
+            payLinks: payLinks,
+            cart: cart,
+            orderNumber : orderNumber,
+            pairingToken : pairingToken,
+            pairingHash : pairingHash,
+        }
+    )
+    }}
 {% endblock %}

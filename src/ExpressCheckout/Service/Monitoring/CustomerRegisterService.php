@@ -47,10 +47,11 @@ class CustomerRegisterService
             'street' => 'Parallelweg 30',
             'city' => 'City',
             'zipcode' => '',
-            'countryId' => '018f386c494770e39c6572daf808dc8a',
+            'countryId' => $context->getSalesChannel()
+                ->getCountryId(),
             'countryStateId' => null,
-            'firstName' => 'Update',
-            'lastName' => 'Later',
+            'firstName' => 'F_Name',
+            'lastName' => 'L_Name',
             'id' => $addressId,
             'customerId' => $id,
         ];

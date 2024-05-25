@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Twint\ExpressCheckout\Repository;
 
 use Shopware\Core\Checkout\Cart\CartPersister;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
@@ -20,7 +21,8 @@ class PairingRepository
 {
     public function __construct(
         private EntityRepository $pairingRepository,
-        private CartPersister $cartPersister
+        private CartPersister $cartPersister,
+        private EntityRepository $orderRepository,
     ) {
     }
 
@@ -48,6 +50,31 @@ class PairingRepository
         $cart = $this->cartPersister->load($entity->getCartToken(), $context);
         $entity->setCart($cart);
 
+        return $entity;
+    }
+
+    public function fetchOrder(TwintPairingEntity $entity, SalesChannelContext $context): TwintPairingEntity
+    {
+        if ($entity->getOrderId() === null) {
+            return $entity;
+        }
+
+        $criteria = new Criteria([$entity->getOrderId()]);
+        $criteria->addAssociation('lineItems.cover')
+            ->addAssociation('transactions.paymentMethod')
+            ->addAssociation('deliveries.shippingMethod')
+            ->addAssociation('billingAddress.salutation')
+            ->addAssociation('billingAddress.country')
+            ->addAssociation('billingAddress.countryState')
+            ->addAssociation('deliveries.shippingOrderAddress.salutation')
+            ->addAssociation('deliveries.shippingOrderAddress.country')
+            ->addAssociation('deliveries.shippingOrderAddress.countryState');
+
+        /** @var OrderEntity $order */
+        $order = $this->orderRepository->search($criteria, $context->getContext())
+            ->first();
+
+        $entity->setOrder($order);
         return $entity;
     }
 
