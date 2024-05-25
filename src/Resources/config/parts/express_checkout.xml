@@ -7,6 +7,7 @@
         <service id="Twint\ExpressCheckout\Repository\PairingRepository">
             <argument type="service" id="twint_pairing.repository"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\CartPersister"/>
+            <argument type="service" id="order.repository"/>
         </service>
 
         <service id="Twint\ExpressCheckout\Util\PaymentMethodUtil">
