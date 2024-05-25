@@ -7,8 +7,10 @@ namespace Twint\Storefront\Controller;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
 use Exception;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
+use Shopware\Storefront\Page\Checkout\Finish\CheckoutFinishPage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -42,7 +44,9 @@ class CheckoutController extends StorefrontController
         ]);
     }
 
-    #[Route(path: '/payment/monitoring/{paringHash}', name: 'frontend.twint.monitoring', methods: ['GET'])]
+    #[Route(path: '/payment/monitoring/{paringHash}', name: 'frontend.twint.monitoring', methods: ['GET'], defaults: [
+        'XmlHttpRequest' => true,
+    ])]
     public function monitor(Request $request, SalesChannelContext $context): Response
     {
         $pairingHash = $request->get('paringHash');
@@ -54,11 +58,15 @@ class CheckoutController extends StorefrontController
             return $this->redirectToRoute('frontend.account.order.page');
         }
 
-        $state = $this->checkoutService->monitoring($paring->getId(), $context);
+        if ($paring->getOrderId()) {
+            return $this->json([
+                'completed' => true,
+                'orderId' => $paring->getOrderId(),
+            ]);
+        }
 
         return $this->json([
-            'success' => true,
-            'state' => $state,
+            'completed' => false,
         ]);
     }
 
@@ -69,9 +77,26 @@ class CheckoutController extends StorefrontController
         try {
             $pairingUUid = $this->cryptoService->unHash($pairingHash);
             $paring = $this->paringLoader->load($pairingUUid, $context);
+            $this->paringLoader->fetchCart($paring, $context);
         } catch (Exception $e) {
             $this->addFlash(self::DANGER, $this->trans('twintPayment.error.pairingNotFound'));
             return $this->redirectToRoute('frontend.account.order.page');
+        }
+
+        if ($paring->getOrderId()) {
+            $page = new CheckoutFinishPage();
+            $this->paringLoader->fetchOrder($paring, $context);
+
+            if (!($paring->getOrder()  instanceof OrderEntity)) {
+                $this->addFlash(self::DANGER, $this->trans('twintPayment.error.orderNotFound'));
+                return $this->redirectToRoute('frontend.account.order.page');
+            }
+
+            $page->setOrder($paring->getOrder());
+
+            return $this->renderStorefront('@Storefront/storefront/page/checkout/finish/index.html.twig', [
+                'page' => $page,
+            ]);
         }
 
         $options = new QROptions(
@@ -84,6 +109,7 @@ class CheckoutController extends StorefrontController
         $qrcode = (new QRCode($options))->render($paring->getToken());
 
         return $this->renderStorefront('@TwintPayment/storefront/page/express-payment.html.twig', [
+            'pairingHash' => $pairingHash,
             'orderNumber' => 'CART',
             'qrCode' => $qrcode,
             'pairingToken' => $paring->getToken(),

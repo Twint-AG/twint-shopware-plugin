@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Twint\Core\DataAbstractionLayer\Entity\Pairing;
 
 use Shopware\Core\Checkout\Cart\Cart;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
@@ -31,6 +32,20 @@ class TwintPairingEntity extends Entity
     protected string $salesChannelId;
 
     protected ?object $customerData = null;
+
+    protected ?string $orderId = null;
+
+    protected ?OrderEntity $order = null;
+
+    public function getOrderId(): ?string
+    {
+        return $this->orderId;
+    }
+
+    public function getOrder(): ?OrderEntity
+    {
+        return $this->order;
+    }
 
     public function getSalesChannelId(): string
     {
@@ -115,5 +130,10 @@ class TwintPairingEntity extends Entity
     public function setPairingStatus(string $status): void
     {
         $this->status = $status;
+    }
+
+    public function setOrder(OrderEntity $order = null): void
+    {
+        $this->order = $order;
     }
 }
