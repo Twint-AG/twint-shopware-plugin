@@ -46,6 +46,7 @@
             <argument type="service"
                       id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Twint\Core\Factory\ClientBuilder"/>
+            <argument type="service" id="twint_transaction_log_writer"/>
         </service>
 
         <service id="Twint\Core\Util\CryptoHandler" public="true">
@@ -61,6 +62,15 @@
                  class="Twint\Extension\TwintExtension"
                  public="false">
             <tag name="twig.extension"/>
+        </service>
+
+        <service id="Twint\Core\DataAbstractionLayer\Entity\TransactionLog\TwintTransactionLogDefinition">
+            <tag name="shopware.entity.definition" entity="twint_transaction_log"/>
+        </service>
+
+        <service id="twint_transaction_log_writer"
+                 class="Twint\Core\Handler\TransactionLog\TransactionLogDatabaseWriter">
+            <argument type="service" id="twint_transaction_log.repository"/>
         </service>
     </services>
 </container>

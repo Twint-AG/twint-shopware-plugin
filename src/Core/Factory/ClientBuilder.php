@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Twint\Core\Factory;
 
+use Soap\Engine\Transport;
 use Throwable;
 use Twint\Core\Exception\InvalidConfigException;
 use Twint\Core\Service\SettingServiceInterface;
@@ -11,6 +12,10 @@ use Twint\Core\Util\CryptoHandler;
 use Twint\Sdk\Certificate\CertificateContainer;
 use Twint\Sdk\Certificate\Pkcs12Certificate;
 use Twint\Sdk\Client;
+use Twint\Sdk\Factory\DefaultSoapEngineFactory;
+use Twint\Sdk\InvocationRecorder\InvocationRecordingClient;
+use Twint\Sdk\InvocationRecorder\Soap\MessageRecorder;
+use Twint\Sdk\InvocationRecorder\Soap\RecordingTransport;
 use Twint\Sdk\Io\InMemoryStream;
 use Twint\Sdk\Value\Environment;
 use Twint\Sdk\Value\MerchantId;
@@ -26,7 +31,7 @@ class ClientBuilder
     ) {
     }
 
-    public function build(string $salesChannelId): Client
+    public function build(string $salesChannelId): InvocationRecordingClient
     {
         if (isset(self::$instances[$salesChannelId])) {
             return self::$instances[$salesChannelId];
@@ -55,12 +60,22 @@ class ClientBuilder
             if ($passphrase === '' || $cert === '') {
                 throw new InvalidConfigException(InvalidConfigException::ERROR_INVALID_CERTIFICATE);
             }
+            $messageRecorder = new MessageRecorder();
 
-            $client = new Client(
-                CertificateContainer::fromPkcs12(new Pkcs12Certificate(new InMemoryStream($cert), $passphrase)),
-                MerchantId::fromString($merchantId),
-                Version::next(),
-                $environment,
+            $client = new InvocationRecordingClient(
+                new Client(
+                    CertificateContainer::fromPkcs12(new Pkcs12Certificate(new InMemoryStream($cert), $passphrase)),
+                    MerchantId::fromString($merchantId),
+                    Version::latest(),
+                    $environment,
+                    soapEngineFactory: new DefaultSoapEngineFactory(
+                        wrapTransport: static fn (Transport $transport) => new RecordingTransport(
+                            $transport,
+                            $messageRecorder
+                        )
+                    )
+                ),
+                $messageRecorder
             );
 
             self::$instances[$salesChannelId] = $client;

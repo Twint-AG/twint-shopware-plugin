@@ -52,6 +52,8 @@ class TwintPayment extends Plugin
             ->install($installContext->getContext());
 
         parent::install($installContext);
+        $installContext->getMigrationCollection()
+            ->migrateInPlace();
     }
 
     public function uninstall(UninstallContext $uninstallContext): void
@@ -69,6 +71,8 @@ class TwintPayment extends Plugin
         parent::activate($activateContext);
         $this->getInstaller()
             ->activate($activateContext->getContext());
+        $activateContext->getMigrationCollection()
+            ->migrateInPlace();
     }
 
     public function deactivate(DeactivateContext $deactivateContext): void
@@ -80,7 +84,9 @@ class TwintPayment extends Plugin
 
     public function update(UpdateContext $updateContext): void
     {
-        // Update necessary stuff, mostly non-database related
+        parent::update($updateContext);
+        $updateContext->getMigrationCollection()
+            ->migrateInPlace();
     }
 
     private function getInstaller(): Installer
