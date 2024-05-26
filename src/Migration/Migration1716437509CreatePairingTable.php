@@ -19,7 +19,7 @@ class Migration1716437509CreatePairingTable extends MigrationStep
 
     public function update(Connection $connection): void
     {
-        $sql = 'CREATE TABLE `twint_pairing` (
+        $sql = 'CREATE TABLE IF NOT EXISTS `twint_pairing` (
             `id` VARCHAR(255) NOT NULL,
             `cart_token` VARCHAR(255) NOT NULL,
             `status` VARCHAR(255) NOT NULL,
@@ -46,7 +46,14 @@ class Migration1716437509CreatePairingTable extends MigrationStep
 
     private function createIndex(Connection $connection): void
     {
-        $sql = 'CREATE INDEX twint_pairing_status_IDX USING BTREE ON twint_pairing (status);';
-        $connection->executeStatement($sql);
+        if (!$this->indexExists($connection, 'twint_pairing', 'twint_pairing_status_IDX')) {
+            $sql = 'CREATE INDEX twint_pairing_status_IDX USING BTREE ON twint_pairing (status);';
+            $connection->executeStatement($sql);
+        }
+    }
+
+    public function updateDestructive(Connection $connection): void
+    {
+        // implement update destructive
     }
 }

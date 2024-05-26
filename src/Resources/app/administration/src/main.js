@@ -4,4 +4,5 @@ import './service';
 import './module/twint-certificate';
 import './module/twint-merchant-id';
 import './module/payment-setting';
+import './module/sw-order';
 

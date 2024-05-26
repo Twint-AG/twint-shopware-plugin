@@ -9,7 +9,7 @@
         "shopware/storefront": "~v6.5.0",
         "symfony/flex": "~2",
         "symfony/runtime": "^5.0|^6.0",
-        "twint/twint": "^0.0.1"
+        "twint/twint": "^0.0.2"
     },
     "repositories": [
         {

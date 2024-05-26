@@ -1,6 +1,7 @@
 {
   "twint": {
-    "title": "TWINT Payment",
+    "name": "TWINT payment",
+    "title": "TWINT payment",
     "express": {
       "title": "TWINT Express Checkout",
       "menuItem": "TWINT Express Checkout"
@@ -56,6 +57,41 @@
           "helpText": "Please enter the password for the certificate"
         }
       }
+    },
+    "order": {
+      "stateCard": {
+        "label": "Payment has been processed by TWINT",
+        "showTransactionLogModal": "Show transaction logs"
+      },
+      "transactionLog": {
+        "list": {
+          "title" : "Transactions",
+          "columns": {
+            "createdAt": "CreatedAt",
+            "order": "Order",
+            "transaction": "Transaction",
+            "request": "Request",
+            "response": "Response",
+            "soapRequest": "SOAP Request",
+            "soapResponse": "SOAP Response",
+            "exception": "Exception",
+            "payment": "Payment",
+            "order": "Order",
+            "action": {
+              "view": "View detail"
+            }
+          },
+          "modal": {
+            "title": "Log details",
+            "close": "Close"
+          }
+        }
+      }
+    }
+  },
+  "sw-order": {
+    "detail": {
+      "twint": "TWINT transaction logs"
     }
   }
 }
