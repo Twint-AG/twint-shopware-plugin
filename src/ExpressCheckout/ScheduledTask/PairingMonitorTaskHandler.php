@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Twint\ExpressCheckout\ScheduledTask;
 
+use Psr\Log\LoggerInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Twint\ExpressCheckout\Service\Monitoring\MonitoringService;
@@ -12,6 +14,16 @@ use Twint\ExpressCheckout\Service\Monitoring\MonitoringService;
 class PairingMonitorTaskHandler extends ScheduledTaskHandler
 {
     private MonitoringService $service;
+
+    private LoggerInterface $logger;
+
+    public function __construct(
+        EntityRepository $scheduledTaskRepository,
+        LoggerInterface $logger
+    ) {
+        parent::__construct($scheduledTaskRepository);
+        $this->logger = $logger;
+    }
 
     public static function getHandledMessages(): iterable
     {
@@ -27,6 +39,6 @@ class PairingMonitorTaskHandler extends ScheduledTaskHandler
     {
         $this->service->monitor();
 
-        $this->exceptionLogger?->info('Cron ran successfully');
+        $this->logger->info('Cron ran successfully');
     }
 }

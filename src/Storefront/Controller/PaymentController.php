@@ -142,6 +142,7 @@ class PaymentController extends StorefrontController
         } catch (Exception $e) {
             return new JsonResponse([
                 'reload' => false,
+                'error' => $e->getMessage(),
             ]);
         }
         return new JsonResponse($result);

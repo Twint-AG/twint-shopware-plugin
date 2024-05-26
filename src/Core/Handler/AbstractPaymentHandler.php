@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Twint\Core\Service\PaymentService;
 use Twint\Core\Util\CryptoHandler;
-use Twint\Sdk\Value\NumericPairingToken;
 use Twint\Util\OrderCustomFieldInstaller;
 
 abstract class AbstractPaymentHandler implements AsynchronousPaymentHandlerInterface
@@ -49,18 +48,7 @@ abstract class AbstractPaymentHandler implements AsynchronousPaymentHandlerInter
             //update API response for order
             $orderCustomFields = $transaction->getOrder()
                 ->getCustomFields();
-            $twintApiArray = [
-                'id' => $twintOrder->id()
-                    ->__toString(),
-                'status' => $twintOrder->status()
-                    ->__toString(),
-                'transactionStatus' => $twintOrder->transactionStatus()
-                    ->__toString(),
-                'pairingToken' => $twintOrder->pairingToken() instanceof NumericPairingToken ? $twintOrder->pairingToken()
-                    ->__toString() : '',
-                'merchantTransactionReference' => $twintOrder->merchantTransactionReference()
-                    ->__toString(),
-            ];
+            $twintApiArray = $this->paymentService->parseTwintOrderToArray($twintOrder);
             $orderCustomFields[OrderCustomFieldInstaller::TWINT_API_RESPONSE_CUSTOM_FIELD] = json_encode(
                 $twintApiArray
             );

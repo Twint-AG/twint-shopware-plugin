@@ -23,6 +23,7 @@ use Twint\Core\Factory\ClientBuilder;
 use Twint\Core\Handler\TransactionLog\TransactionLogWriterInterface;
 use Twint\Core\Setting\Settings;
 use Twint\Sdk\Value\Money;
+use Twint\Sdk\Value\NumericPairingToken;
 use Twint\Sdk\Value\Order;
 use Twint\Sdk\Value\OrderId;
 use Twint\Sdk\Value\OrderStatus;
@@ -78,15 +79,15 @@ class PaymentService
                 'An error occurred during the communication with API gateway' . PHP_EOL . $e->getMessage()
             );
         } finally {
-            $this->transactionLogWriter->write(
+            $this->transactionLogWriter->writeObjectLog(
                 $order->getId(),
                 $transaction->getOrderTransaction()
+                    ->getStateId(),
+                $transaction->getOrder()
+                    ->getStateId(),
+                $transaction->getOrderTransaction()
                     ->getId(),
-                'request',
-                'response',
-                'soapRequest',
-                'soapResponse',
-                'exception'
+                $client->flushInvocations()
             );
         }
     }
@@ -119,11 +120,11 @@ class PaymentService
             $client = $this->clientBuilder->build($order->getSalesChannelId());
             /** @var Order * */
             $twintOrder = $client->monitorOrder(new OrderId(new Uuid($twintApiResponse['id'])));
-
             $transactionId = $order->getTransactions()?->first()?->getId() ?? null;
             if ($transactionId === null) {
                 throw new Exception('Missing transaction id for this order:' . $referenceId . PHP_EOL);
             }
+
             if ($twintOrder->status()->equals(OrderStatus::SUCCESS())) {
                 $this->transactionStateHandler->paid($transactionId, $this->context);
                 return $client->confirmOrder(
@@ -138,6 +139,18 @@ class PaymentService
             throw PaymentException::asyncProcessInterrupted(
                 $order->getId(),
                 'An error occurred during the communication with API gateway' . PHP_EOL . $e->getMessage()
+            );
+        } finally {
+            $order = $this->getOrder($order->getId(), $this->context);
+            $innovations = empty($client) ? [] : $client->flushInvocations();
+            $this->transactionLogWriter->writeObjectLog(
+                $order->getId(),
+                $order->getTransactions()
+                    ?->first()
+                    ?->getStateId() ?? '',
+                $order->getStateId(),
+                $transactionId ?? '',
+                $innovations
             );
         }
     }
@@ -336,5 +349,21 @@ class PaymentService
             return $order;
         }
         throw new Exception($orderId);
+    }
+
+    public function parseTwintOrderToArray(Order $twintOrder): array
+    {
+        return [
+            'id' => $twintOrder->id()
+                ->__toString(),
+            'status' => $twintOrder->status()
+                ->__toString(),
+            'transactionStatus' => $twintOrder->transactionStatus()
+                ->__toString(),
+            'pairingToken' => $twintOrder->pairingToken() instanceof NumericPairingToken ? $twintOrder->pairingToken()
+                ->__toString() : '',
+            'merchantTransactionReference' => $twintOrder->merchantTransactionReference()
+                ->__toString(),
+        ];
     }
 }
