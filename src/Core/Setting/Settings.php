@@ -39,6 +39,8 @@ class Settings
 
     public const ONLY_PICK_ORDERS_FROM_MINUTES = 30;
 
+    public const CHECK_DUPLICATED_TRANSACTION_LOG_FROM_MINUTES = 1;
+
     public const DEFAULT_VALUES = [
         self::TEST_MODE => self::ENVIRONMENT_PROD,
         self::MERCHANT_ID => '',
