@@ -9,7 +9,7 @@
     "shopware/storefront": "*",
     "swag/swag-extension-store": "^3.0",
     "symfony/flex": "~2",
-    "twint/twint": "^0.0.2"
+    "twint/twint": "^0.0.1"
   },
   "repositories": [
     {
