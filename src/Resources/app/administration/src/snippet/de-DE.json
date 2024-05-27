@@ -56,6 +56,41 @@
           "helpText": "Das Passwort für die Zertifikatsdatei "
         }
       }
+    },
+    "order": {
+      "stateCard": {
+        "label": "Zahlung wurde von TWINT verarbeitet",
+        "showTransactionLogModal": "Transaktionsprotokolle anzeigen"
+      },
+      "transactionLog": {
+        "list": {
+          "title" : "Transaktionen",
+          "columns": {
+            "createdAt": "CreatedAt",
+            "order": "Bestellen",
+            "transaction": "Transaktion",
+            "request": "Anfrage",
+            "response": "Antwort",
+            "soapRequest": "Anfrage",
+            "soapResponse": "Antwort",
+            "exception": "Ausnahme",
+            "payment": "Zahlung",
+            "order": "Bestellen",
+            "action": {
+              "view": "Details anzeigen"
+            }
+          },
+          "modal": {
+            "title": "Protokolldetails",
+            "close": "Schließen"
+          }
+        }
+      }
+    }
+  },
+  "sw-order": {
+    "detail": {
+      "twint": "TWINT-Transaktionsprotokolle"
     }
   }
 }
