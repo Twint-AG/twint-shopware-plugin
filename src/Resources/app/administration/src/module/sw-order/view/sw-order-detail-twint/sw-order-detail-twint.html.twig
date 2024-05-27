@@ -94,14 +94,21 @@
                                          {{ $tc('twint.order.transactionLog.list.columns.response') }}
                                     </b>
                                     <sw-textarea-field :disabled="true" :value="item.response"/>
-                                    <p class="sw-order-detail-twint-modal-soap-request">
-                                        {{ $tc('twint.order.transactionLog.list.columns.soapRequest') }}
-                                    </p>
-                                    <sw-textarea-field v-for="request in item.soapRequest" :disabled="true" :value="request"/>
-                                    <h4 class="sw-order-detail-twint-modal-soap-response">
-                                        {{ $tc('twint.order.transactionLog.list.columns.soapResponse') }}
-                                    </h4>
-                                    <sw-textarea-field v-for="request in item.soapResponse" :disabled="true" :value="request"/>
+
+                                    <sw-card v-for="(request, index) in item.soapRequest">
+                                            <sw-container>
+                                                    <h4>SOAP {{ index + 1 }}</h4>
+                                                    <b class="sw-order-detail-twint-modal-soap-request">
+                                                        {{ $tc('twint.order.transactionLog.list.columns.soapRequest') }}
+                                                    </b>
+                                                    <sw-textarea-field :disabled="true" :value="request"/>
+
+                                                    <b class="sw-order-detail-twint-modal-soap-response" v-if="item.soapResponse[index]">
+                                                         {{ $tc('twint.order.transactionLog.list.columns.soapResponse') }}
+                                                    </b>
+                                                    <sw-textarea-field  v-if="item.soapResponse[index]" :disabled="true" :value="item.soapResponse[index]"/>
+                                            </sw-container>
+                                    </sw-card>
                                     <p class="sw-order-detail-twint-modal-exception">
                                         {{ $tc('twint.order.transactionLog.list.columns.exception') }}
                                     </p>
