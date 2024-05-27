@@ -13,6 +13,7 @@ use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\RouterInterface;
 use Twint\Core\Service\PaymentService;
 use Twint\Core\Util\CryptoHandler;
 use Twint\Util\OrderCustomFieldInstaller;
@@ -25,11 +26,14 @@ abstract class AbstractPaymentHandler implements AsynchronousPaymentHandlerInter
 
     private CryptoHandler $cryptoService;
 
-    public function __construct(OrderTransactionStateHandler $transactionStateHandler, PaymentService $paymentService, CryptoHandler $cryptoService)
+    private RouterInterface $router;
+
+    public function __construct(OrderTransactionStateHandler $transactionStateHandler, PaymentService $paymentService, CryptoHandler $cryptoService, RouterInterface $router)
     {
         $this->transactionStateHandler = $transactionStateHandler;
         $this->paymentService = $paymentService;
         $this->cryptoService = $cryptoService;
+        $this->router = $router;
     }
 
     public function pay(
@@ -63,7 +67,9 @@ abstract class AbstractPaymentHandler implements AsynchronousPaymentHandlerInter
         // Redirect to external gateway
         if (!empty($transaction->getOrder()->getOrderNumber())) {
             $hashOrderNumber = $this->cryptoService->hash($transaction->getOrder()->getOrderNumber());
-            return new RedirectResponse('/payment/waiting/' . $hashOrderNumber);
+            return new RedirectResponse($this->router->generate('frontend.twint.waiting', [
+                'orderNumber' => $hashOrderNumber,
+            ]));
         }
         return new RedirectResponse('/');
     }
