@@ -1,4 +1,10 @@
-{% sw_extends '@Storefront/storefront/base.html.twig' %}
+{% sw_extends '@Storefront/storefront/page/checkout/_page.html.twig' %}
+
+{% block base_header %}
+    {% sw_include '@Storefront/storefront/layout/header/header-minimal.html.twig' %}
+{% endblock %}
+
+{% block base_navigation %}{% endblock %}
 
 {% block base_content %}
     {% block page_qr_waiting %}
@@ -14,6 +20,9 @@
         {% if isAndroidDevice and payLinks.android %}
             {% set androidLink = payLinks.android %}
         {% endif %}
+        <script>
+            window.storefrontUrl = "{{ app.request.get('sw-storefront-url') }}";
+        </script>
         <div class="checkout">
             {% block page_qr_waiting_container %}
                 <div class="qr-waiting-container" data-order-number="{{ orderNumber }}" data-mobile="{{ isAndroidDevice or isIosDevice }}" data-is-android-device="{{ isAndroidDevice }}" data-android-link="{{ payLinks.android }}">
@@ -122,7 +131,7 @@
                         {% endblock %}
                         {% if isAndroidDevice  %}
                         <div class="text-center">
-                            <a class="btn btn-dark switch-to-app" href="javascript:window.location = '{{ payLinks.android }}'">
+                            <a class="btn btn-primary switch-to-app" href="javascript:window.location = '{{ payLinks.android }}'">
                                 {{ "twintPayment.appSelector.switchLinkLabel"|trans() }}
                             </a>
                         </div>
@@ -143,10 +152,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row text-center">
+                        <div class="row text-center qr-code-mobile" style="{% if isAndroidDevice or isIosDevice %}display:none{% endif %}">
                             <div class="alternative-text">{{ "twintPayment.appSelector.enterCode"|trans()|raw}}</div>
                         </div>
-                        <div class="qr-row grey-bg text-center">
+                        <div class="qr-row grey-bg text-center qr-code-mobile" style="{% if isAndroidDevice or isIosDevice %}display:none{% endif %}">
                             <div class="wrap">
                                 <div class="credentials">
                                     {% block page_qr_waiting_mobile_qr_token %}

@@ -17,15 +17,19 @@ export default class AppSwitchHandler extends Plugin {
 
     init() {
         this.httpClient = new HttpClient();
+        this.domain = "";
+        if (window.hasOwnProperty('storefrontUrl')) {
+            this.domain = window.storefrontUrl;
+        }
         this.pageSelector = DomAccess.querySelector(document, this.options.pageSelector);
         this.appSelector = DomAccess.querySelector(document, this.options.appSelector);
-        this.qrCodeSelector = DomAccess.querySelector(document, this.options.qrCodeSelector);
+        this.qrCodeSelectors = DomAccess.querySelectorAll(document, this.options.qrCodeSelector);
         this.appLinkSelector = DomAccess.querySelector(document, this.options.appLinkSelector);
         this.bankSelectors = DomAccess.querySelectorAll(this.appSelector, '.bank-logo', false);
         this.orderNumber = this.pageSelector.getAttribute('data-order-number');
         this.isMobile = this.pageSelector.getAttribute('data-mobile');
         this.isAndroidMobile = this.pageSelector.getAttribute('data-is-android-device');
-        this.statusOrderEndpoint = '/payment/order/' + this.orderNumber;
+        this.statusOrderEndpoint = this.domain + '/payment/order/' + this.orderNumber;
         this._registerEvents();
     }
     /**
@@ -98,6 +102,8 @@ export default class AppSwitchHandler extends Plugin {
         }, 'application/json', true);
     }
     showMobileQrCode() {
-        this.qrCodeSelector.style['display'] = 'block';
+        this.qrCodeSelectors.forEach((object) => {
+            object.style['display'] = 'block';
+        });
     }
 }

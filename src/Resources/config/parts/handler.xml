@@ -10,6 +10,7 @@
                       id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Twint\Core\Service\PaymentService"/>
             <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
+            <argument type="service" id="router"/>
             <tag name="shopware.payment.method.async"/>
         </service>
 
@@ -19,6 +20,7 @@
                       id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Twint\Core\Service\PaymentService"/>
             <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
+            <argument type="service" id="router"/>
             <tag name="shopware.payment.method.async"/>
         </service>
 
