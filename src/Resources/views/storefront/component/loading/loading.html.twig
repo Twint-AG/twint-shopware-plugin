@@ -2,7 +2,7 @@
     <div id="twint-loading-popup" data-twint-loading-popup>
         <div class="loading-content">
             <img src="{{ asset('bundles/twintpayment/buttons/express.svg', 'asset') }}" alt="Loading..." class="loading-icon">
-            <p class="loading-text">Express checkout in progress. Please wait</p>
+            <p class="loading-text">{{ 'twintPayment.express.checkingOut'|trans }}</p>
         </div>
     </div>
 {% endblock %}

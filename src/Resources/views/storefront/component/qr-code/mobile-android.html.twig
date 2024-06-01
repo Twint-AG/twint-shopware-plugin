@@ -1,0 +1,8 @@
+{% block twint_android_button %}
+    <div class="text-center row mt-3 px-3 d-md-none">
+        <a class="btn btn-primary android-button rounded py-2 px-3 border-0"
+           href="javascript:window.location = '{{ payLinks.android }}'">
+            {{ "twintPayment.appSelector.switchLinkLabel"|trans() }}
+        </a>
+    </div>
+{% endblock %}

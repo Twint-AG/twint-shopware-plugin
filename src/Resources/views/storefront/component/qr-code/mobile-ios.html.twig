@@ -1,0 +1,39 @@
+{% block twint_qr_ios %}
+    <div class="mb-3 d-md-none">
+        <div class="row app-chooser-area">
+            <div id="app-chooser-container" class="text-center bg-light">
+                <div class="app-chooser-title my-4">{{ 'twintPayment.appSelector.title'|trans() }}</div>
+                {% set prefinedApps = {
+                    'UBS TWINT' : 'bank-ubs',
+                    'Raiffeisen TWINT' : 'bank-raiffeisen',
+                    'PostFinance TWINT' : 'bank-pf',
+                    'ZKB TWINT' :'bank-zkb',
+                    'Credit Suisse TWINT' : 'bank-cs',
+                    'BCV TWINT' : 'bank-bcv',
+                } %}
+
+                <div class="row app-logos-container m-3 mb-2 text-center justify-content-center" id="logo-container">
+                    {% for payLink in payLinks.ios %}
+                        {% if payLink.name in prefinedApps|keys %}
+                            <div class="col-4 mb-3 text-center">
+                                <img class="bank-logo"
+                                     src="{{ asset('bundles/twintpayment/assets/apps/' ~ prefinedApps[payLink.name] ~ '.png') }}"
+                                     data-link="{{ payLink.link }}" alt=""/>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="row text-center">
+            <select class="text-align-last p-3 text-center rounded-0 border-0 text-secondary bg-white" id="app-chooser">
+                <option value="">{{ "twintPayment.appSelector.otherBankOption"|trans() }}</option>
+                {% for payLink in payLinks.ios %}
+                    {% if payLink.name not in prefinedApps|keys %}
+                        <option value="{{ payLink.link }}">{{ payLink.name }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+{% endblock %}

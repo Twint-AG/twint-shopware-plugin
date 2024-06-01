@@ -31,7 +31,7 @@ class ClientBuilder
     ) {
     }
 
-    public function build(string $salesChannelId): InvocationRecordingClient
+    public function build(string $salesChannelId, int $version = Version::LATEST ): InvocationRecordingClient
     {
         if (isset(self::$instances[$salesChannelId])) {
             return self::$instances[$salesChannelId];
@@ -66,7 +66,7 @@ class ClientBuilder
                 new Client(
                     CertificateContainer::fromPkcs12(new Pkcs12Certificate(new InMemoryStream($cert), $passphrase)),
                     MerchantId::fromString($merchantId),
-                    Version::latest(),
+                    new Version($version),
                     $environment,
                     soapEngineFactory: new DefaultSoapEngineFactory(
                         wrapTransport: static fn (Transport $transport) => new RecordingTransport(

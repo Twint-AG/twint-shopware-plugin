@@ -8,16 +8,22 @@
             "successPayment": "Your payment is successful",
             "cancelPayment": "The payment is cancelled"
         },
-        "waitingPage" : {
-            "step1": "Open your bank's TWINT App on your smartphone",
-            "step2": "Tap the QR code",
-            "step3": "Scan the QR code with the App, or select the “Code” tab and enter the code"
+        "instruction" : {
+            "scanQR": "Scan this QR Code with your TWINT-app to complete the checkout.",
+            "selectAddress": "Select a shipping address and complete the purchase in the app.",
+            "inputCode": "Enter this code in your TWINT app:"
+        },
+        "button": {
+            "copyCode": "Copy code"
         },
         "appSelector": {
             "title": "Choose your TWINT App",
             "otherBankOption": "Other banks",
             "enterCode" : "Or enter this code<br>in your App:",
             "switchLinkLabel": "Switch to the TWINT App now"
+        },
+        "express": {
+            "checkingOut": "Express checkout in progress. Please wait"
         }
     }
 }

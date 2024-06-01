@@ -19,6 +19,7 @@
             <argument type="service" id="twint.service.express.checkout"/>
             <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
             <argument type="service" id="Twint\ExpressCheckout\Repository\PairingRepository"/>
+            <argument type="service" id="Twint\Core\Service\PaymentService"/>
 
             <call method="setContainer">
                 <argument type="service" id="service_container"/>

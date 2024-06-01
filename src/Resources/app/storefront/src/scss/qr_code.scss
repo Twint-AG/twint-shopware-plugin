@@ -1,0 +1,133 @@
+.twint-qr-container {
+  font-size: 21px;
+
+  .icon-twint {
+    width: 55px;
+  }
+
+  .qr-img{
+    width: 300px;
+  }
+
+  #qr-token {
+    font-weight: 600;
+    font-size: 30px;
+    line-height: 41px;
+    letter-spacing: 4px;
+    color: black;
+    border: none;
+    opacity: 1;
+    width: 95%;
+  }
+
+  .amount {
+    height: 100px;
+
+    .value {
+      color: white;
+      font-size: 37px;
+      line-height: 36px;
+    }
+  }
+
+  .bank-logo {
+    height: 60px;
+    width: 60px;
+  }
+
+  .md-rounded {
+    @media (max-width: 768px) {
+      & {
+        border-radius: 0;
+      }
+    }
+
+    border-radius: 0.5rem;
+  }
+
+  .rounded{
+    border-radius: 0.5rem;
+  }
+
+  .android-button{
+    background-color: #9E9E9E;
+  }
+
+  .text-align-last{
+    text-align-last: center;
+  }
+
+  .guide-icon{
+    width: 40px;
+    height: 40px;
+  }
+
+  .separator {
+    align-items: center;
+
+    &::before,&::after {
+      content: '';
+      flex-grow: 1;
+      border-bottom: 1px solid #CCCCCC;
+    }
+
+    &::before {
+      margin-right: 10px;
+    }
+
+    &::after {
+      margin-left: 10px;
+    }
+  }
+
+  .pl-md-3{
+    @media (min-width: 768px) {
+      & {
+        padding-left: 1rem;
+      }
+    }
+  }
+
+  select{
+    height: 60px;
+  }
+
+  .copied{
+    color: #28a745;
+  }
+
+  .sm-w-100{
+    @media (max-width: 768px) {
+      & {
+        padding-left: 0;
+        padding-right: 0;
+      }
+    }
+  }
+
+  .modal-lg-12{
+    @media (min-width: 1200px) {
+      .modal & {
+        width: 100%;
+      }
+    }
+  }
+}
+
+.d-none{
+  .generic &.block {
+    @media (max-width: 768px) {
+      & {
+        display: block;
+      }
+    }
+  }
+
+  .generic &.flex {
+    @media (max-width: 768px) {
+      & {
+        display: flex;
+      }
+    }
+  }
+}

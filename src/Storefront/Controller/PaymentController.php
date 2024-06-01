@@ -92,7 +92,7 @@ class PaymentController extends StorefrontController
             'orderNumber' => $orderNumber,
             'qrCode' => $qrcode,
             'pairingToken' => $twintApiResponse['pairingToken'] ?? '',
-            'order' => $order,
+            'amount' => $order->getPrice()->getTotalPrice(),
             'payLinks' => $this->paymentService->getPayLinks(
                 $twintApiResponse['pairingToken'] ?? '',
                 $order->getSalesChannelId()
