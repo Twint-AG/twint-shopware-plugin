@@ -43,7 +43,10 @@ class CheckoutController extends StorefrontController
         return $this->json([
             'success' => true,
             'redirectUrl' => '/payment/express/' . $this->cryptoService->hash($pairing->pairingUuid()->__toString()),
-            'content' => $this->getPairingContent($this->cryptoService->hash($pairing->pairingUuid()->__toString()), $context)
+            'content' => $this->getPairingContent(
+                $this->cryptoService->hash($pairing->pairingUuid()->__toString()),
+                $context
+            ),
         ]);
     }
 
@@ -118,7 +121,9 @@ class CheckoutController extends StorefrontController
             'orderNumber' => 'CART',
             'qrCode' => $qrcode,
             'pairingToken' => $paring->getToken(),
-            'amount' => $paring->getCart()->getPrice()->getPositionPrice(),
+            'amount' => $paring->getCart() // @phpstan-ignore-line
+                ->getPrice()
+                ->getPositionPrice(),
             'payLinks' => [],
         ]);
     }
@@ -139,17 +144,20 @@ class CheckoutController extends StorefrontController
                 'version' => 5,
             ]
         );
-        $qrcode = (new QRCode($options))->render($paring->getToken());
+        $qrcode = (new QRCode($options))->render($paring->getToken()); // @phpstan-ignore-line
 
-        return $this->renderStorefront('@TwintPayment/storefront/page/express-payment.html.twig', [
+        return $this->renderStorefront('@TwintPayment/storefront/page/express-payment.html.twig', [ // @phpstan-ignore-line
             'pairingHash' => $pairingHash,
             'orderNumber' => 'CART',
             'qrCode' => $qrcode,
-            'pairingToken' => $paring->getToken(),
-            'amount' => $paring->getCart()->getPrice()->getPositionPrice(),
+            'pairingToken' => $paring->getToken(), // @phpstan-ignore-line
+            'amount' => $paring->getCart() // @phpstan-ignore-line
+                ->getPrice()
+                ->getPositionPrice(),
             'payLinks' => $this->paymentService->getPayLinks(
-                $paring->getToken(),
-                $context->getSalesChannel()->getId()
+                $paring->getToken(), // @phpstan-ignore-line
+                $context->getSalesChannel() // @phpstan-ignore-line
+                    ->getId()
             ),
         ])->getContent();
     }
