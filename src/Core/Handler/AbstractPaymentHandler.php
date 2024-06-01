@@ -86,7 +86,7 @@ abstract class AbstractPaymentHandler implements AsynchronousPaymentHandlerInter
         if ($request->query->getBoolean('cancel')) {
             throw PaymentException::customerCanceled(
                 $transactionId,
-                'Customer canceled the payment on the PayPal page'
+                'Customer canceled the payment'
             );
         }
 

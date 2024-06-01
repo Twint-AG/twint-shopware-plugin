@@ -15,6 +15,7 @@ use Twint\Sdk\Value\InteractiveFastCheckoutCheckIn;
 use Twint\Sdk\Value\Money;
 use Twint\Sdk\Value\PairingUuid;
 use Twint\Sdk\Value\ShippingMethods;
+use Twint\Sdk\Value\Version;
 
 class ExpressPaymentService
 {
@@ -32,7 +33,7 @@ class ExpressPaymentService
         Cart $cart,
         ShippingMethods $methods
     ): InteractiveFastCheckoutCheckIn {
-        $client = $this->clientBuilder->build($context->getSalesChannel()->getId());
+        $client = $this->clientBuilder->build($context->getSalesChannel()->getId(), Version::NEXT);
 
         $pairing = $client->requestFastCheckOutCheckIn(
             Money::CHF($cart->getPrice()->getPositionPrice()),
@@ -62,7 +63,7 @@ class ExpressPaymentService
      */
     public function monitoring(string $pairingUUid, string $channelId): FastCheckoutState
     {
-        $client = $this->clientBuilder->build($channelId);
+        $client = $this->clientBuilder->build($channelId, Version::NEXT);
 
         return $client->monitorFastCheckOutCheckIn(PairingUuid::fromString($pairingUUid));
     }

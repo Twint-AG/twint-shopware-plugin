@@ -1,5 +1,6 @@
 import Plugin from 'src/plugin-system/plugin.class';
 import HttpClient from "src/service/http-client.service";
+import PseudoModalUtil from 'src/utility/modal-extension/pseudo-modal.util';
 
 export default class ExpressCheckoutButton extends Plugin {
 
@@ -9,12 +10,23 @@ export default class ExpressCheckoutButton extends Plugin {
     };
 
     loadingPopup = null;
+    static modal = null;
 
-    _init() {
+    init() {
         this.checking = false;
         this.client = new HttpClient();
         if (!this.options.useCart) {
             this.form = this.el.closest(this.options.formSelector);
+        }
+
+        if(!ExpressCheckoutButton.modal) {
+            ExpressCheckoutButton.modal = new PseudoModalUtil(
+                '',
+                true,
+                '.js-twint-modal-template',
+                '.js-twint-modal-template-content-element',
+                '.js-twint-modal-template-title-element'
+            );
         }
 
         this._registerEvents();
@@ -91,11 +103,10 @@ export default class ExpressCheckoutButton extends Plugin {
     }
 
     onFinish(responseText, request) {
-        this.checking = false;
         this.getLoadingPopup().hide();
         if(request.status === 200) {
             const response = JSON.parse(responseText);
-            window.location.href = this.baseUrl() + response.redirectUrl
+            this.onModalLoaded(response.content);
 
             return;
         }
@@ -103,11 +114,18 @@ export default class ExpressCheckoutButton extends Plugin {
         this.onError(responseText);
     }
 
-    onError(responseText) {
-        console.log("Express checkout error: ", responseText);
+    onModalLoaded(responseText){
+        this.checking = false;
+
+        ExpressCheckoutButton.modal.open();
+        ExpressCheckoutButton.modal.updateContent(responseText);
+
+        window.PluginManager.initializePlugin('TwintPaymentStatusRefresh', '[data-twint-payment-status-refresh]');
+        window.PluginManager.initializePlugin('TwintCopyToken', '[data-twint-copy-token]');
+        window.PluginManager.initializePlugin('TwintAppSwitchHandler', '[data-app-selector]');
     }
 
-    baseUrl() {
-        return window.location.protocol + '//' + window.location.host;
+    onError(responseText) {
+        console.log("Express checkout error: ", responseText);
     }
 }

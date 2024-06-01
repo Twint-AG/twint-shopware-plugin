@@ -14,6 +14,7 @@ use Shopware\Storefront\Page\Checkout\Finish\CheckoutFinishPage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Twint\Core\Service\PaymentService;
 use Twint\Core\Util\CryptoHandler;
 use Twint\ExpressCheckout\Repository\PairingRepository;
 use Twint\ExpressCheckout\Service\ExpressCheckoutServiceInterface;
@@ -27,6 +28,7 @@ class CheckoutController extends StorefrontController
         private readonly ExpressCheckoutServiceInterface $checkoutService,
         private CryptoHandler $cryptoService,
         private readonly PairingRepository $paringLoader,
+        private PaymentService $paymentService
     ) {
     }
 
@@ -41,6 +43,7 @@ class CheckoutController extends StorefrontController
         return $this->json([
             'success' => true,
             'redirectUrl' => '/payment/express/' . $this->cryptoService->hash($pairing->pairingUuid()->__toString()),
+            'content' => $this->getPairingContent($this->cryptoService->hash($pairing->pairingUuid()->__toString()), $context)
         ]);
     }
 
@@ -70,7 +73,9 @@ class CheckoutController extends StorefrontController
         ]);
     }
 
-    #[Route(path: '/payment/express/{paringHash}', name: 'frontend.twint.express', methods: ['GET'])]
+    #[Route(path: '/payment/express/{paringHash}', name: 'frontend.twint.express', methods: ['GET'], defaults: [
+        'XmlHttpRequest' => true,
+    ])]
     public function express(Request $request, SalesChannelContext $context): Response
     {
         $pairingHash = $request->get('paringHash');
@@ -113,8 +118,39 @@ class CheckoutController extends StorefrontController
             'orderNumber' => 'CART',
             'qrCode' => $qrcode,
             'pairingToken' => $paring->getToken(),
-            'cart' => $paring->getCart(),
+            'amount' => $paring->getCart()->getPrice()->getPositionPrice(),
             'payLinks' => [],
         ]);
+    }
+
+    private function getPairingContent(string $pairingHash, SalesChannelContext $context): string
+    {
+        try {
+            $pairingUUid = $this->cryptoService->unHash($pairingHash);
+            $paring = $this->paringLoader->load($pairingUUid, $context);
+            $this->paringLoader->fetchCart($paring, $context);
+        } catch (Exception $e) {
+        }
+
+        $options = new QROptions(
+            [
+                'eccLevel' => QRCode::ECC_L,
+                'outputType' => QRCode::OUTPUT_MARKUP_SVG,
+                'version' => 5,
+            ]
+        );
+        $qrcode = (new QRCode($options))->render($paring->getToken());
+
+        return $this->renderStorefront('@TwintPayment/storefront/page/express-payment.html.twig', [
+            'pairingHash' => $pairingHash,
+            'orderNumber' => 'CART',
+            'qrCode' => $qrcode,
+            'pairingToken' => $paring->getToken(),
+            'amount' => $paring->getCart()->getPrice()->getPositionPrice(),
+            'payLinks' => $this->paymentService->getPayLinks(
+                $paring->getToken(),
+                $context->getSalesChannel()->getId()
+            ),
+        ])->getContent();
     }
 }

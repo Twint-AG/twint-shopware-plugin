@@ -8,16 +8,19 @@
             "successPayment": "Die Zahlung ist erfolgreich",
             "cancelPayment": "Die Zahlung wurde storniert"
         },
-        "waitingPage" : {
-            "step1": "Öffnen Sie die TWINT App Ihrer Bank auf Ihrem Smartphone.",
-            "step2": "Tippen Sie auf des OR Code Symbol.",
-            "step3": "Richten Sie Ihre Smartphone Kamera auf den OH 'Code'. Oder wählen Sie den Reiter «Code» und geben Sie den Zahiencode ein."
-        },
         "appSelector": {
             "title": "Wählen Sie Ihre TWINT-App",
             "otherBankOption": "Andere Bank",
             "enterCode" : "Oder geben Sie diesen Code<br>in Ihre App ein:",
             "switchLinkLabel": "Jetzt zur App wechseln"
+        },
+        "instruction": {
+            "scanQR": "Scannen Sie diesen QR-Code mit Ihrer TWINT-App, um den Checkout abzuschließen.",
+            "selectAddress": "Wählen Sie eine Versandadresse und schließen Sie den Kauf in der App ab.",
+            "inputCode": "Geben Sie diesen Code in Ihre TWINT-App ein:"
+        },
+        "button": {
+            "copyCode": "Code kopieren"
         }
     }
 }
