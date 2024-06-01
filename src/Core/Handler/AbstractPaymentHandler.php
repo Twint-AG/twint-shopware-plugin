@@ -84,10 +84,7 @@ abstract class AbstractPaymentHandler implements AsynchronousPaymentHandlerInter
 
         // Example check if the user canceled. Might differ for each payment provider
         if ($request->query->getBoolean('cancel')) {
-            throw PaymentException::customerCanceled(
-                $transactionId,
-                'Customer canceled the payment'
-            );
+            throw PaymentException::customerCanceled($transactionId, 'Customer canceled the payment');
         }
 
         // Example check for the actual status of the payment. Might differ for each payment provider
