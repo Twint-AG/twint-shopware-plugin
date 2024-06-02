@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Twint\ExpressCheckout\Repository;
 
 use Shopware\Core\Checkout\Cart\CartPersister;
+use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -23,6 +24,7 @@ class PairingRepository
         private EntityRepository $pairingRepository,
         private CartPersister $cartPersister,
         private EntityRepository $orderRepository,
+        private CartService $cartService
     ) {
     }
 
@@ -39,8 +41,7 @@ class PairingRepository
             throw new PairingException("{$pairingId} not found");
         }
 
-        $cart = $this->cartPersister->load($pairing->getCartToken(), $context);
-        $pairing->setCart($cart);
+        $this->fetchCart($pairing, $context);
 
         return $pairing;
     }
@@ -48,6 +49,7 @@ class PairingRepository
     public function fetchCart(TwintPairingEntity $entity, SalesChannelContext $context): TwintPairingEntity
     {
         $cart = $this->cartPersister->load($entity->getCartToken(), $context);
+        $cart = $this->cartService->recalculate($cart, $context);
         $entity->setCart($cart);
 
         return $entity;
