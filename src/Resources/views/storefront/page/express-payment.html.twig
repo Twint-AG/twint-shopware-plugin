@@ -1,37 +1,35 @@
-{% sw_extends '@Storefront/storefront/page/checkout/_page.html.twig' %}
-
-{% block base_header %}
-    {% sw_include '@Storefront/storefront/layout/header/header-minimal.html.twig' %}
-{% endblock %}
-
-{% block base_navigation %}{% endblock %}
-
 {% block base_content %}
-    {% set isAndroidDevice = false %}
-    {% set isIosDevice = false %}
-    {% set androidLink = '' %}
-    {% if payLinks.android is defined%}
-        {% set isAndroidDevice = true %}
-    {% endif %}
-    {% if payLinks.ios is defined%}
-        {% set isIosDevice = true %}
-    {% endif %}
-    {% if isAndroidDevice and payLinks.android %}
-        {% set androidLink = payLinks.android %}
-    {% endif %}
+    {% block page_qr_waiting %}
+        {% set isAndroid = false %}
+        {% set isIosDevice = false %}
+        {% set androidLink = '' %}
+        {% if payLinks.android is defined%}
+            {% set isAndroid = true %}
+        {% endif %}
+        {% if payLinks.ios is defined%}
+            {% set isIosDevice = true %}
+        {% endif %}
+        {% if isAndroid and payLinks.android %}
+            {% set androidLink = payLinks.android %}
+        {% endif %}
+        <script>
+            window.storefrontUrl = "{{ app.request.get('sw-storefront-url') }}";
+        </script>
 
-    {{ include('@TwintPayment/storefront/component/payment/payment-qr.html.twig',
-        {
-            qrCode: qrCode,
-            androidLink: androidLink,
-            isAndroidDevice: isAndroidDevice,
-            isIosDevice: isIosDevice,
-            payLinks: payLinks,
-            cart: cart,
-            orderNumber : orderNumber,
-            pairingToken : pairingToken,
-            pairingHash : pairingHash,
-        }
-    )
-    }}
+        {{ include('@TwintPayment/storefront/component/qr-code/qr-container.html.twig',
+            {
+                qrCode: qrCode,
+                androidLink: androidLink,
+                isAndroid: isAndroid,
+                isIosDevice: isIosDevice,
+                payLinks: payLinks,
+                cart: cart,
+                orderNumber : orderNumber,
+                pairingToken : pairingToken,
+                pairingHash : pairingHash,
+                expressCheckout: true
+            }
+        )
+        }}
+    {% endblock %}
 {% endblock %}

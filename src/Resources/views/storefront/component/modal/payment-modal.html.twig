@@ -1,0 +1,34 @@
+{% block component_twint_modal %}
+    <div class="js-twint-modal-template">
+        <div class="modal modal-lg fade twint-modal"
+             tabindex="-1"
+             role="dialog">
+            <div class="modal-dialog modal-fullscreen-sm-down" role="document">
+                <div class="modal-content">
+                    {% block component_twint_modal_header %}
+                        <div class="modal-header">
+                            <span class="d-flex gap-2 close" role="button" data-bs-dismiss="modal" aria-label="Close">
+                                {% block component_twint_modal_close_btn %}
+                                    <button type="button" class="btn-close">
+                                    </button>
+                                {% endblock %}
+
+                                {% block component_twint_modal_title %}
+                                    <span class="modal-title js-twint-modal-template-title-element">Cancel checkout</span>
+                                {% endblock %}
+                            </span>
+
+                            <img class="twint-logo d-none d-md-block"
+                                 src="{{ asset('bundles/twintpayment/assets/twint_logo.png') }}" alt="TWINT logo"/>
+                        </div>
+                    {% endblock %}
+
+                    {% block component_twint_modal_body %}
+                        <div class="modal-body js-twint-modal-template-content-element bg-light p-0 p-md-3">
+                        </div>
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
