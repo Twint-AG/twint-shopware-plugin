@@ -5,6 +5,7 @@
 {% block twint_express_checkout_button %}
     <button class="twint-button" data-twint-express-checkout-button
             data-twint-express-checkout-button-options="{{ { useCart: useCart } | json_encode }}"
+            {{ disabled is defined and disabled ? 'disabled' : '' }}
         >
         <span class="twint-button_icon_block">
             <img class="twint-button_icon" src="{{ asset('bundles/twintpayment/buttons/express.svg', 'asset') }}" alt="Express Checkout">
