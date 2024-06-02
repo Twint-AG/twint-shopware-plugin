@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Twint\ExpressCheckout\Service;
 
 use Shopware\Core\Checkout\Cart\Cart;
+use Shopware\Core\Checkout\Cart\CartPersister;
 use Shopware\Core\Checkout\Cart\Delivery\DeliveryBuilder;
 use Shopware\Core\Checkout\Cart\LineItemFactoryRegistry;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
@@ -13,6 +14,7 @@ use Shopware\Core\Checkout\Shipping\ShippingMethodCollection;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\Context\AbstractSalesChannelContextFactory;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Event\RouteRequest\ShippingMethodRouteRequestEvent;
@@ -36,6 +38,7 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
         private readonly ExpressPaymentService $paymentService,
         private readonly PairingRepository $loader,
         private AbstractSalesChannelContextFactory $contextFactory,
+        private CartPersister $cartPersister
     ) {
     }
 
@@ -50,6 +53,10 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
         $useCart = $payload['useCart'] ?? false;
         if ($useCart) {
             $cart = $this->cartService->getCart($context->getToken(), $context);
+
+            $token = Uuid::randomHex();
+            $this->cartPersister->replace($context->getToken(), $token, $context);
+            $cart->setToken($token);
         } else {
             $cart = $this->createCart($context, $payload['lineItems'] ?? []);
         }
@@ -131,7 +138,7 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
 
     private function createCart(SalesChannelContext $context, array $items): Cart
     {
-        $token = $context->getToken();
+        $token = Uuid::randomHex();
         $cart = $this->cartService->createNew($token);
 
         $lineItems = $this->getLineItems($items, $context);

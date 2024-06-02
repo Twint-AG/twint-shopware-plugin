@@ -98,7 +98,7 @@
 
   .sm-w-100{
     @media (max-width: 768px) {
-      & {
+      .content-main & {
         padding-left: 0;
         padding-right: 0;
       }
