@@ -146,7 +146,8 @@ class CheckoutController extends StorefrontController
         );
         $qrcode = (new QRCode($options))->render($paring->getToken()); // @phpstan-ignore-line
 
-        return $this->renderStorefront('@TwintPayment/storefront/page/express-payment.html.twig', [ // @phpstan-ignore-line
+        // @phpstan-ignore-next-line
+        return $this->renderStorefront('@TwintPayment/storefront/page/express-payment.html.twig', [
             'pairingHash' => $pairingHash,
             'orderNumber' => 'CART',
             'qrCode' => $qrcode,
