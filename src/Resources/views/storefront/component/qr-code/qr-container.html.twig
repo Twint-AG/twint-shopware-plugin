@@ -1,0 +1,30 @@
+{% block page_qr_waiting %}
+    <div class="checkout bg-light">
+        {% block twint_qr_container %}
+            <div class="twint-qr-container {{ isAndroid ? 'android' : '' }} {{ isIosDevice ? 'ios' : '' }} {{ not (isAndroid or isIosDevice) ? 'generic' : '' }}"
+                 data-twint-payment-status-container
+                 data-twint-payment-status-container-options="{{ { pairingHash: pairingHash, expressCheckout: expressCheckout } | json_encode }}
+                "
+                 data-twint-payment-status-refresh
+                 data-twint-payment-status-refresh-options="{{ { pairingHash: pairingHash, interval: 5000, expressCheckout: expressCheckout  } | json_encode }}"
+                 data-mobile="{{ isAndroid or isIosDevice }}"
+                 data-is-android-device="{{ isAndroid }}"
+                 data-is-ios-device="{{ isIosDevice }}"
+                 data-android-link="{{ payLinks.android }}"
+                 data-order-number="{{ orderNumber }}">
+
+                {{
+                    include('@TwintPayment/storefront/component/qr-code/qr-code.html.twig',{
+                        qrCode: qrCode,
+                        pairingToken: pairingToken,
+                        payLinks: payLinks,
+                        isAndroid: isAndroid,
+                        isIosDevice: isIosDevice,
+                    })
+                }}
+
+                {{ include('@TwintPayment/storefront/component/qr-code/payment-guide.html.twig') }}
+            </div>
+        {% endblock %}
+    </div>
+{% endblock %}

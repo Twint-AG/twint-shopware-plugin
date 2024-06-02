@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "494c309f6bcb846be5112cadbc5fe57b",
+    "content-hash": "dec8f4d8f284b9d07bae57986a64d57b",
     "packages": [
         {
             "name": "azjezz/psl",
@@ -3560,11 +3560,11 @@
         },
         {
             "name": "twint-ch/twint-sdk",
-            "version": "dev-dev/fast-checkout",
+            "version": "dev-develop",
             "source": {
                 "type": "git",
                 "url": "https://git.nfq.asia/twint-ag/php-sdk.git",
-                "reference": "b069cef36d341d9bc8d40027fbba42c40622f350"
+                "reference": "d260bd35f1e93cc3972ca0969b84edb4359c4a46"
             },
             "require": {
                 "azjezz/psl": "^2.5.0",
@@ -3577,25 +3577,27 @@
                 "php-soap/psr18-transport": "^1.5.0",
                 "phpro/soap-client": "^3.3.0",
                 "psr/clock": "^1.0",
+                "veewee/xml": "^3.0.0",
                 "webimpress/safe-writer": "^2.0"
             },
             "require-dev": {
                 "ext-xdebug": "*",
                 "laminas/laminas-code": "^4.8",
-                "php-soap/wsdl-reader": "^0.10.0",
+                "php-soap/wsdl-reader": "^0.13.1",
                 "php-standard-library/phpstan-extension": "^1.0",
-                "phpstan/phpstan": "^1.11.1",
-                "phpstan/phpstan-strict-rules": "^1.5",
+                "phpstan/phpstan": "^1.11.2",
+                "phpstan/phpstan-strict-rules": "^1.6.0",
                 "phpunit/phpunit": "^10.5",
                 "roave/better-reflection": "^6.25.0",
-                "slevomat/coding-standard": "^8.14",
+                "slevomat/coding-standard": "^8.15.0",
                 "symfony/clock": "^6.4",
                 "symfony/dotenv": "^6.4",
                 "symfony/event-dispatcher": "^6.4",
                 "symfony/finder": "^6.4",
-                "symplify/easy-coding-standard": "^12.1.14",
+                "symplify/easy-coding-standard": "^12.2.0",
                 "wiremock-php/wiremock-php": "dev-cloud-support as 2.39.0"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "files": [
@@ -3623,7 +3625,7 @@
                 }
             ],
             "description": "The TWINT SDK for PHP",
-            "time": "2024-05-22T16:17:33+00:00"
+            "time": "2024-05-29T13:04:18+00:00"
         },
         {
             "name": "veewee/xml",
