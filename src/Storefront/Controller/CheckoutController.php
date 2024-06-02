@@ -102,7 +102,7 @@ class CheckoutController extends StorefrontController
 
             $page->setOrder($paring->getOrder());
 
-            return $this->renderStorefront('@Storefront/storefront/page/checkout/finish/index.html.twig', [
+            return $this->renderStorefront('@TwintPayment/storefront/page/express-finish.html.twig', [
                 'page' => $page,
             ]);
         }

@@ -24,7 +24,8 @@
             "copyCode": "Code kopieren"
         },
         "modal": {
-            "cancelCheckout": "Checkout abbrechen"
+            "cancelCheckout": "Checkout abbrechen",
+            "finish": "Fertig"
         }
     }
 }
