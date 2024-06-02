@@ -10,8 +10,15 @@
     height: 50px;
     background-color: #262626;
 
+    &:disabled{
+        background-color: #CCCCCC;
+    }
+
     [data-bs-theme="dark"] & {
         background-color: #ffffff;
+        &:disabled{
+            background-color: #9E9E9E;
+        }
     }
 
     & &_icon_block {
@@ -21,7 +28,14 @@
 
         [data-bs-theme="dark"] & {
             background-color: #262626;
+            :disabled{
+                background-color: #9E9E9E;
+            }
         }
+    }
+
+    &:disabled &_icon_block {
+        background-color: #9E9E9E;
     }
 
     & &_icon {
