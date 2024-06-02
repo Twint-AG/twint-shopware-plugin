@@ -14,7 +14,9 @@
                                 {% endblock %}
 
                                 {% block component_twint_modal_title %}
-                                    <span class="modal-title js-twint-modal-template-title-element">{{ "twintPayment.modal.cancelCheckout"|trans() }}</span>
+                                    <span class="modal-title js-twint-modal-template-title-element"
+                                          data-finish="{{ "twintPayment.modal.finish"|trans() }}"
+                                    >{{ "twintPayment.modal.cancelCheckout"|trans() }}</span>
                                 {% endblock %}
                             </span>
 

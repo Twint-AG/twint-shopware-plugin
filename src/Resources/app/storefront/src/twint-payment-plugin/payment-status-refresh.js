@@ -1,6 +1,7 @@
 import Plugin from 'src/plugin-system/plugin.class';
 import HttpClient from "src/service/http-client.service";
 import DomAccess from 'src/helper/dom-access.helper';
+import ExpressCheckoutButton from './express-checkout-button';
 
 export default class PaymentStatusRefresh extends Plugin {
 
@@ -55,11 +56,21 @@ export default class PaymentStatusRefresh extends Plugin {
             const data = JSON.parse(response);
             this.checking = false;
             if (data.completed) {
-                window.location.reload();
+                this.loadThankYouPage();
             } else {
                 setTimeout(this.checkExpressCheckoutStatus.bind(this), this.options.interval);
             }
         });
+    }
+
+    loadThankYouPage() {
+        this.client.get(this.getDomain() + '/payment/express/' + this.options.pairingHash, this.ThankYouPageLoaded.bind(this));
+    }
+
+    ThankYouPageLoaded(response) {
+        ExpressCheckoutButton.modal.updateContent(response);
+        let titleEl = DomAccess.querySelector(document, '.js-pseudo-modal .twint-modal .modal-title');
+        titleEl.innerHTML = titleEl.getAttribute('data-finish');
     }
 
     checkRegularCheckoutStatus() {

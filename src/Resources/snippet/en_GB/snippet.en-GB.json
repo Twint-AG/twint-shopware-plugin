@@ -27,7 +27,8 @@
             "checkingOut": "Express checkout in progress. Please wait"
         },
         "modal": {
-            "cancelCheckout": "Cancel checkout"
+            "cancelCheckout": "Cancel checkout",
+            "finish": "Continue shopping"
         }
     }
 }
