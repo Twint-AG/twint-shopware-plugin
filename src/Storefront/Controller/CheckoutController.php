@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Twint\Core\Service\PaymentService;
 use Twint\Core\Util\CryptoHandler;
+use Twint\ExpressCheckout\Exception\PairingException;
 use Twint\ExpressCheckout\Repository\PairingRepository;
 use Twint\ExpressCheckout\Service\ExpressCheckoutServiceInterface;
 
@@ -44,7 +45,7 @@ class CheckoutController extends StorefrontController
             'success' => true,
             'redirectUrl' => '/payment/express/' . $this->cryptoService->hash($pairing->pairingUuid()->__toString()),
             'content' => $this->getPairingContent(
-                $this->cryptoService->hash($pairing->pairingUuid()->__toString()),
+                $this->cryptoService->hash((string) $pairing->pairingUuid()),
                 $context
             ),
         ]);
@@ -85,7 +86,6 @@ class CheckoutController extends StorefrontController
         try {
             $pairingUUid = $this->cryptoService->unHash($pairingHash);
             $paring = $this->paringLoader->load($pairingUUid, $context);
-            $this->paringLoader->fetchCart($paring, $context);
         } catch (Exception $e) {
             $this->addFlash(self::DANGER, $this->trans('twintPayment.error.pairingNotFound'));
             return $this->redirectToRoute('frontend.account.order.page');
@@ -128,14 +128,13 @@ class CheckoutController extends StorefrontController
         ]);
     }
 
+    /**
+     * @throws PairingException
+     */
     private function getPairingContent(string $pairingHash, SalesChannelContext $context): string
     {
-        try {
-            $pairingUUid = $this->cryptoService->unHash($pairingHash);
-            $paring = $this->paringLoader->load($pairingUUid, $context);
-            $this->paringLoader->fetchCart($paring, $context);
-        } catch (Exception $e) {
-        }
+        $pairingUUid = $this->cryptoService->unHash($pairingHash);
+        $paring = $this->paringLoader->load($pairingUUid, $context);
 
         $options = new QROptions(
             [

@@ -8,6 +8,8 @@
             <argument type="service" id="twint_pairing.repository"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\CartPersister"/>
             <argument type="service" id="order.repository"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
+
         </service>
 
         <service id="Twint\ExpressCheckout\Util\PaymentMethodUtil">
@@ -29,6 +31,7 @@
             <argument type="service" id="Twint\ExpressCheckout\Service\ExpressPaymentService"/>
             <argument type="service" id="Twint\ExpressCheckout\Repository\PairingRepository"/>
             <argument type="service" id="Shopware\Core\System\SalesChannel\Context\CachedSalesChannelContextFactory"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\CartPersister"/>
         </service>
 
         <service id="Twint\ExpressCheckout\Service\ExpressPaymentService">
