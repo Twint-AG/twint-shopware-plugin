@@ -26,7 +26,9 @@ class Settings
 
     public const SCREENS = self::PREFIX_EXPRESS . 'screens';
 
-    public const ALLOWED_CURRENCIES = ['CHF', 'EUR'];
+    public const CHECKOUT_SINGLE = self::PREFIX_EXPRESS . 'checkoutSingle';
+
+    public const ALLOWED_CURRENCIES = ['CHF'];
 
     // Screen options
     public const SCREENS_OPTIONS_PLP = 'PLP';
@@ -51,6 +53,7 @@ class Settings
             self::SCREENS_OPTIONS_CART,
             self::SCREENS_OPTIONS_CART_FLYOUT,
         ],
+        self::CHECKOUT_SINGLE => false,
         self::VALIDATED => false,
     ];
 }
