@@ -1,7 +1,7 @@
 {% block sw_order_detail_content_tabs_extension %}
     {% parent %}
     <sw-tabs-item
-            v-if="order?.customFields?.twint_api_response"
+            v-if="isTwintOrder"
             class="sw-order-detail__tab-twint"
             :route="{ name: 'sw.order.detail.twint', params: { id: $route.params.id } }"
             :title="$tc('sw-order.detail.twint')">
