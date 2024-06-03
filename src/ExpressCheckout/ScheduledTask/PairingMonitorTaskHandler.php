@@ -7,10 +7,8 @@ namespace Twint\ExpressCheckout\ScheduledTask;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Twint\ExpressCheckout\Service\Monitoring\MonitoringService;
 
-#[AsMessageHandler(handles: PairingMonitorTask::class)]
 class PairingMonitorTaskHandler extends ScheduledTaskHandler
 {
     private MonitoringService $service;
