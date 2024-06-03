@@ -24,5 +24,14 @@
             <tag name="shopware.payment.method.async"/>
         </service>
 
+        <service id="Twint\Core\Handler\TwintRefundPaymentHandler"
+                 class="Twint\Core\Handler\TwintRefundPaymentHandler">
+            <argument type="service"
+                      id="Shopware\Core\Checkout\Order\Aggregate\OrderTransactionCaptureRefund\OrderTransactionCaptureRefundStateHandler"/>
+            <argument type="service" id="Twint\Core\Service\PaymentService"/>
+            <argument type="service" id="logger"/>
+            <tag name="shopware.payment.refund_handler"/>
+        </service>
+
     </services>
 </container>

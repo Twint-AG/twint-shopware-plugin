@@ -11,7 +11,6 @@ use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Twint\Core\Service\PaymentService;
 use Twint\Sdk\Value\Order;
-use Twint\Util\OrderCustomFieldInstaller;
 
 class CancelTwintOrderSubscriber implements EventSubscriberInterface
 {
@@ -58,27 +57,11 @@ class CancelTwintOrderSubscriber implements EventSubscriberInterface
 
         $order = $this->paymentService->getOrder($event->getTransition()->getEntityId(), $event->getContext());
         try {
-            $twintApiResponse = json_decode(
-                $order->getCustomFields()[OrderCustomFieldInstaller::TWINT_API_RESPONSE_CUSTOM_FIELD] ?? '{}',
-                true
-            );
-            if (!empty($twintApiResponse) && !empty($twintApiResponse['id'])) {
-                $orderTransactionId = $order->getTransactions()?->first()?->getId();
-                $currency = $order->getCurrency()?->getIsoCode();
-                if ($orderTransactionId && !empty($currency) && $order->getAmountTotal() > 0) {
-                    $twintOrder = $this->paymentService->reverseOrder(
-                        $twintApiResponse['id'],
-                        $orderTransactionId,
-                        $currency,
-                        $order->getAmountTotal(),
-                        $order->getSalesChannelId()
-                    );
-                    if ($twintOrder instanceof Order) {
-                        $this->logger->info(
-                            sprintf('TWINT order "%s" is reversed successfully!', $order->getOrderNumber())
-                        );
-                    }
-                }
+            $twintOrder = $this->paymentService->reverseOrder($order);
+            if ($twintOrder instanceof Order) {
+                $this->logger->info(
+                    sprintf('TWINT order "%s" is reversed successfully!', $order->getOrderNumber())
+                );
             }
         } catch (ApiException $e) {
             $this->logger->warning($e->getMessage());

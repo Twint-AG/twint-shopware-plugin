@@ -155,30 +155,48 @@ class PaymentService
         }
     }
 
-    public function reverseOrder(
-        string $twintOrderId,
-        string $orderTransactionId,
-        string $currency,
-        float $amount,
-        string $salesChannelId
-    ): ?Order {
+    public function reverseOrder(OrderEntity $order): ?Order
+    {
         try {
-            $client = $this->clientBuilder->build($salesChannelId);
-            /** @var Order * */
-            $twintOrder = $client->monitorOrder(new OrderId(new Uuid($twintOrderId)));
-            if ($twintOrder->status()->equals(OrderStatus::SUCCESS())) {
-                $twintOrder = $client->reverseOrder(
-                    new UnfiledMerchantTransactionReference('R-' . $twintOrderId),
-                    new OrderId(new Uuid($twintOrderId)),
-                    new Money($currency, $amount)
-                );
-                $this->transactionStateHandler->refund($orderTransactionId, $this->context);
+            $twintApiResponse = json_decode(
+                $order->getCustomFields()[OrderCustomFieldInstaller::TWINT_API_RESPONSE_CUSTOM_FIELD] ?? '{}',
+                true
+            );
+            if (!empty($twintApiResponse) && !empty($twintApiResponse['id'])) {
+                $orderTransactionId = $order->getTransactions()?->first()?->getId();
+                $currency = $order->getCurrency()?->getIsoCode();
+                if ($orderTransactionId && !empty($currency) && $order->getAmountTotal() > 0) {
+                    $client = $this->clientBuilder->build($order->getSalesChannelId());
+                    /** @var Order * */
+                    $twintOrder = $client->monitorOrder(new OrderId(new Uuid($twintApiResponse['id'])));
+                    if ($twintOrder->status()->equals(OrderStatus::SUCCESS())) {
+                        $twintOrder = $client->reverseOrder(
+                            new UnfiledMerchantTransactionReference('R-' . $twintApiResponse['id']),
+                            new OrderId(new Uuid($twintApiResponse['id'])),
+                            new Money($currency, $order->getAmountTotal())
+                        );
+                        $this->transactionStateHandler->refund($orderTransactionId, $this->context);
+                    }
+                    return $twintOrder;
+                }
             }
-            return $twintOrder;
+            return null;
         } catch (Exception $e) {
             throw PaymentException::asyncProcessInterrupted(
                 $orderTransactionId,
                 'An error occurred during the communication with API gateway' . PHP_EOL . $e->getMessage()
+            );
+        } finally {
+            $innovations = empty($client) ? [] : $client->flushInvocations();
+            $this->transactionLogWriter->writeObjectLog(
+                $order->getId(),
+                $order->getTransactions()
+                    ?->first()
+                    ?->getStateId() ?? '',
+                $order
+                    ->getStateId(),
+                $order->getTransactions()?->first()?->getId() ?? '',
+                $innovations
             );
         }
     }

@@ -17,6 +17,8 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStat
 use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\OrderStates;
+use Shopware\Core\Checkout\Order\SalesChannel\OrderService;
+use Shopware\Core\Checkout\Payment\PaymentMethodDefinition;
 use Shopware\Core\Content\Product\Aggregate\ProductVisibility\ProductVisibilityDefinition;
 use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Defaults;
@@ -24,6 +26,9 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Pricing\CashRoundingConfig;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Test\TestCaseBase\KernelLifecycleManager;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -32,15 +37,19 @@ use Shopware\Core\SalesChannelRequest;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SalesChannel\SalesChannelDefinition;
+use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateDefinition;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\Loader\InitialStateIdLoader;
+use Shopware\Core\System\StateMachine\StateMachineDefinition;
 use Shopware\Core\System\StateMachine\StateMachineRegistry;
 use Shopware\Core\System\StateMachine\Transition;
 use Shopware\Core\Test\Integration\PaymentHandler\SyncTestPaymentHandler;
 use Shopware\Core\Test\TestDefaults;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Shopware\Storefront\Framework\Routing\RequestTransformer;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
+use Twint\Util\Method\RegularPaymentMethod;
 
 trait ServicesTrait
 {
@@ -118,8 +127,11 @@ trait ServicesTrait
      * @return OrderEntity
      * @throws \JsonException
      */
-    private function createOrder(string $customerId, Context $context, array $customFields): OrderEntity
+    private function createOrder(string $customerId, Context $context, array $customFields, ?string $paymentMethodId = null): OrderEntity
     {
+        if(!$paymentMethodId){
+            $paymentMethodId = $this->getValidPaymentMethodId();
+        }
         /** @var EntityRepository $orderRepository */
         $orderRepository = $this->getContainer()->get(\sprintf('%s.repository', OrderDefinition::ENTITY_NAME));
         $orderId = Uuid::randomHex();
@@ -127,6 +139,7 @@ trait ServicesTrait
         $initialStateIdLoader = $this->getContainer()->get(InitialStateIdLoader::class);
         $stateId = $initialStateIdLoader->get(OrderStates::STATE_MACHINE);
         $transactionStateId = $initialStateIdLoader->get(OrderTransactionStates::STATE_MACHINE);
+        $transactionStateId = $this->getPaymentInProgressStateId();
         $billingAddressId = Uuid::randomHex();
 
         $order = [
@@ -145,7 +158,7 @@ trait ServicesTrait
                 'lastName' => 'Mustermann',
             ],
             'stateId' => $stateId,
-            'paymentMethodId' => $this->getValidPaymentMethodId(),
+            'paymentMethodId' => $paymentMethodId,
             'currencyId' => Defaults::CURRENCY,
             'currencyFactor' => 1.0,
             'salesChannelId' => TestDefaults::SALES_CHANNEL,
@@ -175,7 +188,7 @@ trait ServicesTrait
             ],
             "transactions" => [
                 [
-                    "paymentMethodId" => $this->getValidPaymentMethodId(),
+                    "paymentMethodId" => $paymentMethodId,
                     "amount" =>  [
                         "unitPrice" => 13.98,
                         "totalPrice" => 13.98,
@@ -382,5 +395,51 @@ trait ServicesTrait
             $context
         );
         return $this->getOrderById($order->getId());
+    }
+    public function getRegularPaymentMethodId(?string $salesChannelId = null): string
+    {
+        /** @var EntityRepository $repository */
+        $repository = $this->getContainer()->get(\sprintf('%s.repository', PaymentMethodDefinition::ENTITY_NAME));
+        $criteria = (new Criteria());
+        $criteria->addFilter(
+            new EqualsAnyFilter('technicalName', [
+                RegularPaymentMethod::TECHNICAL_NAME,
+            ])
+        );
+        $criteria->setLimit(1)
+            ->addFilter(new EqualsFilter('active', true));
+
+        if ($salesChannelId) {
+            $criteria->addFilter(new EqualsFilter('salesChannels.id', $salesChannelId));
+        }
+
+        /** @var string $id */
+        $id = $repository->searchIds($criteria, Context::createDefaultContext())->firstId();
+
+        return $id;
+    }
+    public function getPaymentInProgressStateId(): string
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('technicalName', OrderTransactionStates::STATE_MACHINE));
+        $stateMachineRepository = $this->getContainer()->get(\sprintf('%s.repository', StateMachineDefinition::ENTITY_NAME));
+        $stateMachineStateRepository = $this->getContainer()->get(\sprintf('%s.repository', StateMachineStateDefinition::ENTITY_NAME));
+        $transactionState = $stateMachineRepository->search($criteria, $this->context)
+            ->first();
+        if (!empty($transactionState)) {
+            $transactionStateId = $transactionState->get('id');
+            $criteriaM = new Criteria();
+
+            $criteriaM->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
+                new EqualsFilter('technicalName', OrderTransactionStates::STATE_IN_PROGRESS),
+                new EqualsFilter('stateMachineId', $transactionStateId),
+            ]));
+            $paymentInProgressState = $stateMachineStateRepository->search($criteriaM, $this->context)
+                ->first();
+            if (!empty($paymentInProgressState)) {
+                return $paymentInProgressState->get('id');
+            }
+        }
+        return '';
     }
 }
