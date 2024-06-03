@@ -20,6 +20,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Event\RouteRequest\ShippingMethodRouteRequestEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Twint\Core\Service\SettingServiceInterface;
 use Twint\ExpressCheckout\Repository\PairingRepository;
 use Twint\Sdk\Exception\SdkError;
 use Twint\Sdk\Value\Money;
@@ -38,7 +39,8 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
         private readonly ExpressPaymentService $paymentService,
         private readonly PairingRepository $loader,
         private AbstractSalesChannelContextFactory $contextFactory,
-        private CartPersister $cartPersister
+        private CartPersister $cartPersister,
+        private readonly SettingServiceInterface $settingService,
     ) {
     }
 
@@ -52,13 +54,15 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
 
         $useCart = $payload['useCart'] ?? false;
         if ($useCart) {
-            $cart = $this->cartService->getCart($context->getToken(), $context);
-
-            $token = Uuid::randomHex();
-            $this->cartPersister->replace($context->getToken(), $token, $context);
-            $cart->setToken($token);
+            $cart = $this->cloneCart($context);
         } else {
-            $cart = $this->createCart($context, $payload['lineItems'] ?? []);
+            $setting = $this->settingService->getSetting($context->getSalesChannel()->getId());
+            if ($setting->getCheckoutSingle()) {
+                $cart = $this->createCart($context, $payload['lineItems']);
+            } else {
+                $cart = $this->cloneCart($context);
+                $cart = $this->cartService->add($cart, $this->getLineItems($payload['lineItems'], $context), $context);
+            }
         }
 
         $methods = $this->getShippingMethods($context, $request);
@@ -66,6 +70,16 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
         $options = $this->buildShippingOptions($cart, $methods, $context);
 
         return $this->paymentService->requestFastCheckOutCheckIn($context, $cart, $options);
+    }
+
+    protected function cloneCart(SalesChannelContext $context): Cart
+    {
+        $cart = $this->cartService->getCart($context->getToken(), $context);
+        $token = Uuid::randomHex();
+        $this->cartPersister->replace($context->getToken(), $token, $context);
+        $cart->setToken($token);
+
+        return $cart;
     }
 
     public function monitoring(string $pairingUUid, SalesChannelContext $context): mixed

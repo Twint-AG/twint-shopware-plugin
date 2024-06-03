@@ -30,6 +30,8 @@ class TwintSettingStruct extends Struct
 
     protected bool $validated = false;
 
+    protected bool $checkoutSingle = false;
+
     public function getMerchantId(): string
     {
         return (string) $this->merchantId;
@@ -87,6 +89,17 @@ class TwintSettingStruct extends Struct
     public function setValidated(bool $validated): self
     {
         $this->validated = $validated;
+        return $this;
+    }
+
+    public function getCheckoutSingle(): bool
+    {
+        return $this->checkoutSingle;
+    }
+
+    public function setCheckoutSingle(bool $value): self
+    {
+        $this->checkoutSingle = $value;
         return $this;
     }
 }
