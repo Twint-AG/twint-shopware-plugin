@@ -92,7 +92,7 @@ export default class ExpressCheckoutButton extends Plugin {
 
         this.client.abort();
         this.getLoadingPopup().show();
-        this.client.post('/twint/express-checkout', JSON.stringify({
+        this.client.post(window.router['frontend.twint.express-checkout'], JSON.stringify({
             lineItems: this.getLineItems(),
             useCart: this.options.useCart
         }), this.onFinish.bind(this));

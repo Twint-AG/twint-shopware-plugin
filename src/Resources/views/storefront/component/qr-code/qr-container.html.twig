@@ -3,8 +3,7 @@
         {% block twint_qr_container %}
             <div class="twint-qr-container {{ isAndroid ? 'android' : '' }} {{ isIosDevice ? 'ios' : '' }} {{ not (isAndroid or isIosDevice) ? 'generic' : '' }}"
                  data-twint-payment-status-container
-                 data-twint-payment-status-container-options="{{ { pairingHash: pairingHash, expressCheckout: expressCheckout } | json_encode }}
-                "
+                 data-twint-payment-status-container-options="{{ { pairingHash: pairingHash, expressCheckout: expressCheckout } | json_encode }}"
                  data-twint-payment-status-refresh
                  data-twint-payment-status-refresh-options="{{ { pairingHash: pairingHash, interval: 5000, expressCheckout: expressCheckout  } | json_encode }}"
                  data-mobile="{{ isAndroid or isIosDevice }}"

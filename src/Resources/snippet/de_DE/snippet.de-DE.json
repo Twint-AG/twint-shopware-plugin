@@ -26,6 +26,9 @@
         "modal": {
             "cancelCheckout": "Checkout abbrechen",
             "finish": "Fertig"
+        },
+        "express": {
+            "checkingOut": "Express-Checkout läuft"
         }
     }
 }
