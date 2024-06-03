@@ -11,13 +11,13 @@
     background-color: #262626;
 
     &:disabled{
-        background-color: #CCCCCC;
+        background-color: #9E9E9E;
     }
 
     [data-bs-theme="dark"] & {
         background-color: #ffffff;
         &:disabled{
-            background-color: #9E9E9E;
+            background-color: #CCCCCC;
         }
     }
 
