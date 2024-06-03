@@ -46,7 +46,7 @@
   }
 
   .rounded{
-    border-radius: 0.5rem;
+    border-radius: 0.5rem !important;
   }
 
   .android-button{
@@ -93,7 +93,7 @@
   }
 
   .copied{
-    color: #28a745;
+    color: #28a745 !important;
   }
 
   .sm-w-100{
@@ -112,13 +112,26 @@
       }
     }
   }
+
+  .row-gap-1{
+    row-gap: 0.25rem;
+  }
+
+
+  .row-gap-md-3{
+    @media (min-width: 768px) {
+      & {
+        row-gap: 1rem;
+      }
+    }
+  }
 }
 
 .d-none{
   .generic &.block {
     @media (max-width: 768px) {
       & {
-        display: block;
+        display: block !important;
       }
     }
   }
@@ -126,7 +139,7 @@
   .generic &.flex {
     @media (max-width: 768px) {
       & {
-        display: flex;
+        display: flex !important;
       }
     }
   }

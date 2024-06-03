@@ -24,7 +24,7 @@
             "switchLinkLabel": "Switch to the TWINT App now"
         },
         "express": {
-            "checkingOut": "Express checkout in progress. Please wait"
+            "checkingOut": "Express checkout in progress"
         },
         "modal": {
             "cancelCheckout": "Cancel checkout",
