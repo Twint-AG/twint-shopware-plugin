@@ -19,8 +19,8 @@ class OrderMonitorTaskHandler extends ScheduledTaskHandler
 
     public function __construct(
         EntityRepository $scheduledTaskRepository,
-        PaymentService $paymentService,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        PaymentService $paymentService
     ) {
         parent::__construct($scheduledTaskRepository);
         $this->paymentService = $paymentService;
