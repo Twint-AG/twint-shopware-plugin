@@ -1,0 +1,14 @@
+{% sw_extends '@Storefront/storefront/layout/meta.html.twig' %}
+
+{% block layout_head_javascript_router %}
+    {{ parent() }}
+    <script>
+        window.router = window.router || {};
+        window.router['frontend.twint.waiting'] = '{{ path('frontend.twint.waiting', { orderNumber: '--number--'} ) }}';
+        window.router['frontend.twint.order'] = '{{ path('frontend.twint.order', { orderNumber: '--number--'} ) }}';
+
+        window.router['frontend.twint.express'] = '{{ path('frontend.twint.express', { paringHash: '--hash--'} ) }}';
+        window.router['frontend.twint.express-checkout'] = '{{ path('frontend.twint.express-checkout' ) }}';
+        window.router['frontend.twint.monitoring'] = '{{ path('frontend.twint.monitoring', { paringHash: '--hash--'} ) }}';
+    </script>
+{% endblock %}

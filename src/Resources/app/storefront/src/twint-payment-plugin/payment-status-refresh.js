@@ -52,7 +52,10 @@ export default class PaymentStatusRefresh extends Plugin {
         if (this.reachLimit())
             return;
 
-        this.client.get(this.getDomain() + '/payment/monitoring/' + this.options.pairingHash, (response) => {
+        let url = window.router['frontend.twint.monitoring'];
+        url = url.replace('--hash--', this.options.pairingHash);
+
+        this.client.get(url, (response) => {
             const data = JSON.parse(response);
             this.checking = false;
             if (data.completed) {
@@ -64,7 +67,9 @@ export default class PaymentStatusRefresh extends Plugin {
     }
 
     loadThankYouPage() {
-        this.client.get(this.getDomain() + '/payment/express/' + this.options.pairingHash, this.ThankYouPageLoaded.bind(this));
+        let url = window.router['frontend.twint.express'];
+        url = url.replace('--hash--', this.options.pairingHash);
+        this.client.get(url, this.ThankYouPageLoaded.bind(this));
     }
 
     ThankYouPageLoaded(response) {
@@ -77,9 +82,10 @@ export default class PaymentStatusRefresh extends Plugin {
         if (this.reachLimit())
             return;
 
-        const statusOrderEndpoint = this.getDomain() + '/payment/order/' + this.orderNumber;
+        let url = window.router['frontend.twint.order'];
+        url = url.replace('--number--', this.orderNumber);
 
-        this.client.get(statusOrderEndpoint, (response) => {
+        this.client.get(url, (response) => {
             this.checking = false;
             try {
                 const jsonResponse = JSON.parse(response);
