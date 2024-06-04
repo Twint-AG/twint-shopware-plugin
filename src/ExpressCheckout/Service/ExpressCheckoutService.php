@@ -95,7 +95,7 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
     {
         $options = [];
         /** @var ShippingMethodEntity $method */
-        foreach ($methods as $method) {
+        foreach ($methods as $key => $method) {
             $cart->setDeliveries($this->deliveryBuilder->buildByUsingShippingMethod($cart, $method, $context));
             if ($context->getShippingMethod()->getId() !== $method->getId()) {
                 $session = [
@@ -119,7 +119,7 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
 
             $options[] = new ShippingMethod(
                 new ShippingMethodId($method->getId()),
-                $method->getName() ?? 'Default Shipping Method',
+                $method->getName() ?? $method->getTranslated()['name'] ?? "Shipping Method #{$key}",
                 Money::CHF($amount ?? 0)
             );
         }
