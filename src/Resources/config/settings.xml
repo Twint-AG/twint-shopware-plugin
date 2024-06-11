@@ -11,7 +11,7 @@
             <label>Switch to test mode</label>
             <label lang="de-DE">Zum benutzerdefinierten Abnahmetestmodus wechseln</label>
 
-            <helpText>Custom Acceptance Test Mode (On) / Production Mode (Off)</helpText>
+            <helpText>Turning on test mode will use the TWINT PAT environment. PAT stands for Production Acceptance Test and allows you to test your TWINT integration on an environment closeley resembling the production environment without actually charging a TWINT account.</helpText>
             <helpText lang="de-DE">Custom Acceptance Test Mode (On) / Production Mode (Off)</helpText>
 
             <defaultValue>false</defaultValue>
@@ -33,8 +33,8 @@
             <label>Certificate File</label>
             <label lang="de-DE">Zertifikat Passwort</label>
 
-            <helpText>SwissSign certificate password to allow reading the certificate above</helpText>
-            <helpText lang="de-DE">SwissSign certificate password to allow reading the certificate above</helpText>
+            <helpText>Enter the certificate password for the TWINT merchant certificate</helpText>
+            <helpText lang="de-DE">Enter the certificate password for the TWINT merchant certificate</helpText>
             <required>true</required>
         </component>
     </card>

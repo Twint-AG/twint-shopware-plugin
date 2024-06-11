@@ -122,7 +122,7 @@ class PaymentService
             $twintOrder = $client->monitorOrder(new OrderId(new Uuid($twintApiResponse['id'])));
             $transactionId = $order->getTransactions()?->first()?->getId() ?? null;
             if ($transactionId === null) {
-                throw new Exception('Missing transaction id for this order:' . $referenceId . PHP_EOL);
+                throw new Exception('Missing transaction ID for this order:' . $referenceId . PHP_EOL);
             }
 
             if ($twintOrder->status()->equals(OrderStatus::SUCCESS())) {

@@ -5,11 +5,11 @@
             "orderNotFound": "This order cannot be found"
         },
         "message": {
-            "successPayment": "Your payment is successful",
-            "cancelPayment": "The payment is cancelled"
+            "successPayment": "Your payment was successful",
+            "cancelPayment": "The payment was cancelled"
         },
         "instruction" : {
-            "scanQR": "Scan this QR Code with your TWINT-app to complete the checkout.",
+            "scanQR": "Scan this QR Code with your TWINT app to complete the checkout.",
             "selectAddress": "Select a shipping address and complete the purchase in the app.",
             "inputCode": "Enter this code in your TWINT app:",
             "or": "or"
@@ -18,10 +18,10 @@
             "copyCode": "Copy code"
         },
         "appSelector": {
-            "title": "Choose your TWINT App",
+            "title": "Choose your TWINT app",
             "otherBankOption": "Other banks",
-            "enterCode" : "Or enter this code<br>in your App:",
-            "switchLinkLabel": "Switch to the TWINT App now"
+            "enterCode" : "Or enter this code<br>in your app:",
+            "switchLinkLabel": "Switch to the TWINT app now"
         },
         "express": {
             "checkingOut": "Express checkout in progress"
