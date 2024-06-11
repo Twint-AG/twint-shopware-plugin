@@ -181,6 +181,7 @@ class PaymentService
                             new Money($currency, $amount)
                         );
                         if ($twintOrder->status()->equals(OrderStatus::SUCCESS())) {
+                            $this->changePaymentStatus($order);
                             return $twintOrder;
                         }
                     }
@@ -190,6 +191,7 @@ class PaymentService
         } catch (Exception $e) {
             throw PaymentException::asyncProcessInterrupted($orderTransactionId ?? '', $e->getMessage());
         } finally {
+            $order = $this->getOrder($order->getId(), $this->context);
             $innovations = empty($client) ? [] : $client->flushInvocations();
             $this->transactionLogWriter->writeObjectLog(
                 $order->getId(),
