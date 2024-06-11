@@ -52,6 +52,9 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
         string $transactionId,
         array $invocations
     ): void {
+        if ($invocations === []) {
+            return;
+        }
         $request = json_encode($invocations[0]->arguments());
         $exception = $invocations[0]->exception() ?? '';
         $response = json_encode($invocations[0]->returnValue());

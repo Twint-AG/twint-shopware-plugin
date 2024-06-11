@@ -25,6 +25,7 @@ Shopware.Component.register('sw-order-detail-twint', {
         return {
             isLoading: false,
             transactionLogs: null,
+            refundedAmount: 0,
             sortBy: 'createdAt',
             sortDirection: 'DESC',
             naturalSorting: true,
@@ -39,9 +40,9 @@ Shopware.Component.register('sw-order-detail-twint', {
     methods: {
         createdComponent() {
             this.isLoading = true;
-            this.getList();
+            this.getTransactionLogList();
         },
-        getList() {
+        getTransactionLogList() {
             this.naturalSorting = this.sortBy === 'createdAt';
             const criteria = new Criteria();
             criteria.addSorting(Criteria.sort(this.sortBy, this.sortDirection, this.naturalSorting));
@@ -56,7 +57,7 @@ Shopware.Component.register('sw-order-detail-twint', {
                 this.isLoading = false;
             }).catch(() => {
                 this.isLoading = false;
-            });;
+            });
         },
         /**
          * @param id
@@ -69,9 +70,16 @@ Shopware.Component.register('sw-order-detail-twint', {
         },
         getVariantState(entity, state) {
             return this.stateStyleDataProviderService.getStyle(`${entity}.state`, state.technicalName).variant;
-        },
+        }
     },
     computed: {
+        ...mapState('swOrderDetail', [
+            'order',
+            'versionContext',
+            'orderAddressIds',
+            'editing',
+            'loading',
+        ]),
         orderId() {
             return this.$route.params.id;
         },

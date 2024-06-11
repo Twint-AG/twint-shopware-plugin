@@ -46,7 +46,7 @@ Shopware.Component.override('sw-order-detail', {
             if (customFields['twint_api_response']) {
                 hasTwintApiResponse = true;
             }
-            return this.pairings || this.pairings?.length > 0 || hasTwintApiResponse;
+            return this.pairings?.length > 0 || hasTwintApiResponse;
         },
     }
 });
