@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace Twint\Core\Handler;
 
 use Exception;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\AsynchronousPaymentHandlerInterface;
+use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\RefundPaymentHandlerInterface;
 use Shopware\Core\Checkout\Payment\PaymentException;
+use Shopware\Core\Framework\Api\ApiException;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -16,9 +20,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 use Twint\Core\Service\PaymentService;
 use Twint\Core\Util\CryptoHandler;
+use Twint\Sdk\Value\Order;
 use Twint\Util\OrderCustomFieldInstaller;
 
-abstract class AbstractPaymentHandler implements AsynchronousPaymentHandlerInterface
+abstract class AbstractPaymentHandler implements AsynchronousPaymentHandlerInterface, RefundPaymentHandlerInterface
 {
     private OrderTransactionStateHandler $transactionStateHandler;
 
@@ -28,12 +33,15 @@ abstract class AbstractPaymentHandler implements AsynchronousPaymentHandlerInter
 
     private RouterInterface $router;
 
-    public function __construct(OrderTransactionStateHandler $transactionStateHandler, PaymentService $paymentService, CryptoHandler $cryptoService, RouterInterface $router)
+    private LoggerInterface $logger;
+
+    public function __construct(OrderTransactionStateHandler $transactionStateHandler, PaymentService $paymentService, CryptoHandler $cryptoService, RouterInterface $router, LoggerInterface $logger)
     {
         $this->transactionStateHandler = $transactionStateHandler;
         $this->paymentService = $paymentService;
         $this->cryptoService = $cryptoService;
         $this->router = $router;
+        $this->logger = $logger;
     }
 
     public function pay(
@@ -52,11 +60,14 @@ abstract class AbstractPaymentHandler implements AsynchronousPaymentHandlerInter
             //update API response for order
             $orderCustomFields = $transaction->getOrder()
                 ->getCustomFields();
-            $twintApiArray = $this->paymentService->parseTwintOrderToArray($twintOrder);
-            $orderCustomFields[OrderCustomFieldInstaller::TWINT_API_RESPONSE_CUSTOM_FIELD] = json_encode(
-                $twintApiArray
-            );
-            $this->paymentService->updateOrderCustomField($transaction->getOrder()->getId(), $orderCustomFields);
+            $twintOrderJson = json_encode($twintOrder);
+            if ($twintOrderJson) {
+                $twintApiArray = json_decode($twintOrderJson, true);
+                $orderCustomFields[OrderCustomFieldInstaller::TWINT_API_RESPONSE_CUSTOM_FIELD] = json_encode(
+                    $twintApiArray
+                );
+                $this->paymentService->updateOrderCustomField($transaction->getOrder()->getId(), $orderCustomFields);
+            }
         } catch (Exception $e) {
             throw PaymentException::asyncProcessInterrupted(
                 $transaction->getOrderTransaction()
@@ -97,6 +108,29 @@ abstract class AbstractPaymentHandler implements AsynchronousPaymentHandlerInter
         } else {
             // Payment not completed, set transaction status to "open"
             $this->transactionStateHandler->reopen($transaction->getOrderTransaction()->getId(), $context);
+        }
+    }
+
+    public function refund(string $refundId, Context $context): void
+    {
+        $refund = $this->paymentService->getOrder($refundId, $context);
+        if ($refund->getAmountTotal() > 100.00) {
+            // this will stop the refund process and set the refunds state to `failed`
+            throw PaymentException::refundInvalidTransition($refund->getId(), 'Refunds over 100 € are not allowed');
+        }
+        try {
+            $twintOrder = $this->paymentService->reverseOrder($refund);
+            if ($twintOrder instanceof Order) {
+                $this->logger->info(sprintf('TWINT order "%s" is refund successfully!', $refund->getOrderNumber()));
+                $this->transactionStateHandler->refundPartially($refundId, $context);
+            } else {
+                throw PaymentException::refundInvalidTransition(
+                    $refund->getId(),
+                    'An error occurred during the communication with external payment gateway' . PHP_EOL
+                );
+            }
+        } catch (ApiException $e) {
+            $this->logger->warning($e->getMessage());
         }
     }
 }

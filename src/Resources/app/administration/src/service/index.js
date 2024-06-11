@@ -1,6 +1,7 @@
 import './file-upload';
 import TwintUploadService from "./file-upload";
 import TwintPaymentSettingsService from './twint-payment-settings';
+import TwintPaymentService from './twint-payment';
 
 const {Application} = Shopware;
 
@@ -13,4 +14,8 @@ Application.addServiceProvider('twintFileUploadService', () => {
 
 Application.addServiceProvider('TwintPaymentSettingsService', (container) => {
     return new TwintPaymentSettingsService(httpClient, loginService);
+});
+
+Application.addServiceProvider('TwintPaymentService', (container) => {
+    return new TwintPaymentService(httpClient, loginService);
 });

@@ -6,5 +6,8 @@
         <service id="Twint\Core\DataAbstractionLayer\Entity\Pairing\TwintPairingDefinition">
             <tag name="shopware.entity.definition" entity="twint_transaction_log"/>
         </service>
+        <service id="Twint\Core\DataAbstractionLayer\Entity\ReversalHistory\TwintReversalHistoryDefinition">
+            <tag name="shopware.entity.definition" entity="twint_reversal_history"/>
+        </service>
     </services>
 </container>
