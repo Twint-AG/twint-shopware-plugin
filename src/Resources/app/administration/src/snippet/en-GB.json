@@ -64,6 +64,7 @@
         "showTransactionLogModal": "Show transaction logs"
       },
       "transactionLog": {
+        "cardTitle": "Transaction logs",
         "list": {
           "title" : "Transactions",
           "columns": {
@@ -76,9 +77,8 @@
             "soapResponse": "Response",
             "exception": "Exception",
             "payment": "Payment",
-            "order": "Order",
             "action": {
-              "view": "View detail"
+              "view": "View details"
             }
           },
           "modal": {
@@ -86,12 +86,51 @@
             "close": "Close"
           }
         }
+      },
+      "reversalHistory": {
+        "cardTitle": "Reversal history",
+        "columns": {
+          "amount": "Amount",
+          "currency": "Currency",
+          "reason": "Reason",
+          "createdAt": "Created"
+        }
+      },
+      "refundAction": {
+        "cardTitle": "Refund",
+        "reason": {
+          "label": "Reason",
+          "placeholder": "Add note to this refund"
+        },
+        "refundAmount": {
+          "label": "Amount",
+          "helpText": "0"
+        },
+        "confirmButton": {
+          "text": "Execucte"
+        }
+      }
+    },
+    "refund": {
+      "modal": {
+        "title": "New refund"
+      },
+      "buttons": {
+        "refund": {
+          "label": "Refund"
+        }
+      },
+      "refundable": {
+        "title": "Total refundable left"
+      },
+      "error": {
+        "title" : "Refund error"
       }
     }
   },
   "sw-order": {
     "detail": {
-      "twint": "TWINT transaction logs"
+      "twint": "TWINT"
     }
   }
 }
