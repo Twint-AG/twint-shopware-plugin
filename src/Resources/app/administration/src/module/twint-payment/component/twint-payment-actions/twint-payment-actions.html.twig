@@ -1,0 +1,78 @@
+<div class="sw-order-detail-twint">
+    <sw-container>
+        {% block sw_order_detail_twint_actions_row_reversal_form %}
+            <sw-card  v-if="canRefund" position-identifier="twint-details-actions" :title="$tc('twint.order.refundAction.cardTitle')">
+                {% block sw_order_detail_twint_actions_rows %}
+                    <template #default>
+                        {% block sw_order_detail_twint_actions_row_primary %}
+                            <sw-button variant="primary"
+                                       size="small"
+                                       :disabled="refundableAmount==0 || !acl.can('order.editor')"
+                                       @click="showModal">
+                                {{ $tc('twint.refund.buttons.refund.label') }}
+                            </sw-button>
+                            <span class="twint-refundable-amount__title" v-if="refundableAmount > 0">
+                            {{ $tc('twint.refund.refundable.title') }}
+                            </span>
+                            <sw-label v-if="refundableAmount > 0">{{ refundableAmount }} {{ currency }}</sw-label>
+                            {% block twint_modal_refund %}
+                                <sw-modal variant="small"
+                                          :title="$tc(`twint.refund.modal.title`)" v-if="showRefundModal" @modal-close="onCloseModal">
+
+                                    {% block twint_refund_amount %}
+                                        <sw-number-field
+                                                v-model:value="refundAmount"
+                                                :max="refundableAmount"
+                                                :min="0"
+                                                :label="$tc('twint.order.refundAction.refundAmount.label')"
+                                                :helpText="$tc('twint.order.refundAction.refundAmount.helpText')">
+                                            <template #suffix>
+                                                {{ currency }}
+                                            </template>
+                                        </sw-number-field>
+                                    {% endblock %}
+
+                                    {% block twint_refund_reason %}
+                                        <sw-textarea-field
+                                                v-model:value="reason"
+                                                maxLength="127"
+                                                :label="$tc('twint.order.refundAction.reason.label')"
+                                                :placeholder="$tc('twint.order.refundAction.reason.placeholder')">
+                                        </sw-textarea-field>
+                                    {% endblock %}
+
+                                    {% block twint_refund_confirm_button %}
+                                        <template #modal-footer>
+                                            <sw-button variant="primary"
+                                                       @click="refund">
+                                                {{ $tc('twint.order.refundAction.confirmButton.text') }}
+                                            </sw-button>
+                                        </template>
+                                    {% endblock %}
+
+                                    <sw-loader v-if="isLoading"></sw-loader>
+                                </sw-modal>
+                            {% endblock %}
+                        {% endblock %}
+                    </template>
+                {% endblock %}
+            </sw-card>
+        {% endblock %}
+        {% block sw_order_detail_twint_actions_row_reversal_history %}
+            <sw-card position-identifier="twint-details-actions-reversal-list" :title="$tc('twint.order.reversalHistory.cardTitle')">
+                <template #grid>
+                    {% block sw_order_detail_twint_reversal_history_grid %}
+                        <sw-data-grid v-if="reversalHistory.length > 0" :data-source="reversalHistory"
+                                      :columns="paymentColumns"
+                                      :showActions="false"
+                                      :showSelection="false">
+                            <template #column-createdAt="{ item }">
+                                {{ dateFilter(item.createdAt) }}
+                            </template>
+                        </sw-data-grid>
+                    {% endblock %}
+                </template>
+            </sw-card>
+        {% endblock %}
+    </sw-container>
+</div>

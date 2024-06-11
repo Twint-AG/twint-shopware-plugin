@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Twint\Administration\Controller;
 
+use Exception;
+use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Log\Package;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,10 +13,13 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Twint\Core\Handler\ReversalHistory\ReversalHistoryWriterInterface;
+use Twint\Core\Service\PaymentService;
 use Twint\Core\Util\CertificateHandler;
 use Twint\Core\Util\CredentialValidatorInterface;
 use Twint\Core\Util\CryptoHandler;
 use Twint\Sdk\Certificate\Pkcs12Certificate;
+use Twint\Sdk\Value\Order;
 
 #[Package('checkout')]
 #[Route(defaults: [
@@ -26,6 +31,10 @@ class TwintController extends AbstractController
 
     private CredentialValidatorInterface $validator;
 
+    private PaymentService $paymentService;
+
+    private ReversalHistoryWriterInterface $reversalHistoryWriter;
+
     public function setEncryptor(CryptoHandler $encryptor): void
     {
         $this->encryptor = $encryptor;
@@ -34,6 +43,16 @@ class TwintController extends AbstractController
     public function setValidator(CredentialValidatorInterface $validator): void
     {
         $this->validator = $validator;
+    }
+
+    public function setPaymentService(PaymentService $paymentService): void
+    {
+        $this->paymentService = $paymentService;
+    }
+
+    public function setReversalHistoryWriter(ReversalHistoryWriterInterface $reversalHistoryWriter): void
+    {
+        $this->reversalHistoryWriter = $reversalHistoryWriter;
     }
 
     #[Route(path: '/api/_actions/twint/extract-pem', name: 'api.action.twint.extract_pem', methods: ['POST'])]
@@ -88,5 +107,55 @@ class TwintController extends AbstractController
         return $this->json([
             'success' => $valid,
         ]);
+    }
+
+    #[Route(path: '/api/_actions/twint/refund', name: 'api.action.twint.refund', methods: ['POST'])]
+    public function refund(Request $request, Context $context): Response
+    {
+        $orderId = $request->get('orderId') ?? '';
+        $reason = $request->get('reason') ?? '';
+        $amount = $request->get('amount') ?? 0;
+        if ($amount <= 0) {
+            return $this->json([
+                'success' => false,
+                'error' => 'The refund amount cannot be negative.',
+            ]);
+        }
+        try {
+            $order = $this->paymentService->getOrder($orderId, new Context(new SystemSource()));
+            $refundableAmount = $order->getAmountTotal() - $this->paymentService->getTotalReversal($order->getId());
+            if ($amount > $refundableAmount) {
+                return $this->json([
+                    'success' => false,
+                    'error' => 'The refund amount cannot exceed ' . $refundableAmount . ' ' . $order->getCurrency()?->getIsoCode(),
+                ]);
+            }
+            $twintReverseOrder = $this->paymentService->reverseOrder($order, $amount);
+            if ($twintReverseOrder instanceof Order) {
+                $this->reversalHistoryWriter->write(
+                    $orderId,
+                    $twintReverseOrder->merchantTransactionReference()
+                        ->__toString(),
+                    $twintReverseOrder->amount()
+                        ->amount(),
+                    $twintReverseOrder->amount()
+                        ->currency(),
+                    $reason
+                );
+                $this->paymentService->changePaymentStatus($order);
+                return $this->json([
+                    'success' => true,
+                ]);
+            }
+            return $this->json([
+                'success' => false,
+                'error' => 'Refund cannot be processed for this order',
+            ]);
+        } catch (Exception $e) {
+            return $this->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }
