@@ -39,6 +39,12 @@
             <call method="setValidator">
                 <argument type="service" id="Twint\Core\Util\CredentialValidatorInterface"/>
             </call>
+            <call method="setPaymentService">
+                <argument type="service" id="Twint\Core\Service\PaymentService"/>
+            </call>
+            <call method="setReversalHistoryWriter">
+                <argument type="service" id="twint_reversal_history_writer"/>
+            </call>
             <tag name="controller.service_arguments"/>
         </service>
 

@@ -86,7 +86,8 @@ class PaymentController extends StorefrontController
                     'version' => 5,
                 ]
             );
-            $qrcode = (new QRCode($options))->render($twintApiResponse['pairingToken']);
+            $pairingToken = (string) ($twintApiResponse['pairingToken'] ?? '');
+            $qrcode = (new QRCode($options))->render($pairingToken);
         }
         return $this->renderStorefront('@TwintPayment/storefront/page/waiting.html.twig', [
             'orderNumber' => $orderNumber,
@@ -94,10 +95,7 @@ class PaymentController extends StorefrontController
             'pairingToken' => $twintApiResponse['pairingToken'] ?? '',
             'amount' => $order->getPrice()
                 ->getTotalPrice(),
-            'payLinks' => $this->paymentService->getPayLinks(
-                $twintApiResponse['pairingToken'] ?? '',
-                $order->getSalesChannelId()
-            ),
+            'payLinks' => $this->paymentService->getPayLinks($pairingToken ?? '', $order->getSalesChannelId()),
         ]);
     }
 

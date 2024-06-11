@@ -63,6 +63,7 @@
         "showTransactionLogModal": "Transaktionsprotokolle anzeigen"
       },
       "transactionLog": {
+        "cardTitle": "Transaktionen",
         "list": {
           "title" : "Transaktionen",
           "columns": {
@@ -75,7 +76,6 @@
             "soapResponse": "Antwort",
             "exception": "Ausnahme",
             "payment": "Zahlung",
-            "order": "Bestellen",
             "action": {
               "view": "Details anzeigen"
             }
@@ -85,12 +85,51 @@
             "close": "Schließen"
           }
         }
+      },
+      "reversalHistory": {
+        "cardTitle": "Stornierungsverlauf",
+        "columns": {
+          "amount": "Betrag",
+          "currency": "Währung",
+          "reason": "Grund",
+          "createdAt": "Erstellt"
+        }
+      },
+      "refundAction": {
+        "cardTitle": "Rückerstattungs",
+        "reason": {
+          "label": "Grund",
+          "placeholder": "Geben Sie den Grund für die Rückerstattung ein"
+        },
+        "refundAmount": {
+          "label": "Betrag",
+          "helpText": "0"
+        },
+        "confirmButton": {
+          "text": "Ausführen"
+        }
       }
+    }
+  },
+  "refund": {
+    "modal": {
+      "title": "Neue Rückerstattung"
+    },
+    "buttons": {
+      "refund": {
+        "label": "Rückerstattung"
+      }
+    },
+    "refundable": {
+      "title": "Gesamt verbleibende Rückerstattung"
+    },
+    "error": {
+      "title" : "Rückerstattungsfehler"
     }
   },
   "sw-order": {
     "detail": {
-      "twint": "TWINT-Transaktionsprotokolle"
+      "twint": "TWINT"
     }
   }
 }

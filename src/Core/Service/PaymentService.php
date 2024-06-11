@@ -19,11 +19,11 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
+use Twint\Core\DataAbstractionLayer\Entity\ReversalHistory\TwintReversalHistoryEntity;
 use Twint\Core\Factory\ClientBuilder;
 use Twint\Core\Handler\TransactionLog\TransactionLogWriterInterface;
 use Twint\Core\Setting\Settings;
 use Twint\Sdk\Value\Money;
-use Twint\Sdk\Value\NumericPairingToken;
 use Twint\Sdk\Value\Order;
 use Twint\Sdk\Value\OrderId;
 use Twint\Sdk\Value\OrderStatus;
@@ -41,6 +41,7 @@ class PaymentService
         private readonly EntityRepository $orderRepository,
         private readonly EntityRepository $stateMachineRepository,
         private readonly EntityRepository $stateMachineStateRepository,
+        private readonly EntityRepository $reversalHistoryRepository,
         private readonly OrderTransactionStateHandler $transactionStateHandler,
         private readonly ClientBuilder $clientBuilder,
         private readonly TransactionLogWriterInterface $transactionLogWriter
@@ -124,7 +125,6 @@ class PaymentService
             if ($transactionId === null) {
                 throw new Exception('Missing transaction ID for this order:' . $referenceId . PHP_EOL);
             }
-
             if ($twintOrder->status()->equals(OrderStatus::SUCCESS())) {
                 $this->transactionStateHandler->paid($transactionId, $this->context);
                 return $client->confirmOrder(
@@ -155,9 +155,12 @@ class PaymentService
         }
     }
 
-    public function reverseOrder(OrderEntity $order): ?Order
+    public function reverseOrder(OrderEntity $order, float $amount = 0): ?Order
     {
         try {
+            if ($amount <= 0 || $amount > $order->getAmountTotal()) {
+                $amount = $order->getAmountTotal();
+            }
             $twintApiResponse = json_decode(
                 $order->getCustomFields()[OrderCustomFieldInstaller::TWINT_API_RESPONSE_CUSTOM_FIELD] ?? '{}',
                 true
@@ -170,22 +173,22 @@ class PaymentService
                     /** @var Order * */
                     $twintOrder = $client->monitorOrder(new OrderId(new Uuid($twintApiResponse['id'])));
                     if ($twintOrder->status()->equals(OrderStatus::SUCCESS())) {
+                        $reversalIndex = $this->getReversalIndex($order->getId());
+                        $reversalId = 'R-' . $twintApiResponse['id'] . '-' . $reversalIndex;
                         $twintOrder = $client->reverseOrder(
-                            new UnfiledMerchantTransactionReference('R-' . $twintApiResponse['id']),
+                            new UnfiledMerchantTransactionReference($reversalId),
                             new OrderId(new Uuid($twintApiResponse['id'])),
-                            new Money($currency, $order->getAmountTotal())
+                            new Money($currency, $amount)
                         );
-                        $this->transactionStateHandler->refund($orderTransactionId, $this->context);
+                        if ($twintOrder->status()->equals(OrderStatus::SUCCESS())) {
+                            return $twintOrder;
+                        }
                     }
-                    return $twintOrder;
                 }
             }
             return null;
         } catch (Exception $e) {
-            throw PaymentException::asyncProcessInterrupted(
-                $orderTransactionId,
-                'An error occurred during the communication with API gateway' . PHP_EOL . $e->getMessage()
-            );
+            throw PaymentException::asyncProcessInterrupted($orderTransactionId ?? '', $e->getMessage());
         } finally {
             $innovations = empty($client) ? [] : $client->flushInvocations();
             $this->transactionLogWriter->writeObjectLog(
@@ -369,19 +372,45 @@ class PaymentService
         throw new Exception($orderId);
     }
 
-    public function parseTwintOrderToArray(Order $twintOrder): array
+    public function getReversals(string $orderId): EntityCollection
     {
-        return [
-            'id' => $twintOrder->id()
-                ->__toString(),
-            'status' => $twintOrder->status()
-                ->__toString(),
-            'transactionStatus' => $twintOrder->transactionStatus()
-                ->__toString(),
-            'pairingToken' => $twintOrder->pairingToken() instanceof NumericPairingToken ? $twintOrder->pairingToken()
-                ->__toString() : '',
-            'merchantTransactionReference' => $twintOrder->merchantTransactionReference()
-                ->__toString(),
-        ];
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('orderId', $orderId));
+        $criteria->addAssociation('order');
+        return $this->reversalHistoryRepository->search($criteria, $this->context)
+            ->getEntities();
+    }
+
+    public function getReversalIndex(string $orderId): int
+    {
+        $reversals = $this->getReversals($orderId);
+        return count($reversals) > 0 ? count($reversals) + 1 : 1;
+    }
+
+    public function getTotalReversal(string $orderId): float
+    {
+        $totalReversal = 0;
+        $reversals = $this->getReversals($orderId);
+        if (count($reversals) > 0) {
+            foreach ($reversals as $reversal) {
+                /** @var TwintReversalHistoryEntity $reversal */
+                $totalReversal += $reversal->getAmount();
+            }
+        }
+        return $totalReversal;
+    }
+
+    public function changePaymentStatus(OrderEntity $order): void
+    {
+        $orderTransactionId = $order->getTransactions()?->first()?->getId();
+        $totalReversal = $this->getTotalReversal($order->getId());
+        if (empty($orderTransactionId)) {
+            return;
+        }
+        if ($totalReversal === $order->getAmountTotal()) {
+            $this->transactionStateHandler->refund($orderTransactionId, $this->context);
+        } else {
+            $this->transactionStateHandler->refundPartially($orderTransactionId, $this->context);
+        }
     }
 }
