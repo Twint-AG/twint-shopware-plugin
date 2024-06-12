@@ -121,7 +121,8 @@
       }
     },
     "refundable": {
-      "title": "Gesamt verbleibende Rückerstattung"
+      "title": "Verbleibender Gesamtbetrag der Rückerstattung",
+      "notice": "Gesamtbetrag wird automatisch an den maximalen Bestellpreis angepasst."
     },
     "error": {
       "title" : "Rückerstattungsfehler"

@@ -19,6 +19,7 @@ use Twint\Core\Util\CertificateHandler;
 use Twint\Core\Util\CredentialValidatorInterface;
 use Twint\Core\Util\CryptoHandler;
 use Twint\Sdk\Certificate\Pkcs12Certificate;
+use Twint\Sdk\Value\Money;
 use Twint\Sdk\Value\Order;
 
 #[Package('checkout')]
@@ -114,7 +115,7 @@ class TwintController extends AbstractController
     {
         $orderId = $request->get('orderId') ?? '';
         $reason = $request->get('reason') ?? '';
-        $amount = $request->get('amount') ?? 0;
+        $amount = (float) ($request->get('amount') ?? 0);
         if ($amount <= 0) {
             return $this->json([
                 'success' => false,
@@ -123,8 +124,10 @@ class TwintController extends AbstractController
         }
         try {
             $order = $this->paymentService->getOrder($orderId, new Context(new SystemSource()));
+            $amountMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $amount);
             $refundableAmount = $order->getAmountTotal() - $this->paymentService->getTotalReversal($order->getId());
-            if ($amount > $refundableAmount) {
+            $refundableAmountMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $refundableAmount);
+            if ($refundableAmountMoney->compare($amountMoney) < 0) {
                 return $this->json([
                     'success' => false,
                     'error' => 'The refund amount cannot exceed ' . $refundableAmount . ' ' . $order->getCurrency()?->getIsoCode(),
