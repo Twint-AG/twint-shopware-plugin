@@ -181,7 +181,7 @@ class PaymentService
                             new Money($currency, $amount)
                         );
                         if ($twintOrder->status()->equals(OrderStatus::SUCCESS())) {
-                            $this->changePaymentStatus($order);
+                            $this->changePaymentStatus($order, $amount);
                             return $twintOrder;
                         }
                     }
@@ -402,14 +402,16 @@ class PaymentService
         return $totalReversal;
     }
 
-    public function changePaymentStatus(OrderEntity $order): void
+    public function changePaymentStatus(OrderEntity $order, float $amount = 0): void
     {
         $orderTransactionId = $order->getTransactions()?->first()?->getId();
         $totalReversal = $this->getTotalReversal($order->getId());
         if (empty($orderTransactionId)) {
             return;
         }
-        if ($totalReversal === $order->getAmountTotal()) {
+        $amountMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $order->getAmountTotal());
+        $totalReversalMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $totalReversal + $amount);
+        if ($amountMoney->compare($totalReversalMoney) === 0) {
             $this->transactionStateHandler->refund($orderTransactionId, $this->context);
         } else {
             $this->transactionStateHandler->refundPartially($orderTransactionId, $this->context);
