@@ -69,10 +69,6 @@ Component.register('twint-payment-actions', {
                 label: this.$tc('twint.order.reversalHistory.columns.amount'),
                 rawData: true,
             },{
-                property: 'currency',
-                label: this.$tc('twint.order.reversalHistory.columns.currency'),
-                rawData: true,
-            },{
                 property: 'reason',
                 label: this.$tc('twint.order.reversalHistory.columns.reason'),
                 rawData: true,
@@ -93,6 +89,9 @@ Component.register('twint-payment-actions', {
             }
             return false;
         },
+        currencyFilter() {
+            return Shopware.Filter.getByName('currency');
+        }
     },
     methods: {
         createdComponent() {
@@ -124,7 +123,7 @@ Component.register('twint-payment-actions', {
                     refundedAmount += captureAmount;
                 });
                 this.isLoading = false;
-                this.refundableAmount = this.totalAmount -refundedAmount;
+                this.refundableAmount = this.totalAmount - refundedAmount;
             }).catch(() => {
                 this.isLoading = false;
             });
@@ -144,6 +143,7 @@ Component.register('twint-payment-actions', {
                     this.getReversalHistoryList();
                     this.isLoading = false;
                     this.resetRefundForm();
+                    this.$emit('refund-finish', {});
                 } else {
                     this.isLoading = false;
                     this.createNotificationError({

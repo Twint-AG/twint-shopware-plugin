@@ -121,7 +121,8 @@
         }
       },
       "refundable": {
-        "title": "Total refundable left"
+        "title": "Total refundable amount left",
+        "notice": "Total amount automatically adjusted to the maximum order price."
       },
       "error": {
         "title" : "Refund error"

@@ -29,7 +29,8 @@
                                     :showSelection="false"
                                     :allowDelete="false"
                                     :showDelete="false"
-                                    :isLoading="isLoading">
+                                    :isLoading="isLoading"
+                                    @on-add-new-refund="getTransactionLogList">
 
                                 {% block twint_transaction_log_list_content_order %}
                                     <template #column-orderId="{ item }">
