@@ -14,10 +14,13 @@
                             <span class="twint-refundable-amount__title" v-if="refundableAmount > 0">
                             {{ $tc('twint.refund.refundable.title') }}
                             </span>
-                            <sw-label v-if="refundableAmount > 0">{{ refundableAmount }} {{ currency }}</sw-label>
+                            <sw-label v-if="refundableAmount > 0">{{ currencyFilter(refundableAmount, currency, 2) }}</sw-label>
                             {% block twint_modal_refund %}
                                 <sw-modal variant="small"
                                           :title="$tc(`twint.refund.modal.title`)" v-if="showRefundModal" @modal-close="onCloseModal">
+                                    <sw-alert class="twint-refundable-amount__notice-message" v-if="refundableAmount==refundAmount" variant="warning">
+                                        <span>{{ $tc('twint.refund.refundable.notice') }}</span>
+                                    </sw-alert>
 
                                     {% block twint_refund_amount %}
                                         <sw-number-field
@@ -68,6 +71,9 @@
                                       :showSelection="false">
                             <template #column-createdAt="{ item }">
                                 {{ dateFilter(item.createdAt) }}
+                            </template>
+                            <template #column-amount="{ item }">
+                                {{ currencyFilter(item.amount, item.currency, 2)}}
                             </template>
                         </sw-data-grid>
                     {% endblock %}

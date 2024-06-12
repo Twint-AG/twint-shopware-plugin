@@ -41,6 +41,7 @@ Shopware.Component.register('sw-order-detail-twint', {
         createdComponent() {
             this.isLoading = true;
             this.getTransactionLogList();
+            this.$on('refund-finish', this.getTransactionLogList);
         },
         getTransactionLogList() {
             this.naturalSorting = this.sortBy === 'createdAt';
@@ -71,6 +72,9 @@ Shopware.Component.register('sw-order-detail-twint', {
         getVariantState(entity, state) {
             return this.stateStyleDataProviderService.getStyle(`${entity}.state`, state.technicalName).variant;
         }
+    },
+    destroyed() {
+        this.$off('refund-finish');
     },
     computed: {
         ...mapState('swOrderDetail', [
