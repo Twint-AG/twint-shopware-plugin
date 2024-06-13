@@ -25,4 +25,12 @@ interface TransactionLogWriterInterface
         string $transactionId,
         array $invocations
     ): void;
+
+    public function writeReserveOrderLog(
+        string $orderId,
+        string $paymentStateId,
+        string $orderStateId,
+        string $transactionId,
+        array $invocations
+    ): void;
 }
