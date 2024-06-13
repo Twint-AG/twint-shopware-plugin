@@ -143,7 +143,8 @@ Component.register('twint-payment-actions', {
                     this.getReversalHistoryList();
                     this.isLoading = false;
                     this.resetRefundForm();
-                    this.$emit('refund-finish', {});
+                    this.$root.$emit('refund-finish');
+                    this.$emit('save-edits');
                 } else {
                     this.isLoading = false;
                     this.createNotificationError({

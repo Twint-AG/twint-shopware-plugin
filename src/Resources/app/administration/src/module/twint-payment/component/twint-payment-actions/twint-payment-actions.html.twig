@@ -27,6 +27,8 @@
                                                 v-model:value="refundAmount"
                                                 :max="refundableAmount"
                                                 :min="0"
+                                                number-type="float"
+                                                :step="0.01"
                                                 :label="$tc('twint.order.refundAction.refundAmount.label')"
                                                 :helpText="$tc('twint.order.refundAction.refundAmount.helpText')">
                                             <template #suffix>
