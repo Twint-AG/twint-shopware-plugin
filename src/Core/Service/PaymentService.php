@@ -44,7 +44,8 @@ class PaymentService
         private readonly EntityRepository $reversalHistoryRepository,
         private readonly OrderTransactionStateHandler $transactionStateHandler,
         private readonly ClientBuilder $clientBuilder,
-        private readonly TransactionLogWriterInterface $transactionLogWriter
+        private readonly TransactionLogWriterInterface $transactionLogWriter,
+        private readonly StockManagerInterface $stockManager
     ) {
         $this->context = new Context(new SystemSource());
     }
@@ -193,7 +194,7 @@ class PaymentService
         } finally {
             $order = $this->getOrder($order->getId(), $this->context);
             $innovations = empty($client) ? [] : $client->flushInvocations();
-            $this->transactionLogWriter->writeObjectLog(
+            $this->transactionLogWriter->writeReserveOrderLog(
                 $order->getId(),
                 $order->getTransactions()
                     ?->first()
@@ -413,6 +414,12 @@ class PaymentService
         $totalReversalMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $totalReversal + $amount);
         if ($amountMoney->compare($totalReversalMoney) === 0) {
             $this->transactionStateHandler->refund($orderTransactionId, $this->context);
+            $lineItems = $order->getLineItems();
+            if ($lineItems) {
+                foreach ($lineItems as $lineItem) {
+                    $this->stockManager->increaseStock($lineItem, $lineItem->getQuantity());
+                }
+            }
         } else {
             $this->transactionStateHandler->refundPartially($orderTransactionId, $this->context);
         }

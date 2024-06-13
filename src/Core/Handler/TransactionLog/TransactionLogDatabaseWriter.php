@@ -81,6 +81,40 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
         }
     }
 
+    public function writeReserveOrderLog(
+        string $orderId,
+        string $paymentStateId,
+        string $orderStateId,
+        string $transactionId,
+        array $invocations
+    ): void {
+        if ($invocations === []) {
+            return;
+        }
+        $request = json_encode($invocations[0]->arguments());
+        $exception = $invocations[0]->exception() ?? '';
+        $response = json_encode($invocations[0]->returnValue());
+        $soapMessages = $invocations[0]->messages();
+        $soapRequests = [];
+        $soapResponses = [];
+        foreach ($soapMessages as $soapMessage) {
+            $soapRequests[] = $soapMessage->request()->body();
+            $soapResponses[] = $soapMessage->response()->body();
+        }
+        $record = [
+            'orderId' => $orderId,
+            'paymentStateId' => $paymentStateId,
+            'orderStateId' => $orderStateId,
+            'transactionId' => $transactionId,
+            'request' => $request,
+            'response' => $response,
+            'soapRequest' => $soapRequests,
+            'soapResponse' => $soapResponses,
+            'exception' => $exception,
+        ];
+        $this->repository->create([$record], Context::createDefaultContext());
+    }
+
     public function checkDuplicatedTransactionLogInLastMinutes(array $record): bool
     {
         $lastTime = Settings::CHECK_DUPLICATED_TRANSACTION_LOG_FROM_MINUTES;
