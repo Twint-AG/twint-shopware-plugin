@@ -25,6 +25,10 @@
             <argument type="service" id="event_dispatcher"/>
         </service>
 
+        <service id="Twint\Core\Service\StockManagerInterface" class="Twint\Core\Service\StockManager">
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
+        </service>
+
         <service id="Twint\Util\Method\RegularPaymentMethod">
             <tag name="twint.method.definition"/>
         </service>
@@ -48,6 +52,7 @@
                       id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Twint\Core\Factory\ClientBuilder"/>
             <argument type="service" id="twint_transaction_log_writer"/>
+            <argument type="service" id="Twint\Core\Service\StockManagerInterface"/>
         </service>
 
         <service id="Twint\Core\Util\CryptoHandler" public="true">
