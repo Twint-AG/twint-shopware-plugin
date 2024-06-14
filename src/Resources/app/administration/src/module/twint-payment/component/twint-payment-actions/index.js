@@ -31,6 +31,10 @@ Component.register('twint-payment-actions', {
         currency: {
             type: String,
             required: true,
+        },
+        decimalPrecision: {
+            type: String,
+            required: true,
         }
     },
 
@@ -47,6 +51,8 @@ Component.register('twint-payment-actions', {
             sortBy: 'createdAt',
             sortDirection: 'DESC',
             naturalSorting: true,
+            stateType: 'order_transaction',
+            transaction: null
         };
     },
     created() {
@@ -91,11 +97,21 @@ Component.register('twint-payment-actions', {
         },
         currencyFilter() {
             return Shopware.Filter.getByName('currency');
+        },
+        dynamicStep() {
+            if(this.decimalPrecision < 0) return 0.01;
+            return Math.pow(10, -this.decimalPrecision);
         }
     },
     methods: {
         createdComponent() {
             this.getReversalHistoryList();
+            for (let i = 0; i < this.order.transactions.length; i += 1) {
+                if (!['cancelled', 'failed'].includes(this.order.transactions[i].stateMachineState.technicalName)) {
+                    this.transaction = this.order.transactions[i];
+                }
+            }
+            this.transaction = this.order.transactions.last();
         },
         showModal() {
             this.showRefundModal = true;
@@ -111,17 +127,13 @@ Component.register('twint-payment-actions', {
             this.naturalSorting = this.sortBy === 'createdAt';
             const criteria = new Criteria();
             criteria.addSorting(Criteria.sort(this.sortBy, this.sortDirection, this.naturalSorting));
-            criteria.addAssociation('order');
             criteria.addFilter(Criteria.equals('order.id', this.orderId))
+            criteria.addAggregation(Criteria.sum('refundedAmount', 'amount'))
 
             this.isLoading = true;
             this.reversalHistoryRepository.search(criteria).then((reversalHistory) => {
                 this.reversalHistory = reversalHistory;
-                let refundedAmount = 0;
-                reversalHistory.forEach((reversal) => {
-                    const captureAmount = Number(reversal.amount);
-                    refundedAmount += captureAmount;
-                });
+                const refundedAmount = parseFloat(reversalHistory?.aggregations?.refundedAmount?.sum);
                 this.isLoading = false;
                 this.refundableAmount = this.totalAmount - refundedAmount;
             }).catch(() => {
@@ -137,14 +149,13 @@ Component.register('twint-payment-actions', {
             this.isLoading = true;
             this.TwintPaymentService.refund(data).then((response) => {
                 const success = response.success ?? false;
-
                 if (success) {
                     this.showRefundModal = false;
                     this.getReversalHistoryList();
                     this.isLoading = false;
                     this.resetRefundForm();
                     this.$root.$emit('refund-finish');
-                    this.$emit('save-edits');
+                    this.$root.$emit('order-reload');
                 } else {
                     this.isLoading = false;
                     this.createNotificationError({
@@ -160,6 +171,12 @@ Component.register('twint-payment-actions', {
         resetRefundForm(){
             this.refundAmount = 0;
             this.reason = '';
-        }
+        },
+        getLastChange() {
+            this.lastStateChange = null;
+            this.stateMachineHistoryRepository.search(this.stateMachineHistoryCriteria).then((result) => {
+                this.lastStateChange = result.first();
+            });
+        },
     },
 });

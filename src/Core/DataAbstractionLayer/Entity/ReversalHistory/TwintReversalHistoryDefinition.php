@@ -14,6 +14,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\FloatField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\LongTextField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\ManyToOneAssociationField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\ReferenceVersionField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 
@@ -42,6 +43,7 @@ class TwintReversalHistoryDefinition extends EntityDefinition
             (new IdField('id', 'id'))->setFlags(new PrimaryKey(), new Required()),
 
             (new FkField('order_id', 'orderId', OrderDefinition::class))->addFlags(new Required()),
+            (new ReferenceVersionField(OrderDefinition::class, 'order_version_id'))->addFlags(new Required()),
             new ManyToOneAssociationField('order', 'order_id', OrderDefinition::class, 'id', false),
 
             (new StringField('reversal_id', 'reversalId'))->setFlags(new Required()),

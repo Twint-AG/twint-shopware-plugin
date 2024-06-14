@@ -19,6 +19,7 @@ Shopware.Component.override('sw-order-detail', {
             this.$super('createdComponent');
             this.isLoading = true;
             this.getPairingList();
+            this.$root.$on('order-reload', this.onSaveEdits);
         },
         getPairingList() {
             this.naturalSorting = this.sortBy === 'createdAt';
@@ -34,6 +35,10 @@ Shopware.Component.override('sw-order-detail', {
             }).catch(() => {
                 this.isLoading = false;
             });;
+        },
+        async onSaveEdits() {
+            const result = await this.$super('onSaveEdits');
+            return result;
         }
     },
     computed: {
