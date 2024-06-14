@@ -11,6 +11,7 @@ interface TransactionLogWriterInterface
         string $paymentStateId,
         string $orderStateId,
         string $transactionId,
+        string $apiMethod,
         string $request,
         string $response,
         array $soapRequest,
@@ -23,6 +24,7 @@ interface TransactionLogWriterInterface
         string $paymentStateId,
         string $orderStateId,
         string $transactionId,
+        string $apiMethod,
         array $invocations
     ): void;
 
@@ -31,6 +33,7 @@ interface TransactionLogWriterInterface
         string $paymentStateId,
         string $orderStateId,
         string $transactionId,
+        string $apiMethod,
         array $invocations
     ): void;
 }

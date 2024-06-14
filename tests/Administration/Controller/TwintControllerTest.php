@@ -57,7 +57,7 @@ class TwintControllerTest extends TestCase
         $request = $this->createRequest('api.action.twint.extract_pem', ['password' => '']);
         $response = $this->twintController->extractPem($request, $this->salesChannelContext->getContext());
         static::assertSame(400, $response->getStatusCode());
-        static::assertSame('{"success":false,"message":"Please upload a valid certificate file "}', (string)$response->getContent());
+        static::assertSame('{"success":false,"message":"Please upload a valid certificate file"}', (string)$response->getContent());
     }
 
     public function testExtractPemForInvalidFile(): void{
@@ -66,7 +66,7 @@ class TwintControllerTest extends TestCase
         $request->files->set('file', $file);
         $response = $this->twintController->extractPem($request, $this->salesChannelContext->getContext());
         static::assertSame(400, $response->getStatusCode());
-        static::assertSame('{"success":false,"message":"Invalid certificate file ","errorCode":"ERROR_INVALID_INPUT"}', (string)$response->getContent());
+        static::assertSame('{"success":false,"message":"Invalid certificate file","errorCode":"ERROR_INVALID_INPUT"}', (string)$response->getContent());
     }
     public function testExtractPemForValidFileWrongPassword(): void{
         $file = new UploadedFile(dirname(__DIR__, 2).'/_fixture/certificate.p12', 'certificate.p12', null, null, true);
@@ -74,7 +74,7 @@ class TwintControllerTest extends TestCase
         $request->files->set('file', $file);
         $response = $this->twintController->extractPem($request, $this->salesChannelContext->getContext());
         static::assertSame(400, $response->getStatusCode());
-        static::assertSame('{"success":false,"message":"Invalid certificate file ","errorCode":"ERROR_INVALID_PASSPHRASE"}', (string)$response->getContent());
+        static::assertSame('{"success":false,"message":"Invalid certificate file","errorCode":"ERROR_INVALID_PASSPHRASE"}', (string)$response->getContent());
     }
     public function testExtractPemForValidFileCorrectPassword(): void{
         $file = new UploadedFile(dirname(__DIR__, 2).'/_fixture/certificate.p12', 'certificate.p12', null, null, true);
@@ -82,6 +82,6 @@ class TwintControllerTest extends TestCase
         $request->files->set('file', $file);
         $response = $this->twintController->extractPem($request, $this->salesChannelContext->getContext());
         static::assertSame(400, $response->getStatusCode());
-        static::assertSame('{"success":false,"message":"Invalid certificate file ","errorCode":"ERROR_INVALID_CERTIFICATE_FORMAT"}', (string)$response->getContent());
+        static::assertSame('{"success":false,"message":"Invalid certificate file","errorCode":"ERROR_INVALID_CERTIFICATE_FORMAT"}', (string)$response->getContent());
     }
 }

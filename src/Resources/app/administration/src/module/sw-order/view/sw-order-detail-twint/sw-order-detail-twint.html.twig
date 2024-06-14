@@ -89,7 +89,7 @@
                                             >
                                                 {% block twint_transaction_log_list_content_action_detail_modal_order %}
                                                     <p class="sw-order-detail-twint-modal-order">
-                                                        <b>{{ $tc('twint.order.transactionLog.list.columns.order') }}:</b> {{ item.order.orderNumber }}
+                                                        <b>{{ $tc('twint.order.transactionLog.list.columns.orderID') }}:</b> {{ item.order.orderNumber }}
                                                     </p>
                                                     <p class="sw-order-detail-twint-modal-transaction">
                                                         <b>{{ $tc('twint.order.transactionLog.list.columns.transaction') }}:</b> {{ item.transactionId }}
@@ -111,7 +111,7 @@
 
                                                     <sw-card v-for="(request, index) in item.soapRequest">
                                                         <sw-container>
-                                                            <h4>SOAP {{ index + 1 }}</h4>
+                                                            <h4>{{ $tc('twint.order.transactionLog.list.modal.soapMethod') }}</h4>
                                                             <b class="sw-order-detail-twint-modal-soap-request">
                                                                 {{ $tc('twint.order.transactionLog.list.columns.soapRequest') }}
                                                             </b>

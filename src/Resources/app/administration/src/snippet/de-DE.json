@@ -67,9 +67,11 @@
         "list": {
           "title" : "Transaktionen",
           "columns": {
-            "createdAt": "CreatedAt",
+            "createdAt": "Created at",
+            "apiMethod": "API methode",
+            "orderID": "Order ID",
             "order": "Bestellen",
-            "transaction": "Transaktion",
+            "transaction": "Order transaction ID",
             "request": "Anfrage",
             "response": "Antwort",
             "soapRequest": "Anfrage",
@@ -82,7 +84,8 @@
           },
           "modal": {
             "title": "Protokolldetails",
-            "close": "Schließen"
+            "close": "Schließen",
+            "soapMethod": "SOAP method"
           }
         }
       },
@@ -103,7 +106,7 @@
         },
         "refundAmount": {
           "label": "Betrag",
-          "helpText": "0"
+          "helpText": "The refund amount cannot exceed the total order amount"
         },
         "confirmButton": {
           "text": "Ausführen"
@@ -113,7 +116,7 @@
   },
   "refund": {
     "modal": {
-      "title": "Neue Rückerstattung"
+      "title": "Create new refund"
     },
     "buttons": {
       "refund": {
