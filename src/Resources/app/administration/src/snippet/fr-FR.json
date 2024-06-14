@@ -69,8 +69,8 @@
           "title" : "Transactions",
           "columns": {
             "createdAt": "Created at",
-            "apiMethod": "API method",
             "orderID": "Order ID",
+            "apiMethod": "API method",
             "order": "Order status",
             "transaction": "Order transaction ID",
             "request": "Request",

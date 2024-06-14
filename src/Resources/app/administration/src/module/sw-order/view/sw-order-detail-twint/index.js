@@ -106,11 +106,11 @@ Shopware.Component.register('sw-order-detail-twint', {
 
             return [{
                 property: 'orderId',
-                label: app.$tc('twint.order.transactionLog.list.columns.order'),
+                label: app.$tc('twint.order.transactionLog.list.columns.orderID'),
                 allowResize: true,
             }, {
-                property: 'transactionId',
-                label: app.$tc('twint.order.transactionLog.list.columns.transaction'),
+                property: 'apiMethod',
+                label: app.$tc('twint.order.transactionLog.list.columns.apiMethod'),
                 allowResize: true,
             }, {
                 property: 'paymentStateId',

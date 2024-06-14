@@ -14,12 +14,13 @@ use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Aggregation\Metric\SumAggregation;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\AggregationResult\Metric\SumResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
-use Twint\Core\DataAbstractionLayer\Entity\ReversalHistory\TwintReversalHistoryEntity;
 use Twint\Core\Factory\ClientBuilder;
 use Twint\Core\Handler\TransactionLog\TransactionLogWriterInterface;
 use Twint\Core\Setting\Settings;
@@ -89,6 +90,7 @@ class PaymentService
                     ->getStateId(),
                 $transaction->getOrderTransaction()
                     ->getId(),
+                'startOrder',
                 $client->flushInvocations()
             );
         }
@@ -128,10 +130,6 @@ class PaymentService
             }
             if ($twintOrder->status()->equals(OrderStatus::SUCCESS())) {
                 $this->transactionStateHandler->paid($transactionId, $this->context);
-                return $client->confirmOrder(
-                    new OrderId(new Uuid($twintApiResponse['id'])),
-                    new Money((string) $currency, $order->getAmountTotal())
-                );
             } elseif ($twintOrder->status()->equals(OrderStatus::FAILURE())) {
                 $this->transactionStateHandler->cancel($transactionId, $this->context);
             }
@@ -151,6 +149,7 @@ class PaymentService
                     ?->getStateId() ?? '',
                 $order->getStateId(),
                 $transactionId ?? '',
+                'monitorOrder',
                 $innovations
             );
         }
@@ -174,6 +173,18 @@ class PaymentService
                     /** @var Order * */
                     $twintOrder = $client->monitorOrder(new OrderId(new Uuid($twintApiResponse['id'])));
                     if ($twintOrder->status()->equals(OrderStatus::SUCCESS())) {
+                        $innovations = $client->flushInvocations();
+                        $this->transactionLogWriter->writeReserveOrderLog(
+                            $order->getId(),
+                            $order->getTransactions()
+                                ?->first()
+                                ?->getStateId() ?? '',
+                            $order
+                                ->getStateId(),
+                            $order->getTransactions()?->first()?->getId() ?? '',
+                            'monitorOrder',
+                            $innovations
+                        );
                         $reversalIndex = $this->getReversalIndex($order->getId());
                         $reversalId = 'R-' . $twintApiResponse['id'] . '-' . $reversalIndex;
                         $twintOrder = $client->reverseOrder(
@@ -202,6 +213,7 @@ class PaymentService
                 $order
                     ->getStateId(),
                 $order->getTransactions()?->first()?->getId() ?? '',
+                'reverseOrder',
                 $innovations
             );
         }
@@ -386,24 +398,26 @@ class PaymentService
 
     public function getReversalIndex(string $orderId): int
     {
-        $reversals = $this->getReversals($orderId);
-        return count($reversals) > 0 ? count($reversals) + 1 : 1;
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('orderId', $orderId));
+        $index = $this->reversalHistoryRepository->search($criteria, $this->context)
+            ->count();
+        return $index + 1;
     }
 
     public function getTotalReversal(string $orderId): float
     {
-        $totalReversal = 0;
-        $reversals = $this->getReversals($orderId);
-        if (count($reversals) > 0) {
-            foreach ($reversals as $reversal) {
-                /** @var TwintReversalHistoryEntity $reversal */
-                $totalReversal += $reversal->getAmount();
-            }
-        }
-        return $totalReversal;
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('orderId', $orderId));
+        $criteria->addAggregation(new SumAggregation('totalReversal', 'amount'));
+
+        /** @var SumResult $totalReversal */
+        $totalReversal = $this->reversalHistoryRepository->aggregate($criteria, $this->context)
+            ->get('totalReversal');
+        return $totalReversal->getSum() ?? -1;
     }
 
-    public function changePaymentStatus(OrderEntity $order, float $amount = 0): void
+    public function changePaymentStatus(OrderEntity $order, float $amount = 0, bool $stockRecovery = false): void
     {
         $orderTransactionId = $order->getTransactions()?->first()?->getId();
         $totalReversal = $this->getTotalReversal($order->getId());
@@ -414,10 +428,12 @@ class PaymentService
         $totalReversalMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $totalReversal + $amount);
         if ($amountMoney->compare($totalReversalMoney) === 0) {
             $this->transactionStateHandler->refund($orderTransactionId, $this->context);
-            $lineItems = $order->getLineItems();
-            if ($lineItems) {
-                foreach ($lineItems as $lineItem) {
-                    $this->stockManager->increaseStock($lineItem, $lineItem->getQuantity());
+            if ($stockRecovery) {
+                $lineItems = $order->getLineItems();
+                if ($lineItems) {
+                    foreach ($lineItems as $lineItem) {
+                        $this->stockManager->increaseStock($lineItem, $lineItem->getQuantity());
+                    }
                 }
             }
         } else {

@@ -27,6 +27,8 @@ class TwintTransactionLogEntity extends Entity
 
     protected string $transactionId;
 
+    protected string $apiMethod;
+
     protected string $request;
 
     protected string $response;
@@ -70,6 +72,11 @@ class TwintTransactionLogEntity extends Entity
     public function getTransactionId(): string
     {
         return $this->transactionId;
+    }
+
+    public function getApiMethod(): string
+    {
+        return $this->apiMethod;
     }
 
     public function getRequest(): string

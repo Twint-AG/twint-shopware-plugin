@@ -67,7 +67,6 @@ class PaymentController extends StorefrontController
                 'orderId' => $order->getId(),
             ]);
         } elseif ($this->paymentService->isCancelPaid($order)) {
-            $this->addFlash(self::DANGER, $this->trans('twintPayment.message.cancelPayment'));
             return $this->redirectToRoute('frontend.account.edit-order.page', [
                 'orderId' => $order->getId(),
                 'error-code' => 'CHECKOUT__TWINT_PAYMENT_DECLINED',
