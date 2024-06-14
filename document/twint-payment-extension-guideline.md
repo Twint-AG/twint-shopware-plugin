@@ -31,7 +31,7 @@ Under the `Apps` tab -> Ensure that `TBU - Twint Payment` is enabled
 
 > 🚩 **Note:**
 > 
-> After enter the certification password, please wait for the flash message saying `Certificate validation successful` before click Save. 
+> After entering the certification password, please wait for the flash message saying `Certificate validation successful` before clicking Save. 
 
 <img src="./screenshots/cert-validated.png" alt="Certification validated" width="300" height="auto">
 
@@ -54,6 +54,10 @@ Under the `Display options` section -> Select where you want the `Twint Express 
     - TWINT - Regular Checkout | TBU - Twint Payment
 - You can further custom the payment method (e.g. add logo) by click the `Edit details` link next to each payment method.
 
+```
+🔔 To do - Payment methods' name will be changed soon, to be updated later.
+```
+
 <img src="./screenshots/twint-payment-methods.png" alt="Active TWINT payment methods" width="900" height="auto">
 
 ## Configure Shopware and the Sale channel
@@ -62,7 +66,7 @@ Under the `Display options` section -> Select where you want the `Twint Express 
 
 > 🚩 **Note:**
 >
-> TWINT payment extension requires the Currency to be **CHF** so we need to make sure **CHF** currency is available for the front store (as know as the Sale channel).
+> TWINT payment extension supports **CHF** currency only. Please make sure CHF currency is added to the Sale channel (also know as the Storefront).
 >
 > If you already have **CHF** currency created please ignore this section.
 
@@ -77,12 +81,14 @@ Under the `Display options` section -> Select where you want the `Twint Express 
     - **Short name:** *anything*
     - **Symbol:** Fr
     - **Conversion factor:**
-        - If CHF is the only currency: Enter `1`
-        - If your shop support multiple currency:
-            - CHF is the first one: Enter `1`
-            - CHF is not the first currency: Enter the conversion rate against the first currency *i.e.* `1.1` for `CHF = 1st currency * 1.1`
-- Make change to the `Price rounding` section, especially the `Decimals` field for the displayed decimal places in the front store.
+        - If CHF is the only currency enabled for the shop: Enter `1`
+        - If the shop supports multiple currencies:
+            - CHF is the first currency: Enter `1`
+            - CHF is not the first currency: Enter the `Conversion factor` against the first currency *i.e.* `1.1` for `CHF = 1st currency * 1.1`
+- Configure the `Price rounding` section. To display decimal places in the Sale channel, input the number of decimal places to be displayed to the `Decimals` field.
 - Click the `Save` button.
+
+<img src="./screenshots/multiple-currencies.png" alt="Multiple currencies" width="900" height="auto">
 
 <img src="./screenshots/chf-currency.png" alt="CHF Currency" width="900" height="auto">
 
@@ -90,10 +96,16 @@ Under the `Display options` section -> Select where you want the `Twint Express 
 
 > 🚩 **Note:**
 >
-> This is more about Shopware administration so we assume you should have your Sale channel created and configured.  
+> At this stage, the Sale channel should be set up and configured. The information below serves as kind reminder.  
 > Below are just some information need you attention on.
 
-- You can have as many payment methods as you want, but please ensure the below payment methods are added to your sale channel:
+```
+🔔 To do - Payment methods' name will be changed soon, to be updated later.
+```
+
+- Please ensure the below payment methods are added for the Sale channel:
     - TWINT - Express Checkout | TBU - Twint Payment
     - TWINT - Regular Checkout | TBU - Twint Payment
 - Ensure CHF currency is added to your sale channel.
+
+<img src="./screenshots/sale-channel.png" alt="Add payment methods and currencies to the Sale channel" width="900" height="auto">
