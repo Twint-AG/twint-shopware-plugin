@@ -420,13 +420,18 @@ class PaymentService
     public function changePaymentStatus(OrderEntity $order, float $amount = 0, bool $stockRecovery = false): void
     {
         $orderTransactionId = $order->getTransactions()?->first()?->getId();
+        $lastTransactionStateName = $order->getTransactions()?->first()
+            ?->getStateMachineState()
+            ?->getTechnicalName();
         $totalReversal = $this->getTotalReversal($order->getId());
         if (empty($orderTransactionId)) {
             return;
         }
         $amountMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $order->getAmountTotal());
         $totalReversalMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $totalReversal + $amount);
-        if ($amountMoney->compare($totalReversalMoney) === 0) {
+        if ($amountMoney->compare(
+            $totalReversalMoney
+        ) === 0 && $lastTransactionStateName !== OrderTransactionStates::STATE_REFUNDED) {
             $this->transactionStateHandler->refund($orderTransactionId, $this->context);
             if ($stockRecovery) {
                 $lineItems = $order->getLineItems();
@@ -436,7 +441,7 @@ class PaymentService
                     }
                 }
             }
-        } else {
+        } elseif ($lastTransactionStateName !== OrderTransactionStates::STATE_PARTIALLY_REFUNDED) {
             $this->transactionStateHandler->refundPartially($orderTransactionId, $this->context);
         }
     }

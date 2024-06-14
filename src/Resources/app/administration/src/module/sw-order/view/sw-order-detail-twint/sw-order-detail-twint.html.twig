@@ -7,6 +7,7 @@
                         :order="order"
                         :orderId="orderId"
                         :currency="order.currency.isoCode"
+                        :decimalPrecision="order.itemRounding.decimals"
                         :totalAmount="order.amountTotal"
                 >
                 </twint-payment-actions>

@@ -14,7 +14,7 @@
                             <span class="twint-refundable-amount__title" v-if="refundableAmount > 0">
                             {{ $tc('twint.refund.refundable.title') }}
                             </span>
-                            <sw-label v-if="refundableAmount > 0">{{ currencyFilter(refundableAmount, currency, 2) }}</sw-label>
+                            <sw-label v-if="refundableAmount > 0">{{ currencyFilter(refundableAmount, currency, decimalPrecision) }}</sw-label>
                             {% block twint_modal_refund %}
                                 <sw-modal variant="small"
                                           :title="$tc(`twint.refund.modal.title`)" v-if="showRefundModal" @modal-close="onCloseModal">
@@ -27,8 +27,8 @@
                                                 v-model:value="refundAmount"
                                                 :max="refundableAmount"
                                                 :min="0"
-                                                number-type="float"
-                                                :step="0.01"
+                                                numberType="float"
+                                                :step="dynamicStep"
                                                 :label="$tc('twint.order.refundAction.refundAmount.label')"
                                                 :helpText="$tc('twint.order.refundAction.refundAmount.helpText')">
                                             <template #suffix>
@@ -75,7 +75,7 @@
                                 {{ dateFilter(item.createdAt) }}
                             </template>
                             <template #column-amount="{ item }">
-                                {{ currencyFilter(item.amount, item.currency, 2)}}
+                                {{ currencyFilter(item.amount, item.currency, decimalPrecision)}}
                             </template>
                         </sw-data-grid>
                     {% endblock %}
