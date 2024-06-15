@@ -5,8 +5,7 @@
             "orderNotFound": "Die Bestellung konnte nicht gefunden werden"
         },
         "message": {
-            "successPayment": "Die Zahlung ist erfolgreich",
-            "cancelPayment": "Die Zahlung wurde storniert"
+            "successPayment": "Die Zahlung ist erfolgreich"
         },
         "appSelector": {
             "title": "Wählen Sie Ihre TWINT-App",
@@ -29,6 +28,24 @@
         },
         "express": {
             "checkingOut": "Express-Checkout läuft"
+        },
+        "administration": {
+            "extractPem": {
+                "success": {
+                    "message": "Certificate validation successful"
+                },
+                "error": {
+                    "invalidFile": "Invalid certificate file",
+                    "emptyFile": "Please upload a valid certificate file"
+                }
+            },
+            "refund": {
+                "error": {
+                    "negativeAmount": "The refund amount cannot be negative",
+                    "exceededAmount": "The refund amount cannot exceed the order amount %amount% %currency%",
+                    "fail": "Refund cannot be processed for this order, please try again"
+                }
+            }
         }
     }
 }

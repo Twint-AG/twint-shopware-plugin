@@ -4,29 +4,49 @@
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/trunk/src/Core/System/SystemConfig/Schema/config.xsd">
     <card>
         <title>Display options</title>
+        <title lang="de-DE">Display options</title>
+        <title lang="fr-FR">Display options</title>
+        <title lang="it-IT">Display options</title>
 
         <input-field type="multi-select">
             <name>screens</name>
             <label>Display screens</label>
             <label lang="de-DE">Display screens</label>
-            <helpText>Users can see TWINT checkout button</helpText>
-            <helpText lang="de-DE">Users can see TWINT checkout button</helpText>
+            <label lang="fr-FR">Display screens</label>
+            <label lang="it-IT">Display screens</label>
+
+            <helpText>Where users see the TWINT checkout button</helpText>
+            <helpText lang="de-DE">Where users see the TWINT checkout button</helpText>
+            <helpText lang="fr-FR">Where users see the TWINT checkout button</helpText>
+            <helpText lang="it-IT">Where users see the TWINT checkout button</helpText>
             <options>
                 <option>
                     <id>PDP</id>
-                    <name>Product details page</name>
+                    <name>Product detail page</name>
+                    <name lang="de-DE">Product detail page</name>
+                    <name lang="fr-FR">Product detail page</name>
+                    <name lang="it-IT">Product detail page</name>
                 </option>
                 <option>
                     <id>PLP</id>
                     <name>Product listing page</name>
+                    <name lang="de-DE">Product listing page</name>
+                    <name lang="fr-FR">Product listing page</name>
+                    <name lang="it-IT">Product listing page</name>
                 </option>
                 <option>
                     <id>CART</id>
                     <name>Cart page</name>
+                    <name lang="de-DE">Cart page</name>
+                    <name lang="fr-FR">Cart page</name>
+                    <name lang="it-IT">Cart page</name>
                 </option>
                 <option>
                     <id>CART_FLYOUT</id>
                     <name>Cart flyout</name>
+                    <name lang="de-DE">Cart flyout</name>
+                    <name lang="fr-FR">Cart flyout</name>
+                    <name lang="it-IT">Cart flyout</name>
                 </option>
             </options>
             <defaultValue>["PDP", "PLP", "CART"]</defaultValue>
@@ -35,14 +55,21 @@
 
     <card>
         <title>Checkout options</title>
+        <title lang="de-DE">Checkout options</title>
+        <title lang="fr-FR">Checkout options</title>
+        <title lang="it-IT">Checkout options</title>
 
         <input-field type="bool">
             <name>checkoutSingle</name>
             <label>Checkout the whole current cart (PLP and PDP page)</label>
             <label lang="de-DE">Den gesamten aktuellen Warenkorb auschecken</label>
+            <label lang="fr-FR">Checkout the whole current cart (PLP and PDP page)</label>
+            <label lang="it-IT">Checkout the whole current cart (PLP and PDP page)</label>
 
             <helpText>Allow customers to express checkout of a single item on the PLP and PDP pages. If not, the product has to be added to the cart before checkout the whole cart</helpText>
             <helpText lang="de-DE">Ermöglichen Sie Kunden, einen einzelnen Artikel auf den PLP- und PDP-Seiten schnell zu bezahlen. Andernfalls muss das Produkt in den Warenkorb gelegt werden, bevor der gesamte Warenkorb bezahlt werden kann.</helpText>
+            <helpText lang="fr-FR">Allow customers to express checkout of a single item on the PLP and PDP pages. If not, the product has to be added to the cart before checkout the whole cart</helpText>
+            <helpText lang="it-IT">Allow customers to express checkout of a single item on the PLP and PDP pages. If not, the product has to be added to the cart before checkout the whole cart</helpText>
 
             <defaultValue>false</defaultValue>
         </input-field>
