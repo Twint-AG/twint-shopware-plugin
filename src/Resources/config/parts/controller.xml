@@ -45,6 +45,9 @@
             <call method="setReversalHistoryWriter">
                 <argument type="service" id="twint_reversal_history_writer"/>
             </call>
+            <call method="setTranslator">
+                <argument type="service" id="translator"/>
+            </call>
             <tag name="controller.service_arguments"/>
         </service>
 

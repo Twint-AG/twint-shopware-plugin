@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twint\Core\Handler\ReversalHistory\ReversalHistoryWriterInterface;
 use Twint\Core\Service\PaymentService;
 use Twint\Core\Util\CertificateHandler;
@@ -36,6 +37,8 @@ class TwintController extends AbstractController
 
     private ReversalHistoryWriterInterface $reversalHistoryWriter;
 
+    private TranslatorInterface $translator;
+
     public function setEncryptor(CryptoHandler $encryptor): void
     {
         $this->encryptor = $encryptor;
@@ -56,6 +59,11 @@ class TwintController extends AbstractController
         $this->reversalHistoryWriter = $reversalHistoryWriter;
     }
 
+    public function setTranslator(TranslatorInterface $translator): void
+    {
+        $this->translator = $translator;
+    }
+
     #[Route(path: '/api/_actions/twint/extract-pem', name: 'api.action.twint.extract_pem', methods: ['POST'])]
     public function extractPem(Request $request, Context $context): Response
     {
@@ -71,7 +79,7 @@ class TwintController extends AbstractController
             if ($certificate instanceof Pkcs12Certificate) {
                 return $this->json([
                     'success' => true,
-                    'message' => 'Certificate validation successful ',
+                    'message' => $this->translator->trans('twintPayment.administration.extractPem.success.message'),
                     'data' => [
                         'certificate' => $this->encryptor->encrypt($certificate->content()),
                         'passphrase' => $this->encryptor->encrypt($certificate->passphrase()),
@@ -81,14 +89,14 @@ class TwintController extends AbstractController
 
             return $this->json([
                 'success' => false,
-                'message' => 'Invalid certificate file ',
+                'message' => $this->translator->trans('twintPayment.administration.extractPem.error.invalidFile'),
                 'errorCode' => $certificate,
             ], 400);
         }
 
         return $this->json([
             'success' => false,
-            'message' => 'Please upload a valid certificate file ',
+            'message' => $this->translator->trans('twintPayment.administration.extractPem.error.emptyFile'),
         ], 400);
     }
 
@@ -119,7 +127,7 @@ class TwintController extends AbstractController
         if ($amount <= 0) {
             return $this->json([
                 'success' => false,
-                'error' => 'The refund amount cannot be negative.',
+                $this->translator->trans('twintPayment.administration.refund.error.negativeAmount'),
             ]);
         }
         try {
@@ -130,7 +138,10 @@ class TwintController extends AbstractController
             if ($refundableAmountMoney->compare($amountMoney) < 0) {
                 return $this->json([
                     'success' => false,
-                    'error' => 'The refund amount cannot exceed ' . $refundableAmount . ' ' . $order->getCurrency()?->getIsoCode(),
+                    'error' => $this->translator->trans('twintPayment.administration.refund.error.exceededAmount', [
+                        '%amount%' => $refundableAmount,
+                        '%currency%' => $order->getCurrency()?->getIsoCode(),
+                    ]),
                 ]);
             }
             $twintReverseOrder = $this->paymentService->reverseOrder($order, $amount);
@@ -154,7 +165,7 @@ class TwintController extends AbstractController
             }
             return $this->json([
                 'success' => false,
-                'error' => 'Refund cannot be processed for this order',
+                'error' => $this->translator->trans('twintPayment.administration.refund.error.fail'),
             ]);
         } catch (Exception $e) {
             return $this->json([

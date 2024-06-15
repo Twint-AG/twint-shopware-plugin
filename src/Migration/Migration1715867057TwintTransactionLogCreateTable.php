@@ -26,6 +26,7 @@ class Migration1715867057TwintTransactionLogCreateTable extends MigrationStep
             `payment_state_id` BINARY(16) NOT NULL,
             `order_state_id` BINARY(16) NOT NULL,
             `transaction_id` VARCHAR(255) NOT NULL,
+            `api_method` VARCHAR(100) NOT NULL,
             `request` text NOT NULL,
             `response` text NOT NULL,
             `soap_request` json NOT NULL,
