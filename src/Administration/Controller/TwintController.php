@@ -161,6 +161,7 @@ class TwintController extends AbstractController
                 );
                 return $this->json([
                     'success' => true,
+                    'changePaymentStatus' => $this->paymentService->changePaymentStatus($order),
                 ]);
             }
             return $this->json([
