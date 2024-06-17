@@ -149,13 +149,16 @@ Component.register('twint-payment-actions', {
             this.isLoading = true;
             this.TwintPaymentService.refund(data).then((response) => {
                 const success = response.success ?? false;
+                const changePaymentStatus = response.changePaymentStatus ?? false;
                 if (success) {
                     this.showRefundModal = false;
                     this.getReversalHistoryList();
                     this.isLoading = false;
                     this.resetRefundForm();
                     this.$root.$emit('refund-finish');
-                    this.$root.$emit('order-reload');
+                    if(changePaymentStatus){
+                        this.$root.$emit('order-reload');
+                    }
                 } else {
                     this.isLoading = false;
                     this.createNotificationError({

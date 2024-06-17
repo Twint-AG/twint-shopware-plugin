@@ -193,7 +193,6 @@ class PaymentService
                             new Money($currency, $amount)
                         );
                         if ($twintOrder->status()->equals(OrderStatus::SUCCESS())) {
-                            $this->changePaymentStatus($order, $amount);
                             return $twintOrder;
                         }
                     }
@@ -417,7 +416,7 @@ class PaymentService
         return $totalReversal->getSum() ?? -1;
     }
 
-    public function changePaymentStatus(OrderEntity $order, float $amount = 0, bool $stockRecovery = false): void
+    public function changePaymentStatus(OrderEntity $order, float $amount = 0, bool $stockRecovery = false): bool
     {
         $orderTransactionId = $order->getTransactions()?->first()?->getId();
         $lastTransactionStateName = $order->getTransactions()?->first()
@@ -425,7 +424,7 @@ class PaymentService
             ?->getTechnicalName();
         $totalReversal = $this->getTotalReversal($order->getId());
         if (empty($orderTransactionId)) {
-            return;
+            return false;
         }
         $amountMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $order->getAmountTotal());
         $totalReversalMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $totalReversal + $amount);
@@ -441,8 +440,11 @@ class PaymentService
                     }
                 }
             }
+            return true;
         } elseif ($lastTransactionStateName !== OrderTransactionStates::STATE_PARTIALLY_REFUNDED) {
             $this->transactionStateHandler->refundPartially($orderTransactionId, $this->context);
+            return true;
         }
+        return false;
     }
 }

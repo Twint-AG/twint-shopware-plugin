@@ -26,7 +26,7 @@ class Migration1717754582CreateTwintReversalHistoryTable extends MigrationStep
             `order_id` BINARY(16) NOT NULL,
             `order_version_id` BINARY(16) NOT NULL,
             `reversal_id` VARCHAR(255) NOT NULL,
-            `amount` DECIMAL(10,3) unsigned NOT NULL,
+            `amount` DECIMAL(19,2) unsigned NOT NULL,
             `currency` VARCHAR(3) NOT NULL,
             `reason` text NULL,
             `created_at` DATETIME(3) NOT NULL,
