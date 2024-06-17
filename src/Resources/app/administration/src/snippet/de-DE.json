@@ -83,7 +83,7 @@
             }
           },
           "modal": {
-            "title": "Protokolldetails",
+            "title": "TWINT Transaktionen",
             "close": "Schließen",
             "soapMethod": "SOAP method"
           }

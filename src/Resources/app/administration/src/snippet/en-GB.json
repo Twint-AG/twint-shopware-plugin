@@ -84,7 +84,7 @@
             }
           },
           "modal": {
-            "title": "Log details",
+            "title": "TWINT Transaction log",
             "close": "Close",
             "soapMethod": "SOAP method"
           }

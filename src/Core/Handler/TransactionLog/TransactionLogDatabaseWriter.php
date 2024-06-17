@@ -11,6 +11,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 use Twint\Core\Setting\Settings;
+use Twint\Sdk\Exception\ApiFailure;
 
 class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
 {
@@ -59,7 +60,10 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
             return;
         }
         $request = json_encode($invocations[0]->arguments());
-        $exception = $invocations[0]->exception() ?? '';
+        $exception = $invocations[0]->exception() ?? ' ';
+        if ($exception instanceof ApiFailure) {
+            $exception = $exception->getMessage();
+        }
         $response = json_encode($invocations[0]->returnValue());
         $soapMessages = $invocations[0]->messages();
         $soapRequests = [];
@@ -97,7 +101,10 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
             return;
         }
         $request = json_encode($invocations[0]->arguments());
-        $exception = $invocations[0]->exception() ?? '';
+        $exception = $invocations[0]->exception() ?? ' ';
+        if ($exception instanceof ApiFailure) {
+            $exception = $exception->getMessage();
+        }
         $response = json_encode($invocations[0]->returnValue());
         $soapMessages = $invocations[0]->messages();
         $soapRequests = [];

@@ -8,22 +8,12 @@ use Shopware\Storefront\Page\Account\Order\AccountEditOrderPageLoadedEvent;
 use Shopware\Storefront\Page\Account\PaymentMethod\AccountPaymentMethodPageLoadedEvent;
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Twint\Core\Handler\TwintExpressPaymentHandler;
 use Twint\Core\Handler\TwintRegularPaymentHandler;
 use Twint\Core\Setting\Settings;
-use Twint\Sdk\Value\Money;
 
 class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
 {
-    private TranslatorInterface $translator;
-
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
-    }
-
     /**
      * @return array<mixed>>
      */
@@ -58,17 +48,6 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
                         $event->getPage()
                             ->getPaymentMethods()
                             ->remove($method->getId());
-
-                        $session = $event->getRequest()
-                            ->getSession();
-
-                        if ($session instanceof FlashBagAwareSessionInterface) {
-                            $session->getFlashBag()
-                                ->add('danger', $this->translator->trans('twintPayment.error.invalidPaymentError', [
-                                    '%name%' => $method->getName(),
-                                    '%currency%' => Money::CHF,
-                                ]));
-                        }
                     }
             }
         }
