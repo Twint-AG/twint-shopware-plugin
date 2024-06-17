@@ -18,8 +18,8 @@ class RegularPaymentMethod extends AbstractMethod
                 'name' => 'TWIN - DE Regular Checkout',
             ],
             'en-GB' => [
-                'description' => 'TWINT - Regular checkout payment - supported by TWINT',
-                'name' => 'TWINT - Regular Checkout',
+                'description' => 'Regular Checkout Payment Plugin supported by TWINT',
+                'name' => 'TWINT - Regular Checkout Payment',
             ],
         ];
     }
