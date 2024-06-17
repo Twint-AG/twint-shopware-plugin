@@ -21,6 +21,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
+use Twint\Core\DataAbstractionLayer\Entity\TransactionLog\TwintTransactionLogCollection;
 use Twint\Core\Factory\ClientBuilder;
 use Twint\Core\Handler\TransactionLog\TransactionLogWriterInterface;
 use Twint\Core\Setting\Settings;
@@ -43,6 +45,7 @@ class PaymentService
         private readonly EntityRepository $stateMachineRepository,
         private readonly EntityRepository $stateMachineStateRepository,
         private readonly EntityRepository $reversalHistoryRepository,
+        private readonly EntityRepository $transactionLogRepository,
         private readonly OrderTransactionStateHandler $transactionStateHandler,
         private readonly ClientBuilder $clientBuilder,
         private readonly TransactionLogWriterInterface $transactionLogWriter,
@@ -193,6 +196,7 @@ class PaymentService
                             new Money($currency, $amount)
                         );
                         if ($twintOrder->status()->equals(OrderStatus::SUCCESS())) {
+                            $this->changePaymentStatus($order, $amount);
                             return $twintOrder;
                         }
                     }
@@ -416,7 +420,7 @@ class PaymentService
         return $totalReversal->getSum() ?? -1;
     }
 
-    public function changePaymentStatus(OrderEntity $order, float $amount = 0, bool $stockRecovery = false): bool
+    public function changePaymentStatus(OrderEntity $order, float $amount = 0, bool $stockRecovery = false): void
     {
         $orderTransactionId = $order->getTransactions()?->first()?->getId();
         $lastTransactionStateName = $order->getTransactions()?->first()
@@ -424,7 +428,7 @@ class PaymentService
             ?->getTechnicalName();
         $totalReversal = $this->getTotalReversal($order->getId());
         if (empty($orderTransactionId)) {
-            return false;
+            return;
         }
         $amountMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $order->getAmountTotal());
         $totalReversalMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $totalReversal + $amount);
@@ -440,11 +444,25 @@ class PaymentService
                     }
                 }
             }
-            return true;
         } elseif ($lastTransactionStateName !== OrderTransactionStates::STATE_PARTIALLY_REFUNDED) {
             $this->transactionStateHandler->refundPartially($orderTransactionId, $this->context);
-            return true;
         }
-        return false;
+    }
+
+    public function justChangePaymentStatus(string $orderId): bool
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('orderId', $orderId));
+        $criteria->setLimit(2);
+        $criteria->addSorting(new FieldSorting('createdAt', 'DESC'));
+        $result = $this->transactionLogRepository->search($criteria, $this->context);
+        if ($result->getTotal() === 2) {
+            /** @var TwintTransactionLogCollection $transactionLogs */
+            $transactionLogs = $result->getEntities();
+            if ($transactionLogs->getAt(0)?->getPaymentStateId() === $transactionLogs->getAt(1)?->getPaymentStateId()) {
+                return false;
+            }
+        }
+        return true;
     }
 }
