@@ -9,7 +9,7 @@ Component.register('twint-payment-actions', {
     template,
 
     inject: [
-        'repositoryFactory', 'acl', 'TwintPaymentService'
+        'repositoryFactory', 'acl', 'TwintPaymentService', 'orderStateMachineService'
     ],
     mixins: [
         Mixin.getByName('notification'),
@@ -52,7 +52,9 @@ Component.register('twint-payment-actions', {
             sortDirection: 'DESC',
             naturalSorting: true,
             stateType: 'order_transaction',
-            transaction: null
+            transaction: null,
+            currentActionName: null,
+            showStateModal: false,
         };
     },
     created() {
@@ -135,7 +137,7 @@ Component.register('twint-payment-actions', {
                 this.reversalHistory = reversalHistory;
                 const refundedAmount = parseFloat(reversalHistory?.aggregations?.refundedAmount?.sum);
                 this.isLoading = false;
-                this.refundableAmount = this.totalAmount - refundedAmount;
+                this.refundableAmount = this.roundingFloat(this.totalAmount - refundedAmount, this.decimalPrecision);
             }).catch(() => {
                 this.isLoading = false;
             });
@@ -149,15 +151,15 @@ Component.register('twint-payment-actions', {
             this.isLoading = true;
             this.TwintPaymentService.refund(data).then((response) => {
                 const success = response.success ?? false;
-                const changePaymentStatus = response.changePaymentStatus ?? false;
+                this.currentActionName = response.action ?? '';
                 if (success) {
                     this.showRefundModal = false;
                     this.getReversalHistoryList();
                     this.isLoading = false;
                     this.resetRefundForm();
                     this.$root.$emit('refund-finish');
-                    if(changePaymentStatus){
-                        this.$root.$emit('order-reload');
+                    if(this.currentActionName){
+                        this.showStateModal = true;
                     }
                 } else {
                     this.isLoading = false;
@@ -175,11 +177,43 @@ Component.register('twint-payment-actions', {
             this.refundAmount = 0;
             this.reason = '';
         },
-        getLastChange() {
-            this.lastStateChange = null;
-            this.stateMachineHistoryRepository.search(this.stateMachineHistoryCriteria).then((result) => {
-                this.lastStateChange = result.first();
-            });
+        roundingFloat(num, digits = 2) {
+            return Number(Number(num).toFixed(digits));
         },
+        onLeaveModalClose() {
+            this.$root.$emit('refund-finish');
+            this.currentActionName = null;
+            this.showStateModal = false;
+        },
+
+        onLeaveModalConfirm(docIds, sendMail = true) {
+            this.showStateModal = false;
+            if(this.currentActionName){
+                let transition = this.orderStateMachineService.transitionOrderTransactionState(
+                    this.transaction.id,
+                    this.currentActionName,
+                    { documentIds: docIds, sendMail },
+                );
+                if (transition) {
+                    transition.then(() => {
+                        this.TwintPaymentService.orderStatus(this.orderId).then((response) => {
+                            const success = response.success ?? false;
+                            if(success) {
+                                this.$root.$emit('save-edits');
+                                this.$root.$emit('refund-finish');
+                            }
+                        });
+                    }).catch((error) => {
+                        this.createNotificationError({
+                            title: this.$tc('twint.refund.error.title'),
+                            message: error
+                        });
+                    }).finally(() => {
+                        this.showStateModal = false;
+                        this.currentActionName = null;
+                    });
+                }
+            }
+        }
     },
 });

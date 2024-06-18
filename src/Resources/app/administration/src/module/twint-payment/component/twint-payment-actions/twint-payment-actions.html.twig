@@ -58,6 +58,16 @@
                                     <sw-loader v-if="isLoading"></sw-loader>
                                 </sw-modal>
                             {% endblock %}
+                            {% block sw_order_detail_twint_state_change_card_modal %}
+                                <sw-order-state-change-modal
+                                        v-if="showStateModal"
+                                        :order="order"
+                                        :is-loading="isLoading"
+                                        :technical-name="''"
+                                        @page-leave="onLeaveModalClose"
+                                        @page-leave-confirm="onLeaveModalConfirm"
+                                />
+                            {% endblock %}
                         {% endblock %}
                     </template>
                 {% endblock %}

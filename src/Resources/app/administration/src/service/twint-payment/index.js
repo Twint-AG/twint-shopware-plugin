@@ -20,5 +20,18 @@ export default class TwintPaymentService extends ApiService {
                 return ApiService.handleResponse(response);
             });
     }
+
+    orderStatus(orderId) {
+        const headers = this.getBasicHeaders();
+        return this.httpClient
+            .get(
+                `_actions/twint/order/${orderId}/status`,
+                {
+                    headers,
+                },
+            ).then((response) => {
+                return ApiService.handleResponse(response);
+            });
+    }
 }
 
