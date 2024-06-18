@@ -48,6 +48,9 @@
             <call method="setTranslator">
                 <argument type="service" id="translator"/>
             </call>
+            <call method="setCashRounding">
+                <argument type="service" id="Shopware\Core\Checkout\Cart\Price\CashRounding"/>
+            </call>
             <tag name="controller.service_arguments"/>
         </service>
 

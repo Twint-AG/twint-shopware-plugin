@@ -18,7 +18,7 @@ Shopware.Component.override('sw-order-detail', {
             this.$super('createdComponent');
             this.isLoading = true;
             this.getPairingList();
-            this.$root.$on('order-reload', this.onSaveEdits);
+            this.$root.$on('save-edits', this.onSaveEdits);
         },
         getPairingList() {
             this.naturalSorting = this.sortBy === 'createdAt';
@@ -40,6 +40,9 @@ Shopware.Component.override('sw-order-detail', {
             return result;
         }
     },
+    destroyed() {
+        this.$root.$off('save-edits');
+    },
     computed: {
         twintPairingRepository() {
             return this.repositoryFactory.create('twint_pairing');
@@ -51,6 +54,6 @@ Shopware.Component.override('sw-order-detail', {
                 hasTwintApiResponse = true;
             }
             return this.pairings?.length > 0 || hasTwintApiResponse;
-        },
+        }
     }
 });
