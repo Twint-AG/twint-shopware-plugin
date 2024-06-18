@@ -1,4 +1,5 @@
 import './page/sw-order-detail'
+import './view/sw-order-detail-details'
 import './view/sw-order-detail-twint'
 
 
