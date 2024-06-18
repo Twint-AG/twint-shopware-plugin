@@ -58,16 +58,6 @@
                                     <sw-loader v-if="isLoading"></sw-loader>
                                 </sw-modal>
                             {% endblock %}
-                            {% block sw_order_detail_twint_state_change_card_modal %}
-                                <sw-order-state-change-modal
-                                        v-if="showStateModal"
-                                        :order="order"
-                                        :is-loading="isLoading"
-                                        :technical-name="''"
-                                        @page-leave="onLeaveModalClose"
-                                        @page-leave-confirm="onLeaveModalConfirm"
-                                />
-                            {% endblock %}
                         {% endblock %}
                     </template>
                 {% endblock %}
@@ -76,6 +66,16 @@
         {% block sw_order_detail_twint_actions_row_reversal_history %}
             <sw-card position-identifier="twint-details-actions-reversal-list" :title="$tc('twint.order.reversalHistory.cardTitle')">
                 <template #grid>
+                    {% block sw_order_detail_twint_state_change_card_modal %}
+                        <sw-order-state-change-modal
+                                v-if="showStateModal"
+                                :order="order"
+                                :is-loading="isLoading"
+                                :technical-name="''"
+                                @page-leave="onLeaveModalClose"
+                                @page-leave-confirm="onLeaveModalConfirm"
+                        />
+                    {% endblock %}
                     {% block sw_order_detail_twint_reversal_history_grid %}
                         <sw-data-grid v-if="reversalHistory.length > 0" :data-source="reversalHistory"
                                       :columns="paymentColumns"
