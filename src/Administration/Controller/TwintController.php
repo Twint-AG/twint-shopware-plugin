@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Twint\Administration\Controller;
 
 use Exception;
+use Shopware\Core\Checkout\Cart\Price\CashRounding;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Log\Package;
@@ -39,6 +40,8 @@ class TwintController extends AbstractController
 
     private TranslatorInterface $translator;
 
+    private CashRounding $rounding;
+
     public function setEncryptor(CryptoHandler $encryptor): void
     {
         $this->encryptor = $encryptor;
@@ -62,6 +65,11 @@ class TwintController extends AbstractController
     public function setTranslator(TranslatorInterface $translator): void
     {
         $this->translator = $translator;
+    }
+
+    public function setCashRounding(CashRounding $rounding): void
+    {
+        $this->rounding = $rounding;
     }
 
     #[Route(path: '/api/_actions/twint/extract-pem', name: 'api.action.twint.extract_pem', methods: ['POST'])]
@@ -133,7 +141,10 @@ class TwintController extends AbstractController
         try {
             $order = $this->paymentService->getOrder($orderId, new Context(new SystemSource()));
             $amountMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $amount);
-            $refundableAmount = $order->getAmountTotal() - $this->paymentService->getTotalReversal($order->getId());
+            $refundableAmount = $this->rounding->mathRound(
+                $order->getAmountTotal() - $this->paymentService->getTotalReversal($order->getId()),
+                $order->getItemRounding() ?? $context->getRounding()
+            );
             $refundableAmountMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $refundableAmount);
             if ($refundableAmountMoney->compare($amountMoney) < 0) {
                 return $this->json([
@@ -161,12 +172,37 @@ class TwintController extends AbstractController
                 );
                 return $this->json([
                     'success' => true,
-                    'changePaymentStatus' => $this->paymentService->justChangePaymentStatus($order->getId()),
+                    'action' => $this->paymentService->getNextAction($order),
                 ]);
             }
             return $this->json([
                 'success' => false,
                 'error' => $this->translator->trans('twintPayment.administration.refund.error.fail'),
+            ]);
+        } catch (Exception $e) {
+            return $this->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    #[Route(path: '/api/_actions/twint/order/{orderId}/status', name: 'api.action.twint.order.status', methods: [
+        'GET',
+    ])]
+    public function status(string $orderId, Request $request, Context $context): Response
+    {
+        try {
+            $order = $this->paymentService->getOrder($orderId, new Context(new SystemSource()));
+            $twintStatusOrder = $this->paymentService->monitorOrder($order);
+            if ($twintStatusOrder instanceof Order) {
+                return $this->json([
+                    'success' => true,
+                    'order' => json_encode($twintStatusOrder),
+                ]);
+            }
+            return $this->json([
+                'success' => false,
             ]);
         } catch (Exception $e) {
             return $this->json([
