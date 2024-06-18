@@ -181,7 +181,6 @@ Component.register('twint-payment-actions', {
             return Number(Number(num).toFixed(digits));
         },
         onLeaveModalClose() {
-            this.$root.$emit('refund-finish');
             this.currentActionName = null;
             this.showStateModal = false;
         },
