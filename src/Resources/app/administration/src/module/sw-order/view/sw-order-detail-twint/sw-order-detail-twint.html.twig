@@ -112,7 +112,7 @@
 
                                                     <sw-card v-for="(request, index) in item.soapRequest">
                                                         <sw-container>
-                                                            <h4>{{ $tc('twint.order.transactionLog.list.modal.soapMethod') }}</h4>
+                                                            <h4>{{ item.apiMethod }}</h4>
                                                             <b class="sw-order-detail-twint-modal-soap-request">
                                                                 {{ $tc('twint.order.transactionLog.list.columns.soapRequest') }}
                                                             </b>
