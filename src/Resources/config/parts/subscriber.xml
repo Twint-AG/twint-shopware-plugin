@@ -8,13 +8,6 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="Twint\Subscriber\CancelTwintOrderSubscriber">
-            <argument type="service" id="Twint\Core\Service\PaymentService"/>
-            <argument type="service" id="logger"/>
-            <argument>%kernel.shopware_version%</argument>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
         <service id="Twint\Subscriber\SystemConfigSubscriber">
             <argument type="service" id="Twint\Core\Service\SettingServiceInterface"/>
             <tag name="kernel.event_subscriber"/>
