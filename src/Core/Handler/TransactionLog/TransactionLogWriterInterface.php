@@ -24,7 +24,6 @@ interface TransactionLogWriterInterface
         string $paymentStateId,
         string $orderStateId,
         string $transactionId,
-        string $apiMethod,
         array $invocations
     ): void;
 
@@ -33,7 +32,6 @@ interface TransactionLogWriterInterface
         string $paymentStateId,
         string $orderStateId,
         string $transactionId,
-        string $apiMethod,
         array $invocations
     ): void;
 }
