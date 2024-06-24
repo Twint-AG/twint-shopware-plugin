@@ -7,6 +7,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Symfony\Component\Console\Tester\CommandTester;
 use Twint\Command\OrderMonitorCommand;
+use Twint\Core\Service\OrderService;
 use Twint\Core\Service\PaymentService;
 use Twint\Tests\Helper\ServicesTrait;
 
@@ -28,7 +29,8 @@ class OrderMonitorCommandTest extends TestCase
     {
         parent::setUp();
         $this->command = new OrderMonitorCommand(
-            $this->getContainer()->get(PaymentService::class)
+            $this->getContainer()->get(PaymentService::class),
+            $this->getContainer()->get(OrderService::class),
         );
     }
     public function testServiceIsDecoratedCorrectly(): void

@@ -33,6 +33,8 @@ class Installer
 
     public function activate(Context $context): void
     {
+        //in case for missing payment method
+        $this->paymentMethodInstaller->installAll($context);
         $this->paymentMethodInstaller->setAllPaymentStatus(true, $context);
     }
 

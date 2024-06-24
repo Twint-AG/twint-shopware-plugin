@@ -18,6 +18,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
+use Twint\Core\Service\OrderService;
 use Twint\Core\Service\PaymentService;
 use Twint\Core\Util\CryptoHandler;
 use Twint\Sdk\Value\Order;
@@ -29,19 +30,22 @@ abstract class AbstractPaymentHandler implements AsynchronousPaymentHandlerInter
 
     private PaymentService $paymentService;
 
+    private OrderService $orderService;
+
     private CryptoHandler $cryptoService;
 
     private RouterInterface $router;
 
     private LoggerInterface $logger;
 
-    public function __construct(OrderTransactionStateHandler $transactionStateHandler, PaymentService $paymentService, CryptoHandler $cryptoService, RouterInterface $router, LoggerInterface $logger)
+    public function __construct(OrderTransactionStateHandler $transactionStateHandler, PaymentService $paymentService, CryptoHandler $cryptoService, RouterInterface $router, LoggerInterface $logger, OrderService $orderService)
     {
         $this->transactionStateHandler = $transactionStateHandler;
         $this->paymentService = $paymentService;
         $this->cryptoService = $cryptoService;
         $this->router = $router;
         $this->logger = $logger;
+        $this->orderService = $orderService;
     }
 
     public function pay(
@@ -113,7 +117,7 @@ abstract class AbstractPaymentHandler implements AsynchronousPaymentHandlerInter
 
     public function refund(string $refundId, Context $context): void
     {
-        $refund = $this->paymentService->getOrder($refundId, $context);
+        $refund = $this->orderService->getOrder($refundId, $context);
         if ($refund->getAmountTotal() > 100.00) {
             // this will stop the refund process and set the refunds state to `failed`
             throw PaymentException::refundInvalidTransition($refund->getId(), 'Refunds over 100 € are not allowed');

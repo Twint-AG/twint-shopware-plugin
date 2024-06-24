@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twint\Core\Handler\ReversalHistory\ReversalHistoryWriterInterface;
+use Twint\Core\Service\OrderService;
 use Twint\Core\Service\PaymentService;
 use Twint\Core\Util\CertificateHandler;
 use Twint\Core\Util\CredentialValidatorInterface;
@@ -41,6 +42,8 @@ class TwintController extends AbstractController
     private TranslatorInterface $translator;
 
     private CashRounding $rounding;
+
+    private OrderService $orderService;
 
     public function setEncryptor(CryptoHandler $encryptor): void
     {
@@ -70,6 +73,11 @@ class TwintController extends AbstractController
     public function setCashRounding(CashRounding $rounding): void
     {
         $this->rounding = $rounding;
+    }
+
+    public function setOrderService(OrderService $orderService): void
+    {
+        $this->orderService = $orderService;
     }
 
     #[Route(path: '/api/_actions/twint/extract-pem', name: 'api.action.twint.extract_pem', methods: ['POST'])]
@@ -139,45 +147,56 @@ class TwintController extends AbstractController
             ]);
         }
         try {
-            $order = $this->paymentService->getOrder($orderId, new Context(new SystemSource()));
-            $amountMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $amount);
-            $refundableAmount = $this->rounding->mathRound(
-                $order->getAmountTotal() - $this->paymentService->getTotalReversal($order->getId()),
-                $order->getItemRounding() ?? $context->getRounding()
-            );
-            $refundableAmountMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $refundableAmount);
-            if ($refundableAmountMoney->compare($amountMoney) < 0) {
+            $order = $this->orderService->getOrder($orderId, new Context(new SystemSource()));
+            if (($twintOrder = $this->orderService->getTwintOrder($order)) instanceof Order) {
+                $amountMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $amount);
+                $refundableAmount = $this->rounding->mathRound(
+                    $twintOrder->amount()
+                        ->amount() - $this->paymentService->getTotalReversal($order->getId()),
+                    $order->getItemRounding() ?? $context->getRounding()
+                );
+                $refundableAmountMoney = new Money(
+                    $order->getCurrency()?->getIsoCode() ?? Money::CHF,
+                    $refundableAmount
+                );
+                if ($refundableAmountMoney->compare($amountMoney) < 0) {
+                    return $this->json([
+                        'success' => false,
+                        'error' => $this->translator->trans('twintPayment.administration.refund.error.exceededAmount', [
+                            '%amount%' => $refundableAmount,
+                            '%currency%' => $order->getCurrency()?->getIsoCode(),
+                        ]),
+                    ]);
+                }
+                $twintReverseOrder = $this->paymentService->reverseOrder($order, $amount);
+                if ($twintReverseOrder instanceof Order) {
+                    if (empty($reason)) {
+                        $reason = ' ';
+                    }
+                    $this->reversalHistoryWriter->write(
+                        $orderId,
+                        $twintReverseOrder->merchantTransactionReference()
+                            ->__toString(),
+                        $twintReverseOrder->amount()
+                            ->amount(),
+                        $twintReverseOrder->amount()
+                            ->currency(),
+                        $reason
+                    );
+                    return $this->json([
+                        'success' => true,
+                        'action' => $this->paymentService->getNextAction($order),
+                    ]);
+                }
                 return $this->json([
                     'success' => false,
-                    'error' => $this->translator->trans('twintPayment.administration.refund.error.exceededAmount', [
-                        '%amount%' => $refundableAmount,
-                        '%currency%' => $order->getCurrency()?->getIsoCode(),
-                    ]),
+                    'error' => $this->translator->trans('twintPayment.administration.refund.error.fail'),
                 ]);
             }
-            $twintReverseOrder = $this->paymentService->reverseOrder($order, $amount);
-            if ($twintReverseOrder instanceof Order) {
-                if (empty($reason)) {
-                    $reason = ' ';
-                }
-                $this->reversalHistoryWriter->write(
-                    $orderId,
-                    $twintReverseOrder->merchantTransactionReference()
-                        ->__toString(),
-                    $twintReverseOrder->amount()
-                        ->amount(),
-                    $twintReverseOrder->amount()
-                        ->currency(),
-                    $reason
-                );
-                return $this->json([
-                    'success' => true,
-                    'action' => $this->paymentService->getNextAction($order),
-                ]);
-            }
+
             return $this->json([
                 'success' => false,
-                'error' => $this->translator->trans('twintPayment.administration.refund.error.fail'),
+                'error' => $this->translator->trans('twintPayment.administration.refund.error.missingResponse'),
             ]);
         } catch (Exception $e) {
             return $this->json([
@@ -193,7 +212,7 @@ class TwintController extends AbstractController
     public function status(string $orderId, Request $request, Context $context): Response
     {
         try {
-            $order = $this->paymentService->getOrder($orderId, new Context(new SystemSource()));
+            $order = $this->orderService->getOrder($orderId, new Context(new SystemSource()));
             $twintStatusOrder = $this->paymentService->monitorOrder($order);
             if ($twintStatusOrder instanceof Order) {
                 return $this->json([

@@ -44,9 +44,6 @@
         </service>
 
         <service id="Twint\Core\Service\PaymentService">
-            <argument type="service" id="order.repository"/>
-            <argument type="service" id="state_machine.repository"/>
-            <argument type="service" id="state_machine_state.repository"/>
             <argument type="service" id="twint_reversal_history.repository"/>
             <argument type="service"
                       id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
@@ -54,6 +51,13 @@
             <argument type="service" id="twint_transaction_log_writer"/>
             <argument type="service" id="Twint\Core\Service\StockManagerInterface"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\Price\CashRounding"/>
+            <argument type="service" id="Twint\Core\Service\OrderService"/>
+        </service>
+
+        <service id="Twint\Core\Service\OrderService">
+            <argument type="service" id="order.repository"/>
+            <argument type="service" id="state_machine.repository"/>
+            <argument type="service" id="state_machine_state.repository"/>
         </service>
 
         <service id="Twint\Core\Util\CryptoHandler" public="true">

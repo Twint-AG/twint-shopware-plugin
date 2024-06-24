@@ -6,6 +6,7 @@
 
         <service id="Twint\Command\OrderMonitorCommand">
             <argument type="service" id="Twint\Core\Service\PaymentService"/>
+            <argument type="service" id="Twint\Core\Service\OrderService"/>
             <tag name="console.command"/>
         </service>
 

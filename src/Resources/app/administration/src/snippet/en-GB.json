@@ -91,7 +91,7 @@
         }
       },
       "reversalHistory": {
-        "cardTitle": "Reversal history",
+        "cardTitle": "Refund history",
         "columns": {
           "amount": "Amount",
           "currency": "Currency",
@@ -110,7 +110,7 @@
           "helpText": "The refund amount cannot exceed the total order amount"
         },
         "confirmButton": {
-          "text": "Execute"
+          "text": "Refund"
         }
       }
     },
