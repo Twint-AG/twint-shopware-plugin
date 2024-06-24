@@ -9,21 +9,26 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
+use Twint\Core\Service\OrderService;
 use Twint\Core\Service\PaymentService;
 
 class OrderMonitorTaskHandler extends ScheduledTaskHandler
 {
     private PaymentService $paymentService;
 
+    private OrderService $orderService;
+
     private LoggerInterface $logger;
 
     public function __construct(
         EntityRepository $scheduledTaskRepository,
         LoggerInterface $logger,
-        PaymentService $paymentService
+        PaymentService $paymentService,
+        OrderService $orderService
     ) {
         parent::__construct($scheduledTaskRepository);
         $this->paymentService = $paymentService;
+        $this->orderService = $orderService;
         $this->logger = $logger;
     }
 
@@ -37,7 +42,7 @@ class OrderMonitorTaskHandler extends ScheduledTaskHandler
      */
     public function run(): void
     {
-        $pendingOrders = $this->paymentService->getPendingOrders();
+        $pendingOrders = $this->orderService->getPendingOrders();
         if (count($pendingOrders) > 0) {
             /** @var OrderEntity $order */
             foreach ($pendingOrders as $order) {

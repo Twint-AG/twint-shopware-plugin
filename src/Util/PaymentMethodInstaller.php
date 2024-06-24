@@ -9,6 +9,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\Validation\RestrictDeleteViolationException;
 use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -54,15 +55,17 @@ class PaymentMethodInstaller
         $translationData = [];
         $paymentMethods = [];
         foreach ($this->methodRegistry->getPaymentMethods() as $method) {
-            $data = $this->getPaymentMethodData($method, $pluginId, $context);
-            $upsertData[] = $data;
+            if (!$this->isPaymentMethodExist($method->getHandler(), $context)) {
+                $data = $this->getPaymentMethodData($method, $pluginId, $context);
+                $upsertData[] = $data;
 
-            $translationData[] = [
-                'id' => $data['id'],
-                'translations' => $method->getTranslations(),
-            ];
+                $translationData[] = [
+                    'id' => $data['id'],
+                    'translations' => $method->getTranslations(),
+                ];
 
-            $paymentMethods[$data['id']] = $method;
+                $paymentMethods[$data['id']] = $method;
+            }
         }
 
         $this->paymentMethodRepository->upsert($upsertData, $context);
@@ -195,5 +198,14 @@ class PaymentMethodInstaller
         $criteria->addFilter(new EqualsAnyFilter('handlerIdentifier', $handlers));
         return $this->paymentMethodRepository->searchIds($criteria, $context)
             ->getIds();
+    }
+
+    private function isPaymentMethodExist(string $handlerIdentifier, Context $context): bool
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('handlerIdentifier', $handlerIdentifier));
+        $firstId = $this->paymentMethodRepository->searchIds($criteria, $context)
+            ->firstId();
+        return $firstId !== null;
     }
 }

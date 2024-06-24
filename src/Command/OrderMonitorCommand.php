@@ -10,6 +10,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Twint\Core\Service\OrderService;
 use Twint\Core\Service\PaymentService;
 use Twint\Sdk\Value\Order;
 use Twint\TwintPayment;
@@ -18,9 +19,12 @@ class OrderMonitorCommand extends Command
 {
     private PaymentService $paymentService;
 
-    public function __construct(PaymentService $paymentService)
+    private OrderService $orderService;
+
+    public function __construct(PaymentService $paymentService, OrderService $orderService)
     {
         $this->paymentService = $paymentService;
+        $this->orderService = $orderService;
         parent::__construct();
     }
 
@@ -34,7 +38,7 @@ class OrderMonitorCommand extends Command
     {
         $style = new SymfonyStyle($input, $output);
         $style->info('Start scanning all pending TWINT orders for updates');
-        $pendingOrders = $this->paymentService->getPendingOrders();
+        $pendingOrders = $this->orderService->getPendingOrders();
         if (count($pendingOrders) > 0) {
             $style->info(sprintf('These total: %d TWINT orders will be processed', count($pendingOrders)));
             foreach ($pendingOrders as $order) {

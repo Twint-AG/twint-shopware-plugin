@@ -7,6 +7,7 @@
             <argument type="service" id="order.repository"/>
             <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
             <argument type="service" id="Twint\Core\Service\PaymentService"/>
+            <argument type="service" id="Twint\Core\Service\OrderService"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
@@ -50,6 +51,9 @@
             </call>
             <call method="setCashRounding">
                 <argument type="service" id="Shopware\Core\Checkout\Cart\Price\CashRounding"/>
+            </call>
+            <call method="setOrderService">
+                <argument type="service" id="Twint\Core\Service\OrderService"/>
             </call>
             <tag name="controller.service_arguments"/>
         </service>

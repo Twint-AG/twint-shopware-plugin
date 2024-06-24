@@ -15,11 +15,11 @@ class ExpressPaymentMethod extends AbstractMethod
         return [
             'de-DE' => [
                 'description' => 'TWINT DE - Express checkout payment - supported by TWINT',
-                'name' => 'TWIN - DE Express Checkout',
+                'name' => 'TWINT',
             ],
             'en-GB' => [
                 'description' => 'Express Checkout Payment Plugin supported by TWINT',
-                'name' => 'TWINT - Express Checkout Payment',
+                'name' => 'TWINT',
             ],
         ];
     }
