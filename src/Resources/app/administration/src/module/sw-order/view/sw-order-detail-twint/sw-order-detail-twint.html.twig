@@ -41,6 +41,12 @@
                                     </template>
                                 {% endblock %}
 
+                                {% block twint_transaction_log_list_content_soap_method %}
+                                    <template #column-apiMethod="{ item }">
+                                        <sw-label v-for="method in item.apiMethod">{{ method }}</sw-label>
+                                    </template>
+                                {% endblock %}
+
                                 {% block twint_transaction_log_list_content_transaction %}
                                     <template #column-transactionId="{ item }">
                                         {{ item.transactionId }}
@@ -112,7 +118,7 @@
 
                                                     <sw-card v-for="(request, index) in item.soapRequest">
                                                         <sw-container>
-                                                            <h4>{{ item.apiMethod }}</h4>
+                                                            <h4>{{ item.apiMethod[index] }}</h4>
                                                             <b class="sw-order-detail-twint-modal-soap-request">
                                                                 {{ $tc('twint.order.transactionLog.list.columns.soapRequest') }}
                                                             </b>

@@ -5,16 +5,18 @@
                 {% block sw_order_detail_twint_actions_rows %}
                     <template #default>
                         {% block sw_order_detail_twint_actions_row_primary %}
-                            <span class="twint-refundable-amount__title" v-if="refundableAmount > 0">
-                            {{ $tc('twint.refund.refundable.title') }}
-                            </span>
-                            <sw-label v-if="refundableAmount > 0">{{ currencyFilter(refundableAmount, currency, decimalPrecision) }}</sw-label>
-                            <sw-button variant="primary"
-                                       size="small"
-                                       :disabled="refundableAmount==0 || !acl.can('order.editor')"
-                                       @click="showModal">
-                                {{ $tc('twint.refund.buttons.refund.label') }}
-                            </sw-button>
+                            <div class="twint-payment-actions__button-container">
+                                <span class="twint-refundable-amount__title" v-if="refundableAmount > 0">
+                                {{ $tc('twint.refund.refundable.title') }}
+                                </span>
+                                <sw-label v-if="refundableAmount > 0">{{ currencyFilter(refundableAmount, currency, decimalPrecision) }}</sw-label>
+                                <sw-button variant="primary"
+                                           size="small"
+                                           :disabled="refundableAmount==0 || !acl.can('order.editor')"
+                                           @click="showModal">
+                                    {{ $tc('twint.refund.buttons.refund.label') }}
+                                </sw-button>
+                            </div>
                             {% block twint_modal_refund %}
                                 <sw-modal variant="small"
                                           :title="$tc(`twint.refund.modal.title`)" v-if="showRefundModal" @modal-close="onCloseModal">
