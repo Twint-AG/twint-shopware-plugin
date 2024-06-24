@@ -20,6 +20,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Aggregation\Metric\SumAg
 use Shopware\Core\Framework\DataAbstractionLayer\Search\AggregationResult\Metric\SumResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\Uuid\Uuid as ShopwareUuid;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Twint\Core\Factory\ClientBuilder;
 use Twint\Core\Handler\TransactionLog\TransactionLogWriterInterface;
@@ -62,14 +63,11 @@ class PaymentService
             ->getIsoCode();
         $client = $this->clientBuilder->build($order->getSalesChannelId());
         try {
-            /**var non-empty-string $orderNumber**/
-            $orderNumber = empty($order->getOrderNumber()) ? $order->getId() : $order->getOrderNumber();
-            if ($orderNumber === '') {
-                throw PaymentException::asyncProcessInterrupted($orderNumber, 'Order number missing' . PHP_EOL);
-            }
+            /** @var non-empty-string $orderId * */
+            $orderId = empty($order->getId()) ? ShopwareUuid::randomHex() : $order->getId();
             /** @var Order * */
             return $client->startOrder(
-                new UnfiledMerchantTransactionReference($orderNumber),
+                new UnfiledMerchantTransactionReference($orderId),
                 new Money($currency, $order->getAmountTotal())
             );
         } catch (Exception $e) {
@@ -87,7 +85,6 @@ class PaymentService
                     ->getStateId(),
                 $transaction->getOrderTransaction()
                     ->getId(),
-                'startOrder',
                 $client->flushInvocations()
             );
         }
@@ -131,7 +128,6 @@ class PaymentService
                     ?->getStateId() ?? '',
                 $order->getStateId(),
                 $transactionId ?? '',
-                'monitorOrder',
                 $innovations
             );
         }
@@ -161,7 +157,6 @@ class PaymentService
                             $order
                                 ->getStateId(),
                             $order->getTransactions()?->first()?->getId() ?? '',
-                            'monitorOrder',
                             $innovations
                         );
                         $reversalIndex = $this->getReversalIndex($order->getId());
@@ -191,7 +186,6 @@ class PaymentService
                 $order
                     ->getStateId(),
                 $order->getTransactions()?->first()?->getId() ?? '',
-                'reverseOrder',
                 $innovations
             );
         }
@@ -228,7 +222,6 @@ class PaymentService
                     ?->getStateId() ?? '',
                 $order->getStateId(),
                 $order->getTransactions()?->first()?->getId() ?? '',
-                'monitorOrder',
                 $innovations
             );
         }

@@ -68,7 +68,7 @@
           "title" : "Transaktionen",
           "columns": {
             "createdAt": "Created at",
-            "apiMethod": "API methode",
+            "apiMethod": "SOAP action",
             "orderID": "Order ID",
             "order": "Bestellen",
             "transaction": "Order transaction ID",

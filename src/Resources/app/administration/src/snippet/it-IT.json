@@ -70,7 +70,7 @@
           "columns": {
             "createdAt": "Created at",
             "orderID": "Order ID",
-            "apiMethod": "API method",
+            "apiMethod": "SOAP action",
             "order": "Order status",
             "transaction": "Order transaction ID",
             "request": "Request",

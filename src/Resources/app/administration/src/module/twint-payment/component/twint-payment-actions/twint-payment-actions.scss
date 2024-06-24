@@ -1,4 +1,8 @@
 .twint-payment-actions__button-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
+    align-items: center;
+    .sw-label{
+        margin: 0px 10px;
+    }
 }

@@ -53,7 +53,6 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
         string $paymentStateId,
         string $orderStateId,
         string $transactionId,
-        string $apiMethod,
         array $invocations
     ): void {
         if ($invocations === []) {
@@ -68,7 +67,9 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
         $soapMessages = $invocations[0]->messages();
         $soapRequests = [];
         $soapResponses = [];
+        $apiMethods = [];
         foreach ($soapMessages as $soapMessage) {
+            $apiMethods[] = $soapMessage->request()->action();
             $soapRequests[] = $soapMessage->request()->body();
             $soapResponses[] = $soapMessage->response()->body();
         }
@@ -77,7 +78,7 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
             'paymentStateId' => $paymentStateId,
             'orderStateId' => $orderStateId,
             'transactionId' => $transactionId,
-            'apiMethod' => $apiMethod,
+            'apiMethod' => $apiMethods,
             'request' => $request,
             'response' => $response,
             'soapRequest' => $soapRequests,
@@ -94,7 +95,6 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
         string $paymentStateId,
         string $orderStateId,
         string $transactionId,
-        string $apiMethod,
         array $invocations
     ): void {
         if ($invocations === []) {
@@ -109,7 +109,9 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
         $soapMessages = $invocations[0]->messages();
         $soapRequests = [];
         $soapResponses = [];
+        $apiMethods = [];
         foreach ($soapMessages as $soapMessage) {
+            $apiMethods[] = $soapMessage->request()->action();
             $soapRequests[] = $soapMessage->request()->body();
             $soapResponses[] = $soapMessage->response()->body();
         }
@@ -118,7 +120,7 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
             'paymentStateId' => $paymentStateId,
             'orderStateId' => $orderStateId,
             'transactionId' => $transactionId,
-            'apiMethod' => $apiMethod,
+            'apiMethod' => $apiMethods,
             'request' => $request,
             'response' => $response,
             'soapRequest' => $soapRequests,
@@ -137,7 +139,6 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
             new EqualsFilter('paymentStateId', $record['paymentStateId'] ?? ''),
             new EqualsFilter('orderStateId', $record['orderStateId'] ?? ''),
             new EqualsFilter('transactionId', $record['transactionId'] ?? ''),
-            new EqualsFilter('apiMethod', $record['apiMethod'] ?? ''),
             new EqualsFilter('request', $record['request'] ?? ''),
             new EqualsFilter('response', $record['response'] ?? '')
         );
