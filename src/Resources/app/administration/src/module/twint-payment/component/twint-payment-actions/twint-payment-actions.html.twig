@@ -5,16 +5,16 @@
                 {% block sw_order_detail_twint_actions_rows %}
                     <template #default>
                         {% block sw_order_detail_twint_actions_row_primary %}
+                            <span class="twint-refundable-amount__title" v-if="refundableAmount > 0">
+                            {{ $tc('twint.refund.refundable.title') }}
+                            </span>
+                            <sw-label v-if="refundableAmount > 0">{{ currencyFilter(refundableAmount, currency, decimalPrecision) }}</sw-label>
                             <sw-button variant="primary"
                                        size="small"
                                        :disabled="refundableAmount==0 || !acl.can('order.editor')"
                                        @click="showModal">
                                 {{ $tc('twint.refund.buttons.refund.label') }}
                             </sw-button>
-                            <span class="twint-refundable-amount__title" v-if="refundableAmount > 0">
-                            {{ $tc('twint.refund.refundable.title') }}
-                            </span>
-                            <sw-label v-if="refundableAmount > 0">{{ currencyFilter(refundableAmount, currency, decimalPrecision) }}</sw-label>
                             {% block twint_modal_refund %}
                                 <sw-modal variant="small"
                                           :title="$tc(`twint.refund.modal.title`)" v-if="showRefundModal" @modal-close="onCloseModal">
@@ -66,16 +66,6 @@
         {% block sw_order_detail_twint_actions_row_reversal_history %}
             <sw-card position-identifier="twint-details-actions-reversal-list" :title="$tc('twint.order.reversalHistory.cardTitle')">
                 <template #grid>
-                    {% block sw_order_detail_twint_state_change_card_modal %}
-                        <sw-order-state-change-modal
-                                v-if="showStateModal"
-                                :order="order"
-                                :is-loading="isLoading"
-                                :technical-name="''"
-                                @page-leave="onLeaveModalClose"
-                                @page-leave-confirm="onLeaveModalConfirm"
-                        />
-                    {% endblock %}
                     {% block sw_order_detail_twint_reversal_history_grid %}
                         <sw-data-grid v-if="reversalHistory.length > 0" :data-source="reversalHistory"
                                       :columns="paymentColumns"

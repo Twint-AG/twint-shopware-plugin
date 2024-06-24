@@ -43,6 +43,7 @@ Component.register('twint-payment-actions', {
             reversalId: '',
             reversalHistory: [],
             refundAmount: 0,
+            totalOrderAmount: 0,
             refundedAmount: 0,
             reason: '',
             refundableAmount: 0,
@@ -53,8 +54,7 @@ Component.register('twint-payment-actions', {
             naturalSorting: true,
             stateType: 'order_transaction',
             transaction: null,
-            currentActionName: null,
-            showStateModal: false,
+            currentActionName: null
         };
     },
     created() {
@@ -114,6 +114,12 @@ Component.register('twint-payment-actions', {
                 }
             }
             this.transaction = this.order.transactions.last();
+            const customFields = this.order?.customFields || {};
+            const twintResponse = JSON.parse(customFields['twint_api_response'] || '{}');
+            this.totalOrderAmount = this.totalAmount;
+            if(twintResponse?.amount){
+                this.totalOrderAmount = twintResponse.amount.amount;
+            }
         },
         showModal() {
             this.showRefundModal = true;
@@ -137,7 +143,7 @@ Component.register('twint-payment-actions', {
                 this.reversalHistory = reversalHistory;
                 const refundedAmount = parseFloat(reversalHistory?.aggregations?.refundedAmount?.sum);
                 this.isLoading = false;
-                this.refundableAmount = this.roundingFloat(this.totalAmount - refundedAmount, this.decimalPrecision);
+                this.refundableAmount = this.roundingFloat(this.totalOrderAmount - refundedAmount, this.decimalPrecision);
             }).catch(() => {
                 this.isLoading = false;
             });
@@ -158,9 +164,7 @@ Component.register('twint-payment-actions', {
                     this.isLoading = false;
                     this.resetRefundForm();
                     this.$root.$emit('refund-finish');
-                    if(this.currentActionName){
-                        this.showStateModal = true;
-                    }
+                    this.updatePaymentStatus();
                 } else {
                     this.isLoading = false;
                     this.createNotificationError({
@@ -180,13 +184,8 @@ Component.register('twint-payment-actions', {
         roundingFloat(num, digits = 2) {
             return Number(Number(num).toFixed(digits));
         },
-        onLeaveModalClose() {
-            this.currentActionName = null;
-            this.showStateModal = false;
-        },
 
-        onLeaveModalConfirm(docIds, sendMail = true) {
-            this.showStateModal = false;
+        updatePaymentStatus(docIds = [], sendMail = false) {
             if(this.currentActionName){
                 let transition = this.orderStateMachineService.transitionOrderTransactionState(
                     this.transaction.id,
@@ -208,7 +207,6 @@ Component.register('twint-payment-actions', {
                             message: error
                         });
                     }).finally(() => {
-                        this.showStateModal = false;
                         this.currentActionName = null;
                     });
                 }
