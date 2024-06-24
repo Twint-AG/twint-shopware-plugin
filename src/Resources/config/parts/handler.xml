@@ -12,6 +12,7 @@
             <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
             <argument type="service" id="router"/>
             <argument type="service" id="logger"/>
+            <argument type="service" id="Twint\Core\Service\OrderService"/>
             <tag name="shopware.payment.method.async"/>
             <tag name="shopware.payment.method.refund"/>
         </service>
@@ -24,6 +25,7 @@
             <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
             <argument type="service" id="router"/>
             <argument type="service" id="logger"/>
+            <argument type="service" id="Twint\Core\Service\OrderService"/>
             <tag name="shopware.payment.method.async"/>
             <tag name="shopware.payment.method.refund"/>
         </service>

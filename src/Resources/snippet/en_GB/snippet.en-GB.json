@@ -30,6 +30,10 @@
             "checkingOut": "Express checkout in progress"
         },
         "administration": {
+            "name": {
+                "twint_express_checkout": "TWINT - Express Checkout Payment | TBU - Twint Payment",
+                "twint_checkout": "TWINT - Regular Checkout Payment | TBU - Twint Payment"
+            },
             "extractPem": {
                 "success": {
                     "message": "Certificate validation successful"
@@ -43,7 +47,8 @@
                 "error": {
                     "negativeAmount": "The refund amount cannot be negative",
                     "exceededAmount": "The refund amount cannot exceed the order amount %amount% %currency%",
-                    "fail": "Refund cannot be processed for this order, please try again"
+                    "fail": "Refund cannot be processed for this order, please try again",
+                    "missingResponse": "Missing TWINT response for this order"
                 }
             }
         }

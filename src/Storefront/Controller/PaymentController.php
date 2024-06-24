@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Twint\Core\Service\OrderService;
 use Twint\Core\Service\PaymentService;
 use Twint\Core\Util\CryptoHandler;
 use Twint\Sdk\Value\Order;
@@ -32,7 +33,8 @@ class PaymentController extends StorefrontController
     public function __construct(
         private EntityRepository $orderRepository,
         private CryptoHandler $cryptoService,
-        private PaymentService $paymentService
+        private PaymentService $paymentService,
+        private OrderService $orderService
     ) {
     }
 
@@ -61,12 +63,12 @@ class PaymentController extends StorefrontController
             $this->addFlash(self::DANGER, $this->trans('twintPayment.error.orderNotFound'));
             return $this->redirectToRoute('frontend.account.order.page');
         }
-        if ($this->paymentService->isOrderPaid($order)) {
+        if ($this->orderService->isOrderPaid($order)) {
             $this->addFlash(self::SUCCESS, $this->trans('twintPayment.message.successPayment'));
             return $this->redirectToRoute('frontend.checkout.finish.page', [
                 'orderId' => $order->getId(),
             ]);
-        } elseif ($this->paymentService->isCancelPaid($order)) {
+        } elseif ($this->orderService->isCancelPaid($order)) {
             return $this->redirectToRoute('frontend.account.edit-order.page', [
                 'orderId' => $order->getId(),
                 'error-code' => 'CHECKOUT__TWINT_PAYMENT_DECLINED',
@@ -116,7 +118,7 @@ class PaymentController extends StorefrontController
             /** @var OrderEntity|null $order */
             $order = $this->orderRepository->search($criteria, $context)
                 ->first();
-            if (!empty($order) && ($this->paymentService->isOrderPaid($order) || $this->paymentService->isCancelPaid(
+            if (!empty($order) && ($this->orderService->isOrderPaid($order) || $this->orderService->isCancelPaid(
                 $order
             ))) {
                 $result = [
