@@ -32,7 +32,7 @@
         "administration": {
             "name": {
                 "twint_express_checkout": "TWINT - Express Checkout  | TBU - Twint Payment",
-                "twint_checkout": "TWINT - Regular Checkout Payment | TBU - Twint Payment"
+                "twint_checkout": "TWINT - Regular Checkout  | TBU - Twint Payment"
             },
             "extractPem": {
                 "success": {
