@@ -4,8 +4,10 @@
     {{ parent() }}
     {% block twint_buy_button %}
         {% if isTwintExpress('PDP') %}
-            <div class="col-12">
-                {{ include('@TwintPayment/storefront/component/button/express-checkout-button.html.twig') }}
+            <div class="row g-2 mt-0 justify-content-end ms-1">
+                <div class="col-8 ps-0">
+                	{{ include('@TwintPayment/storefront/component/button/express-checkout-button.html.twig') }}
+            	</div>
             </div>
         {% endif %}
     {% endblock %}
