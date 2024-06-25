@@ -41,9 +41,15 @@
                                     </template>
                                 {% endblock %}
 
-                                {% block twint_transaction_log_list_content_soap_method %}
+                                {% block twint_transaction_log_list_content_api_method %}
                                     <template #column-apiMethod="{ item }">
-                                        <sw-label v-for="method in item.apiMethod">{{ method }}</sw-label>
+                                        <sw-label>{{ item.apiMethod }}</sw-label>
+                                    </template>
+                                {% endblock %}
+
+                                {% block twint_transaction_log_list_content_soap_action %}
+                                    <template #column-soapAction="{ item }">
+                                        <sw-label v-for="action in item.soapAction">{{ action }}</sw-label>
                                     </template>
                                 {% endblock %}
 
@@ -94,31 +100,90 @@
                                                     variant="large"
                                                     @modal-close="onCloseModalDetail"
                                             >
+                                                <div class="sw-data-grid">
+                                                    <table class="sw-data-grid__table">
+                                                        <tbody class="sw-data-grid__body">
+                                                            <tr class="sw-data-grid__row">
+                                                                <td class="sw-data-grid__cell">
+                                                                    <div class="sw-data-grid__cell-content">
+                                                                        <b>{{ $tc('twint.order.transactionLog.list.columns.orderID') }}:</b>
+                                                                    </div>
+                                                                </td>
+                                                                <td class="sw-data-grid__cell">
+                                                                    <div class="sw-data-grid__cell-content"> {{ item.order.orderNumber }}</div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr class="sw-data-grid__row">
+                                                                <td class="sw-data-grid__cell">
+                                                                    <div class="sw-data-grid__cell-content">
+                                                                        <b>{{ $tc('twint.order.transactionLog.list.columns.apiMethod') }}:</b>
+                                                                    </div>
+                                                                </td>
+                                                                <td class="sw-data-grid__cell">
+                                                                    <div class="sw-data-grid__cell-content"> {{ item.apiMethod }}</div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr class="sw-data-grid__row">
+                                                                <td class="sw-data-grid__cell">
+                                                                    <div class="sw-data-grid__cell-content">
+                                                                        <b>{{ $tc('twint.order.transactionLog.list.columns.transaction') }}:</b>
+                                                                    </div>
+                                                                </td>
+                                                                <td class="sw-data-grid__cell">
+                                                                    <div class="sw-data-grid__cell-content"> {{ item.transactionId }}</div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr class="sw-data-grid__row">
+                                                                <td class="sw-data-grid__cell">
+                                                                    <div class="sw-data-grid__cell-content">
+                                                                        <b>{{ $tc('twint.order.transactionLog.list.columns.payment') }}:</b>
+                                                                    </div>
+                                                                </td>
+                                                                <td class="sw-data-grid__cell">
+                                                                    <div class="sw-data-grid__cell-content">
+                                                                        <sw-label :variant="getVariantState('order_transaction', item.paymentStateMachineState)" appearance="badged">
+                                                                            {{ item.paymentStateMachineState.name }}
+                                                                        </sw-label>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr class="sw-data-grid__row">
+                                                                <td class="sw-data-grid__cell">
+                                                                    <div class="sw-data-grid__cell-content">
+                                                                        <b>{{ $tc('twint.order.transactionLog.list.columns.order') }}:</b>
+                                                                    </div>
+                                                                </td>
+                                                                <td class="sw-data-grid__cell">
+                                                                    <div class="sw-data-grid__cell-content">
+                                                                        <sw-label :variant="getVariantState('order', item.orderStateMachineState)" appearance="badged">
+                                                                            {{ item.orderStateMachineState.name }}
+                                                                        </sw-label>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                                 {% block twint_transaction_log_list_content_action_detail_modal_order %}
-                                                    <p class="sw-order-detail-twint-modal-order">
-                                                        <b>{{ $tc('twint.order.transactionLog.list.columns.orderID') }}:</b> {{ item.order.orderNumber }}
-                                                    </p>
-                                                    <p class="sw-order-detail-twint-modal-transaction">
-                                                        <b>{{ $tc('twint.order.transactionLog.list.columns.transaction') }}:</b> {{ item.transactionId }}
-                                                    </p>
-                                                    <p class="sw-order-detail-twint-modal-payment">
-                                                        <b>{{ $tc('twint.order.transactionLog.list.columns.payment') }}:</b> {{ item.paymentStateMachineState.name }}
-                                                    </p>
-                                                    <p class="sw-order-detail-twint-modal-order">
-                                                        <b>{{ $tc('twint.order.transactionLog.list.columns.order') }}:</b> {{ item.orderStateMachineState.name }}
-                                                    </p>
-                                                    <b class="sw-order-detail-twint-modal-soap-request">
-                                                        {{ $tc('twint.order.transactionLog.list.columns.request') }}
-                                                    </b>
-                                                    <sw-textarea-field :disabled="true" :value="item.request" />
-                                                    <b class="sw-order-detail-twint-modal-soap-response">
-                                                        {{ $tc('twint.order.transactionLog.list.columns.response') }}
-                                                    </b>
-                                                    <sw-textarea-field :disabled="true" :value="item.response"/>
-
+                                                    <sw-card>
+                                                        <b class="sw-order-detail-twint-modal-soap-request">
+                                                            {{ $tc('twint.order.transactionLog.list.columns.request') }}
+                                                        </b>
+                                                        <sw-textarea-field :disabled="true" :value="item.request" />
+                                                        <b class="sw-order-detail-twint-modal-soap-response">
+                                                            {{ $tc('twint.order.transactionLog.list.columns.response') }}
+                                                        </b>
+                                                        <sw-textarea-field :disabled="true" :value="item.response"/>
+                                                        <div v-if="item.exception != ' '">
+                                                            <p class="sw-order-detail-twint-modal-exception">
+                                                                <b>{{ $tc('twint.order.transactionLog.list.columns.exception') }}</b>
+                                                            </p>
+                                                            <sw-textarea-field :disabled="true" :value="item.exception"/>
+                                                        </div>
+                                                    </sw-card>
                                                     <sw-card v-for="(request, index) in item.soapRequest">
                                                         <sw-container>
-                                                            <h4>{{ item.apiMethod[index] }}</h4>
+                                                            <h4>{{ item.soapAction[index] }}</h4>
                                                             <b class="sw-order-detail-twint-modal-soap-request">
                                                                 {{ $tc('twint.order.transactionLog.list.columns.soapRequest') }}
                                                             </b>
@@ -130,10 +195,6 @@
                                                             <sw-textarea-field  v-if="item.soapResponse[index]" :disabled="true" :value="item.soapResponse[index]"/>
                                                         </sw-container>
                                                     </sw-card>
-                                                    <p class="sw-order-detail-twint-modal-exception">
-                                                        {{ $tc('twint.order.transactionLog.list.columns.exception') }}
-                                                    </p>
-                                                    <sw-textarea-field :disabled="true" :value="item.exception"/>
                                                 {% endblock %}
 
                                                 {% block twint_transaction_log_list_content_action_detail_modal_footer %}

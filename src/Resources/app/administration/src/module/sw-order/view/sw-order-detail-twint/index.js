@@ -113,6 +113,10 @@ Shopware.Component.register('sw-order-detail-twint', {
                 label: app.$tc('twint.order.transactionLog.list.columns.apiMethod'),
                 allowResize: true,
             }, {
+                property: 'soapAction',
+                label: app.$tc('twint.order.transactionLog.list.columns.soapAction'),
+                allowResize: true,
+            }, {
                 property: 'paymentStateId',
                 label: app.$tc('twint.order.transactionLog.list.columns.payment'),
                 allowResize: true,
