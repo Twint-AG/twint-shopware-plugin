@@ -2,3 +2,4 @@ cypress
 cypress.env.json
 node_modules
 fixtures/testAccount.json
+mochawesome-report
