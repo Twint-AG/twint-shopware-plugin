@@ -1,0 +1,21 @@
+{
+    "testAccount": {
+        "username": "TEST_USERNAME",
+        "password": "TEST_PASSWORD"
+    },
+
+    "guessAccount": {
+        "salutation":  "Mr.",
+        "firstname": "GuessFN",
+        "lastname": "GuessLN",
+        "email": "guess@email.com",
+        "street": "92 NHC",
+        "city": "HCM",
+        "country": "Switzerland"
+    },
+
+    "basicAuth": {
+        "username": "USERNAME",
+        "password": "PASSWORD"
+    }   
+}
