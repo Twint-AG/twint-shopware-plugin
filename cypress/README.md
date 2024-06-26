@@ -1,3 +1,7 @@
+### Change directory if you did not do that (from root folder of repository)
+`` cd cypress
+``
+
 ### Install dependencies via npm
 ```
 npm install
