@@ -9,6 +9,9 @@
                                 <span class="twint-refundable-amount__title" v-if="refundableAmount > 0">
                                 {{ $tc('twint.refund.refundable.title') }}
                                 </span>
+                                <span class="twint-refundable-amount__notice" v-if="refundableAmount == 0">
+                                {{ $tc('twint.refund.refundable.fullRefundNotice') }}
+                                </span>
                                 <sw-label v-if="refundableAmount > 0">{{ currencyFilter(refundableAmount, currency, decimalPrecision) }}</sw-label>
                                 <sw-button variant="primary"
                                            size="small"

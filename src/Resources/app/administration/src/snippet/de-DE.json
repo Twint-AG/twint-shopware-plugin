@@ -68,7 +68,8 @@
           "title" : "Transaktionen",
           "columns": {
             "createdAt": "Created at",
-            "apiMethod": "SOAP action",
+            "apiMethod": "API method",
+            "soapAction": "SOAP action",
             "orderID": "Order ID",
             "order": "Bestellen",
             "transaction": "Order transaction ID",
@@ -125,7 +126,8 @@
     },
     "refundable": {
       "title": "Verbleibender Gesamtbetrag der Rückerstattung",
-      "notice": "Gesamtbetrag wird automatisch an den maximalen Bestellpreis angepasst."
+      "notice": "Gesamtbetrag wird automatisch an den maximalen Bestellpreis angepasst.",
+      "fullRefundNotice": "No refundable amount left for this order"
     },
     "error": {
       "title" : "Rückerstattungsfehler"

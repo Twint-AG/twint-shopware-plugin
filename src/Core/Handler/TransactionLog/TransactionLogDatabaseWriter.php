@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Twint\Core\Handler\TransactionLog;
 
+use Exception;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -16,7 +18,8 @@ use Twint\Sdk\Exception\ApiFailure;
 class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
 {
     public function __construct(
-        private readonly EntityRepository $repository
+        private readonly EntityRepository $repository,
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -32,20 +35,24 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
         array $soapResponse,
         string $exception
     ): void {
-        $this->repository->create([
-            [
-                'orderId' => $orderId,
-                'paymentStateId' => $paymentStateId,
-                'orderStateId' => $orderStateId,
-                'transactionId' => $transactionId,
-                'apiMethod' => $apiMethod,
-                'request' => $request,
-                'response' => $response,
-                'soapRequest' => $soapRequest,
-                'soapResponse' => $soapResponse,
-                'exception' => $exception,
-            ],
-        ], Context::createDefaultContext());
+        try {
+            $this->repository->create([
+                [
+                    'orderId' => $orderId,
+                    'paymentStateId' => $paymentStateId,
+                    'orderStateId' => $orderStateId,
+                    'transactionId' => $transactionId,
+                    'apiMethod' => $apiMethod,
+                    'request' => $request,
+                    'response' => $response,
+                    'soapRequest' => $soapRequest,
+                    'soapResponse' => $soapResponse,
+                    'exception' => $exception,
+                ],
+            ], Context::createDefaultContext());
+        } catch (Exception $e) {
+            $this->logger->error($e->getMessage());
+        }
     }
 
     public function writeObjectLog(
@@ -63,30 +70,36 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
         if ($exception instanceof ApiFailure) {
             $exception = $exception->getMessage();
         }
+        $apiMethod = $invocations[0]->methodName() ?? ' ';
         $response = json_encode($invocations[0]->returnValue());
         $soapMessages = $invocations[0]->messages();
         $soapRequests = [];
         $soapResponses = [];
-        $apiMethods = [];
+        $soapActions = [];
         foreach ($soapMessages as $soapMessage) {
-            $apiMethods[] = $soapMessage->request()->action();
+            $soapActions[] = $soapMessage->request()->action();
             $soapRequests[] = $soapMessage->request()->body();
             $soapResponses[] = $soapMessage->response()->body();
         }
-        $record = [
-            'orderId' => $orderId,
-            'paymentStateId' => $paymentStateId,
-            'orderStateId' => $orderStateId,
-            'transactionId' => $transactionId,
-            'apiMethod' => $apiMethods,
-            'request' => $request,
-            'response' => $response,
-            'soapRequest' => $soapRequests,
-            'soapResponse' => $soapResponses,
-            'exception' => $exception,
-        ];
-        if (!$this->checkDuplicatedTransactionLogInLastMinutes($record)) {
-            $this->repository->create([$record], Context::createDefaultContext());
+        try {
+            $record = [
+                'orderId' => $orderId,
+                'paymentStateId' => $paymentStateId,
+                'orderStateId' => $orderStateId,
+                'transactionId' => $transactionId,
+                'apiMethod' => $apiMethod,
+                'soapAction' => $soapActions,
+                'request' => $request,
+                'response' => $response,
+                'soapRequest' => $soapRequests,
+                'soapResponse' => $soapResponses,
+                'exception' => $exception,
+            ];
+            if (!$this->checkDuplicatedTransactionLogInLastMinutes($record)) {
+                $this->repository->create([$record], Context::createDefaultContext());
+            }
+        } catch (Exception $e) {
+            $this->logger->error($e->getMessage());
         }
     }
 
@@ -105,29 +118,35 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
         if ($exception instanceof ApiFailure) {
             $exception = $exception->getMessage();
         }
+        $apiMethod = $invocations[0]->methodName() ?? ' ';
         $response = json_encode($invocations[0]->returnValue());
         $soapMessages = $invocations[0]->messages();
         $soapRequests = [];
         $soapResponses = [];
-        $apiMethods = [];
+        $soapActions = [];
         foreach ($soapMessages as $soapMessage) {
-            $apiMethods[] = $soapMessage->request()->action();
+            $soapActions[] = $soapMessage->request()->action();
             $soapRequests[] = $soapMessage->request()->body();
             $soapResponses[] = $soapMessage->response()->body();
         }
-        $record = [
-            'orderId' => $orderId,
-            'paymentStateId' => $paymentStateId,
-            'orderStateId' => $orderStateId,
-            'transactionId' => $transactionId,
-            'apiMethod' => $apiMethods,
-            'request' => $request,
-            'response' => $response,
-            'soapRequest' => $soapRequests,
-            'soapResponse' => $soapResponses,
-            'exception' => $exception,
-        ];
-        $this->repository->create([$record], Context::createDefaultContext());
+        try {
+            $record = [
+                'orderId' => $orderId,
+                'paymentStateId' => $paymentStateId,
+                'orderStateId' => $orderStateId,
+                'transactionId' => $transactionId,
+                'apiMethod' => $apiMethod,
+                'soapAction' => $soapActions,
+                'request' => $request,
+                'response' => $response,
+                'soapRequest' => $soapRequests,
+                'soapResponse' => $soapResponses,
+                'exception' => $exception,
+            ];
+            $this->repository->create([$record], Context::createDefaultContext());
+        } catch (Exception $e) {
+            $this->logger->error($e->getMessage());
+        }
     }
 
     public function checkDuplicatedTransactionLogInLastMinutes(array $record): bool
@@ -139,6 +158,7 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
             new EqualsFilter('paymentStateId', $record['paymentStateId'] ?? ''),
             new EqualsFilter('orderStateId', $record['orderStateId'] ?? ''),
             new EqualsFilter('transactionId', $record['transactionId'] ?? ''),
+            new EqualsFilter('apiMethod', $record['apiMethod'] ?? ''),
             new EqualsFilter('request', $record['request'] ?? ''),
             new EqualsFilter('response', $record['response'] ?? '')
         );

@@ -82,10 +82,12 @@
         <service id="twint_transaction_log_writer"
                  class="Twint\Core\Handler\TransactionLog\TransactionLogDatabaseWriter">
             <argument type="service" id="twint_transaction_log.repository"/>
+            <argument type="service" id="logger"/>
         </service>
         <service id="twint_reversal_history_writer"
                  class="Twint\Core\Handler\ReversalHistory\ReversalHistoryDatabaseWriter">
             <argument type="service" id="twint_reversal_history.repository"/>
+            <argument type="service" id="logger"/>
         </service>
     </services>
 </container>

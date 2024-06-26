@@ -69,7 +69,8 @@
           "title" : "Transactions",
           "columns": {
             "createdAt": "Created at",
-            "apiMethod": "SOAP action",
+            "apiMethod": "API method",
+            "soapAction": "SOAP action",
             "orderID": "Order ID",
             "order": "Order status",
             "transaction": "Order transaction ID",
@@ -125,7 +126,8 @@
       },
       "refundable": {
         "title": "Total refundable amount left",
-        "notice": "Total amount automatically adjusted to the maximum order price."
+        "notice": "Total amount automatically adjusted to the maximum order price.",
+        "fullRefundNotice": "No refundable amount left for this order"
       },
       "error": {
         "title" : "Refund error"
