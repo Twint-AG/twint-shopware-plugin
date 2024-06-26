@@ -1,0 +1,77 @@
+{
+    "productOne": {
+        "name": "Test Product 1",
+        "manufacturer": "NFQ",
+        "grandPrice": {
+            "standardShipping": {
+                "CHF": "CHF 4.00"
+            },
+            "expressShipping": {
+                "CHF": {
+                    "title": "CHF",
+                    "amount": "11.00"
+                }
+            }
+        }
+    },
+
+    "productTwo": {
+        "name": "Test Product 2",
+        "grandPrice": {
+            "standardShipping": {
+                "CHF": "CHF 5.00"
+            },
+            "expressShipping": {
+                "CHF": {
+                    "title": "CHF",
+                    "amount": "12.00"
+                }
+            }
+        }
+    },
+
+    "productThree": {
+        "name": "Test Product 3",
+        "grandPrice": {
+            "standardShipping": {
+                "CHF": "CHF 6.00"
+            },
+            "expressShipping": {
+                "CHF": {
+                    "title": "CHF",
+                    "amount": "13.00"
+                }
+            }
+        }
+    },
+
+    "productFour": {
+        "name": "Test Product 4",
+        "grandPrice": {
+            "standardShipping": {
+                "CHF": "CHF 7.00"
+            },
+            "expressShipping": {
+                "CHF": {
+                    "title": "CHF",
+                    "amount": "14.00"
+                }
+            }
+        }
+    },
+
+    "productFive": {
+        "name": "Test Product 5",
+        "grandPrice": {
+            "standardShipping": {
+                "CHF": "CHF 1,003.00"
+            },
+            "expressShipping": {
+                "CHF": {
+                    "title": "CHF",
+                    "amount": "1,010.00"
+                }
+            }
+        }
+    }
+}

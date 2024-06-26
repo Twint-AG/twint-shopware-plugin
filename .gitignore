@@ -1,15 +1,22 @@
 .idea
-**/.DS_Store
-**/.env
+/.DS_Store
+/.env
 
-**/var
-**/vendor
+/var
+/vendor
 build/
-**/public/static
+/public/static
+package*
+/node_modules
+/infra
+src/Resources/public/administration/css/twint-payment.css
+cypress/fixtures/testAccount.json
+/cypress/reports
+/cypress/screenshots
 
 phpunit.clover.xml
 phpunit.junit.xml
 
+
 src/Resources/public/administration/js/twint-payment.js.map
 **.js.map
-
