@@ -1,41 +1,24 @@
-After clone the project - execute
-
+### Install dependencies via npm
 ```
-npm init
-```
-
-Install Cypress
-
-```
-npm install cypress --save-dev
+npm install
 ```
 
-Install Typescript
+### Setup environments
 
-```
-npm install typescript --save-dev
-```
+```shell
+cp cypress.env.dist.json cypress.env.json;
 
-Create `tsconfig.json` file
-```
-touch tsconfig.json
+// replace placeholder with your value
+sed -i "s|\"__BASE_URL__\"|\"$BASE_URL\"|g" cypress.env.json
 ```
 
-And enter the below content
-
-``` json
-{
-  "compilerOptions": {
-    "target": "ES5",
-    "lib": ["ES5", "DOM"],
-    "types": ["cypress", "node"]
-  },
-  "include": ["**/*.ts"]
-}
-```
-
-Open Cypress
+### Run Test cases
 
 ```
-npx cypress open
+npm run test
+```
+
+For running testing in CI/CD process. Should run it in headless mode
+```bash
+npm run test:headless
 ```

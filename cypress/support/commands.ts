@@ -120,3 +120,10 @@ Cypress.Commands.add("selectShippingMethod", (shippingMethod) => {
   .should('be.checked')
 })
 
+Cypress.Commands.overwrite('visit', (originalFn, url, options) => {
+  const baseUrl = Cypress.env('BASE_URL');
+  const authUrl = `${baseUrl}${url || ''}`;
+
+  return originalFn(authUrl, options);
+});
+
