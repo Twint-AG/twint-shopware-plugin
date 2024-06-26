@@ -12,12 +12,8 @@ describe("ser perform Twint Regular Checkout", () => {
   beforeEach("Open the front store", () => {
     // Visite the store front
     // To do: manage this by env variable
-    cy.visit('/', {
-        auth: {
-            username: userData.basicAuth.username,
-            password: userData.basicAuth.password
-        }
-    })
+
+    cy.visit('/');
     cy.get(homePage.storeLogo).should("be.visible")
 
     // Change currency to CHF
