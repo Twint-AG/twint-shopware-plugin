@@ -6,7 +6,6 @@ export default defineConfig({
   video: true,
   screenshotOnRunFailure: true,
   fixturesFolder: 'fixtures',
-  reporter: 'mochawesome',
   e2e: {
     specPattern: 'e2e/**/*.cy.{js,jsx,ts,tsx}',
     supportFile: 'support/e2e.{js,jsx,ts,tsx}',
