@@ -100,3 +100,21 @@ test:
     key: $CI_COMMIT_REF_SLUG-${CI_JOB_NAME}
     paths:
       - $CI_PROJECT_DIR/.gitlab-ci-cache
+      
+end-2-end:
+  only:
+    - test/cypress
+  stage: check
+  image: cypress/browsers:latest
+  tags:
+    - d13-runner
+  script:
+    - cd cypress
+    - cp cypress.env.dist.json cypress.env.json;
+    - sed -i "s|\"__BASE_URL__\"|\"CYPRESS_URL\"|g" cypress.env.json
+    - npm install
+    - npx cypress run --headless --browser chrome
+  artifacts:
+    paths:
+      - cypress/cypress/screenshots/
+      - cypress/cypress/videos/
