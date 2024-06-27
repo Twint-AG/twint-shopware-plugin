@@ -43,7 +43,7 @@ class OrderCustomFieldInstaller
 
     public function install(Context $context): void
     {
-        $twintApiResponseCustomerFieldId = Uuid::randomHex();
+        $twintApiResponseCustomFieldId = Uuid::randomHex();
         try {
             $this->customFieldSetRepository->upsert([[
                 'id' => Uuid::randomHex(),
@@ -57,7 +57,7 @@ class OrderCustomFieldInstaller
                 ],
                 'customFields' => [
                     [
-                        'id' => $twintApiResponseCustomerFieldId,
+                        'id' => $twintApiResponseCustomFieldId,
                         'name' => self::TWINT_API_RESPONSE_CUSTOM_FIELD,
                         'type' => CustomFieldTypes::JSON,
                         'config' => [
@@ -73,7 +73,7 @@ class OrderCustomFieldInstaller
                 ],
                 'relations' => [
                     [
-                        'id' => $twintApiResponseCustomerFieldId,
+                        'id' => $twintApiResponseCustomFieldId,
                         'entityName' => OrderDefinition::ENTITY_NAME,
                     ],
                 ],

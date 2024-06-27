@@ -1,6 +1,6 @@
 {% block twint_qr_ios %}
     <div class="mb-3 d-md-none">
-        <div class="row app-chooser-area">
+        <div class="row app-chooser-area" data-test="app">
             <div id="app-chooser-container" class="text-center bg-light">
                 <div class="app-chooser-title my-4">{{ 'twintPayment.appSelector.title'|trans() }}</div>
                 {% set prefinedApps = {
@@ -25,7 +25,7 @@
                 </div>
             </div>
         </div>
-        <div class="row text-center">
+        <div class="row text-center" data-test="bank">
             <select class="text-align-last p-3 text-center rounded-0 border-0 text-secondary bg-white" id="app-chooser">
                 <option value="">{{ "twintPayment.appSelector.otherBankOption"|trans() }}</option>
                 {% for payLink in payLinks.ios %}
