@@ -17,7 +17,8 @@ export default {
             isLoading: false,
             isTesting: false,
             isSaveSuccessful: false,
-            isTestSuccessful: false
+            isTestSuccessful: false,
+            isDisabled: false
         };
     },
 
@@ -26,7 +27,9 @@ export default {
             title: this.$createTitle()
         };
     },
-
+    created() {
+        this.$root.$on('update-lock', this.updateLock);
+    },
     methods: {
         onChanged(config) {
             this.isTestSuccessful = false;
@@ -52,6 +55,10 @@ export default {
             }
 
             return value;
+        },
+        updateLock(value) {
+            console.log('emit lock');
+            this.isDisabled = value;
         },
 
         onSave() {
@@ -144,5 +151,8 @@ export default {
                 this.isTesting = false;
             });
         }
+    },
+    destroyed() {
+        this.$root.$off('update-lock');
     }
 };

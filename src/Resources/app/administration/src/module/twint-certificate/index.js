@@ -15,17 +15,35 @@ Component.register('twint-certificate', {
         return {
             currentPassword: null,
             currentCertFile: null,
+            passwordError: false
         };
     },
 
     methods: {
         onFileChange(file) {
             this.currentCertFile = file;
+            if (this.currentCertFile && (!this.currentPassword || this.currentPassword.length === 0)) {
+                this.passwordError = true;
+                this.$root.$emit('update-lock', true);
+                return;
+            }
+            else if(!this.currentCertFile){
+                this.passwordError = false;
+                this.$root.$emit('update-lock', false);
+                return;
+            }
             this.extractPem();
         },
 
         updatePassword(event) {
-            this.extractPem();
+            if (this.currentCertFile && (!this.currentPassword || this.currentPassword.length === 0)) {
+                this.passwordError = true;
+                this.$root.$emit('update-lock', true);
+            }
+            else if(this.currentCertFile){
+                this.passwordError = false;
+                this.extractPem();
+            }
         },
 
         extractPem() {
@@ -41,7 +59,7 @@ Component.register('twint-certificate', {
                     message: this.$tc('twint.settings.certificate.success.message'),
                     growl: true
                 }).then(r => {
-
+                    this.$root.$emit('update-lock', false);
                 });
 
             }).catch((err) => {
