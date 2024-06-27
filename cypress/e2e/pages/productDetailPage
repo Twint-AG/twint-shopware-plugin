@@ -1,0 +1,9 @@
+const productDetailPage = {
+    productQuantityInput: ".product-detail-quantity-input",
+    increaseQuantityBtn: ".btn-plus",
+    decreaseQuantityBtn: ".btn-minus",
+    addToCartBtn: ".btn-buy",
+    twintExpressBtn: ".twint-button",
+    productPriceLabel: ".product-detail-price",
+}
+export default productDetailPage
