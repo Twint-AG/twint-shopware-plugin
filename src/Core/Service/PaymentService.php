@@ -239,7 +239,7 @@ class PaymentService
             $client = $this->clientBuilder->build($salesChannelId);
             $device = $client->detectDevice(string()->assert($_SERVER['HTTP_USER_AGENT'] ?? ''));
             if ($device->isAndroid()) {
-                $payLinks['android'] = 'intent://payment#Intent;action=ch.twint.action.TWINT_PAYMENT;scheme=twint;S.code =' . $token . ';S.startingOrigin=EXTERNAL_WEB_BROWSER;S.browser_fallback_url=;end';
+                $payLinks['android'] = 'intent://payment#Intent;action=ch.twint.action.TWINT_PAYMENT;scheme=twint;S.code=' . $token . ';S.startingOrigin=EXTERNAL_WEB_BROWSER;S.browser_fallback_url=;end';
             } elseif ($device->isIos()) {
                 $appList = [];
                 $apps = $client->getIosAppSchemes();

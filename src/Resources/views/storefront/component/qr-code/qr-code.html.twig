@@ -7,7 +7,7 @@
                 <div class="row h-100 flex-column-reverse flex-md-row pl-md-3">
                     <div class="qr-code col-12 col-md-6 d-flex px-0 justify-content-center bg-white md-rounded pt-4 pt-md-0 pd-md-auto d-md-flex d-none flex d-md-flex">
                         <div data-twint-copy-token class="d-flex flex-column text-center flex-md-column-reverse">
-                            <div class="qr-token text-center mb-3">
+                            <div class="qr-token text-center mb-3" data-test="qr-code">
                                 <input id="qr-token" class="text-center bg-white" type="text" value="{{ pairingToken }}" disabled>
                             </div>
 
@@ -16,7 +16,7 @@
                             </div>
 
                             {% if qrCode %}
-                                <div class="text-center">
+                                <div class="text-center" data-test="code">
                                     <img src="{{ qrCode }}" alt="QR Code" class="qr-img col-12 img-fluid md-rounded">
                                 </div>
                             {% endif %}
