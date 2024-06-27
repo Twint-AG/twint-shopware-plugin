@@ -14,11 +14,11 @@ class RegularPaymentMethod extends AbstractMethod
     {
         return [
             'de-DE' => [
-                'description' => 'TWINT DE - Regular checkout payment - supported by TWINT',
+                'description' => '',
                 'name' => 'TWINT',
             ],
             'en-GB' => [
-                'description' => 'Regular Checkout Payment Plugin supported by TWINT',
+                'description' => '',
                 'name' => 'TWINT',
             ],
         ];

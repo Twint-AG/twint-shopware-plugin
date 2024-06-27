@@ -3,23 +3,13 @@
         <div class="row justify-content-center p-4">
             <div class="col-lg-10 modal-lg-12">
                 <div class="row justify-content-center">
-                    <div class="col-12 col-md-6 mb-4">
-                        <div class="d-flex flex-column align-items-center">
+                    <div class="col-12 col-md-12">
+                        <div class="d-flex flex-column align-items-center" data-test="tutorial-scan">
                             <div class="d-flex justify-content-center">
                                 <img class="guide-icon"
                                      src="{{ asset('bundles/twintpayment/assets/icons/icon-scan.svg') }}" alt="scan"/>
                             </div>
                             <div class="text-center mt-4">{{ "twintPayment.instruction.scanQR"|trans() }}</div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <div class="d-flex flex-column align-items-center">
-                            <div class="d-flex justify-content-center">
-                                <img class="guide-icon"
-                                     src="{{ asset('bundles/twintpayment/assets/icons/icon-contact.svg') }}"
-                                     alt="scan"/>
-                            </div>
-                            <div class="text-center mt-4">{{ "twintPayment.instruction.selectAddress"|trans() }}</div>
                         </div>
                     </div>
                 </div>

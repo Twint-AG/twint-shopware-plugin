@@ -15,6 +15,7 @@
         <sw-password-field
                 v-model:value="currentPassword"
                 :entity-collection="null"
+                :error="passwordError"
                 class="twint-config-field"
                 :label="$tc('twint.settings.certificate.password.label')"
                 :help-text="$tc('twint.settings.certificate.password.helpText')"

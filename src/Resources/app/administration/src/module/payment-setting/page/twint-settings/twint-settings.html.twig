@@ -17,9 +17,10 @@
                             class="sw-settings-login-registration__save-action"
                             :isLoading="isLoading"
                             :processSuccess="isSaveSuccessful"
-                            :disabled="isLoading || isTesting"
+                            :disabled="isLoading || isTesting || isDisabled"
                             variant="primary"
                             @process-finish="saveFinish"
+                            @update-lock="updateLock"
                             @click="onTest"
                             >
                         <span v-if="isTesting">
