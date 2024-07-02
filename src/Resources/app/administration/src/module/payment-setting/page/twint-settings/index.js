@@ -57,7 +57,6 @@ export default {
             return value;
         },
         updateLock(value) {
-            console.log('emit lock');
             this.isDisabled = value;
         },
 

@@ -3,6 +3,7 @@ import template65 from './twint-certificate-65.html.twig';
 import './twint-certificate.scss';
 
 const {Component, Mixin} = Shopware;
+const { ShopwareError } = Shopware.Classes;
 
 Component.register('twint-certificate', {
     template: Shopware.Feature.isActive('v6.6.0.0') ? template : template65,
@@ -15,7 +16,8 @@ Component.register('twint-certificate', {
         return {
             currentPassword: null,
             currentCertFile: null,
-            passwordError: false
+            passwordError: null,
+            validatePassword: ''
         };
     },
 
@@ -23,12 +25,14 @@ Component.register('twint-certificate', {
         onFileChange(file) {
             this.currentCertFile = file;
             if (this.currentCertFile && (!this.currentPassword || this.currentPassword.length === 0)) {
-                this.passwordError = true;
+                this.passwordError = new ShopwareError({
+                    code: 'c1051bb4-d103-4f74-8988-acbcafc7fdc3',
+                });
                 this.$root.$emit('update-lock', true);
                 return;
             }
             else if(!this.currentCertFile){
-                this.passwordError = false;
+                this.passwordError = null;
                 this.$root.$emit('update-lock', false);
                 return;
             }
@@ -37,11 +41,13 @@ Component.register('twint-certificate', {
 
         updatePassword(event) {
             if (this.currentCertFile && (!this.currentPassword || this.currentPassword.length === 0)) {
-                this.passwordError = true;
+                this.passwordError = new ShopwareError({
+                    code: 'c1051bb4-d103-4f74-8988-acbcafc7fdc3',
+                });
                 this.$root.$emit('update-lock', true);
             }
             else if(this.currentCertFile){
-                this.passwordError = false;
+                this.passwordError = null;
                 this.extractPem();
             }
         },
