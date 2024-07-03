@@ -354,10 +354,16 @@ trait ServicesTrait
     /**
      * @param array<string, mixed> $params
      */
-    private function createRequest(string $route, array $params = []): Request
+    private function createRequest(string $route, array $params = [], string $method = 'GET'): Request
     {
         $request = new Request();
-        $request->query->add($params);
+        if($method == 'GET'){
+            $request->query->add($params);
+        }
+        else if($method == 'POST'){
+            $request->request->add($params);
+        }
+
         $request->setSession($this->getSession());
         $request->headers->set('HOST', 'localhost');
         $request->attributes->add([

@@ -40,7 +40,6 @@ class CheckoutController extends StorefrontController
     public function expressCheckout(Request $request, SalesChannelContext $context): Response
     {
         $pairing = $this->checkoutService->pairing($context, $request);
-
         return $this->json([
             'success' => true,
             'redirectUrl' => '/payment/express/' . $this->cryptoService->hash($pairing->pairingUuid()->__toString()),

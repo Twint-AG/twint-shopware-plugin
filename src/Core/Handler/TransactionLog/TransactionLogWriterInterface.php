@@ -12,6 +12,7 @@ interface TransactionLogWriterInterface
         string $orderStateId,
         string $transactionId,
         string $apiMethod,
+        array $soapAction,
         string $request,
         string $response,
         array $soapRequest,
