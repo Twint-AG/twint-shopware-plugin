@@ -3,9 +3,14 @@ declare(strict_types=1);
 
 namespace Twint\Tests\Storefront\Controller;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionDefinition;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
@@ -14,10 +19,18 @@ use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMa
 use Shopware\Core\System\StateMachine\StateMachineRegistry;
 use Shopware\Core\System\StateMachine\Transition;
 use Shopware\Core\Test\TestDefaults;
+use Shopware\Storefront\Controller\StorefrontController;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Twint\Core\DataAbstractionLayer\Entity\TransactionLog\TwintTransactionLogEntity;
+use Twint\Core\Service\OrderService;
+use Twint\Core\Service\PaymentService;
 use Twint\Tests\Helper\ServicesTrait;
 use Twint\Storefront\Controller\PaymentController;
 use Twint\Core\Util\CryptoHandler;
 use Shopware\Storefront\Test\Controller\StorefrontControllerTestBehaviour;
+use Symfony\Component\HttpFoundation\Request;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 
 /**
  * @internal
@@ -28,6 +41,7 @@ class PaymentControllerTest extends TestCase
     use StorefrontControllerTestBehaviour;
     use IntegrationTestBehaviour;
 
+    private ContainerInterface $container;
     /**
      * @var PaymentController
      */
@@ -46,6 +60,13 @@ class PaymentControllerTest extends TestCase
     private array $twintCustomFields = [];
 
     private StateMachineRegistry $stateMachineRegistry;
+
+    private PaymentController $controller;
+    private MockObject $orderRepository;
+    private MockObject $cryptoService;
+    private MockObject $paymentService;
+    private MockObject $orderService;
+    private MockObject $request;
 
     /**
      * @return string
@@ -69,6 +90,8 @@ class PaymentControllerTest extends TestCase
             'twint_api_response' => '{"id":"40684cd7-66a0-4118-92e0-5b06b5459f59","status":"IN_PROGRESS","transactionStatus":"ORDER_RECEIVED","pairingToken":"74562","merchantTransactionReference":"10095"}'
         ];
         $this->stateMachineRegistry = $this->getContainer()->get(StateMachineRegistry::class);
+
+
     }
 
     public function testValidOrder(): void{
