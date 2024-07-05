@@ -1,6 +1,6 @@
 {
     "name": "twint/twint",
-    "description": "TBU - Twint Payment plugin",
+    "description": "TBU - TWINT Payment plugin",
     "type": "shopware-platform-plugin",
     "version": "0.0.2",
     "license": "MIT",
@@ -38,17 +38,17 @@
         "plugin-icon": "src/Resources/public/plugin.png",
         "copyright": "(c) by Twint 2024 (c) by NFQ",
         "label": {
-            "de-DE": "TBU - Twint Payment",
-            "en-GB": "TBU - Twint Payment",
-            "fr-FR": "TBU - Twint Payment"
+            "de-DE": "TBU - TWINT Payment",
+            "en-GB": "TBU - TWINT Payment",
+            "fr-FR": "TBU - TWINT Payment"
         },
         "description": {
-            "de-DE": "TBU - Twint Payment",
-            "en-GB": "TBU - Twint Payment"
+            "de-DE": "TBU - TWINT Payment",
+            "en-GB": "TBU - TWINT Payment"
         },
         "supportLink": {
-            "de-DE": "https://localhost/",
-            "en-GB": "https://localhost/"
+            "de-DE": "https://www.twint.ch/privatkunden/support/?lang=de",
+            "en-GB": "https://www.twint.ch/en/private-customers/support/"
         }
     },
     "autoload": {

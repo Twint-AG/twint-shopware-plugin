@@ -16,7 +16,7 @@
             <label lang="fr-FR">Switch to test mode</label>
             <label lang="it-IT">Switch to test mode</label>
 
-            <helpText>Turning on test mode will use the TWINT PAT environment. PAT stands for Production Acceptance Test and allows you to test your TWINT integration on an environment closeley resembling the production environment without actually charging a TWINT account.</helpText>
+            <helpText>Turning on test mode will use the TWINT PAT environment. PAT stands for Production Acceptance Test and allows you to test your TWINT integration on an environment closeley resembling the production environment without actually charging a TWINT account</helpText>
             <helpText lang="de-DE">Custom Acceptance Test Mode (On) / Production Mode (Off)</helpText>
             <helpText lang="fr-FR">Custom Acceptance Test Mode (On) / Production Mode (Off)</helpText>
             <helpText lang="it-IT">Custom Acceptance Test Mode (On) / Production Mode (Off)</helpText>
