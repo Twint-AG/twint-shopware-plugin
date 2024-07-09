@@ -19,7 +19,8 @@
                 class="twint-config-field"
                 :label="$tc('twint.settings.certificate.password.label')"
                 :help-text="$tc('twint.settings.certificate.password.helpText')"
-                @blur="updatePassword">
+                @blur="updatePassword"
+                required>
             <template #suffix>
                 {% block twint_certificate_password_suffix_block %}
                     <sw-icon name="regular-low-vision" size="22px"></sw-icon>
