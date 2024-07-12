@@ -63,14 +63,14 @@ Under the `Apps` tab -> Ensure that `TWINT Payment` is enabled
 
 #### 3. Go to `Settings -> Extensions -> TWINT Express Checkout`
 
-Under the `Display options` section -> Select where we want the `TWINT Express Checkout` button to be displayed.
+Under the `Display options` section -> Choose the placement for displaying the `TWINT Express Checkout` button.
 
 #### 4. Go to `Settings -> Payment methods`
 
 - Ensure that the below payment methods are enabled:
     - TWINT - Express Checkout
     - TWINT - Regular Checkout
-- We can further custom the payment method (e.g. add logo) by click the `Edit details` link next to each payment method.
+- The payment method can be customized (e.g. add logo) by clicking the "Edit details" link next to each payment method.
 
 <img src="./screenshots/twint-payment-methods.png" alt="Active TWINT payment methods" width="900" height="auto">
 
@@ -82,7 +82,7 @@ Under the `Display options` section -> Select where we want the `TWINT Express C
 >
 > TWINT payment extension supports **CHF** currency only. Please make sure CHF currency is added to the Sale channel (also know as the Storefront).
 >
-> If we already have **CHF** currency created please ignore this section.
+> If **CHF** currency was already created, please skip this section.
 
 #### 1. Login to the Admin console panel
 
@@ -113,7 +113,7 @@ Under the `Display options` section -> Select where we want the `TWINT Express C
 > At this stage, the Sale channel should be set up and configured. The information below serves as kind reminder.  
 > Below are some information that need our attention on.
 
-- Please ensure the below payment methods are added for the Sale channel:
+- Ensure CHF currency is added to the desired sale channel.:
     - TWINT - Express Checkout
     - TWINT - Regular Checkout
 - Ensure CHF currency is added to your sale channel.
