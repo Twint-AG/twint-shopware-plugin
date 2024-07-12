@@ -15,6 +15,7 @@
         },
         "instruction": {
             "scanQR": "Scannen Sie diesen QR-Code mit Ihrer TWINT-App, um den Checkout abzuschließen.",
+            "selectAddress": "Wählen Sie eine Versandadresse und schließen Sie den Kauf in der App ab.",
             "inputCode": "Geben Sie diesen Code in Ihre TWINT-App ein:",
             "or": "oder"
         },
