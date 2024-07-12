@@ -111,7 +111,7 @@ Under the `Display options` section -> Select where we want the `TWINT Express C
 > 🚩 **Note:**
 >
 > At this stage, the Sale channel should be set up and configured. The information below serves as kind reminder.  
-> Below are just some information need our attention on.
+> Below are some information that need our attention on.
 
 - Please ensure the below payment methods are added for the Sale channel:
     - TWINT - Express Checkout
