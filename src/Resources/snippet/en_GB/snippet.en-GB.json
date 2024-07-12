@@ -9,6 +9,7 @@
         },
         "instruction" : {
             "scanQR": "Scan this QR Code with your TWINT app to complete the checkout.",
+            "selectAddress": "Select a shipping address and complete the purchase in the app.",
             "inputCode": "Enter this code in your TWINT app:",
             "or": "or"
         },
