@@ -34,7 +34,7 @@ After the extension was imported -> Click the `Install` link to install the exte
 
 #### 2. Go to `Extensions -> My extensions`
 
-Under the `Apps` tab -> Ensure that `Twint Payment` is enabled
+Under the `Apps` tab -> Ensure that `TWINT Payment` is enabled
 
 <img src="./screenshots/twint-enable-extension.png" alt="Enable the TWINT Payment extension" width="900" height="auto">
 
@@ -63,7 +63,7 @@ Under the `Apps` tab -> Ensure that `Twint Payment` is enabled
 
 #### 3. Go to `Settings -> Extensions -> TWINT Express Checkout`
 
-Under the `Display options` section -> Select where we want the `Twint Express Checkout` button to be displayed.
+Under the `Display options` section -> Select where we want the `TWINT Express Checkout` button to be displayed.
 
 #### 4. Go to `Settings -> Payment methods`
 
