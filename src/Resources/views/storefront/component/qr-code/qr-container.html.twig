@@ -22,7 +22,11 @@
                     })
                 }}
 
-                {{ include('@TwintPayment/storefront/component/qr-code/payment-guide.html.twig') }}
+                {{
+                    include('@TwintPayment/storefront/component/qr-code/payment-guide.html.twig', {
+                        expressCheckout: expressCheckout
+                    })
+                }}
             </div>
         {% endblock %}
     </div>
