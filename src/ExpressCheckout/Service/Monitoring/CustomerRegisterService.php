@@ -12,7 +12,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGenerator;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Twint\Core\DataAbstractionLayer\Entity\Pairing\TwintPairingEntity;
+use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\ExpressCheckout\Util\PaymentMethodUtil;
 use Twint\Sdk\Value\Address;
 use Twint\Sdk\Value\CustomerData;
@@ -28,7 +28,7 @@ class CustomerRegisterService
     ) {
     }
 
-    public function register(TwintPairingEntity $pairing, SalesChannelContext $context): array
+    public function register(PairingEntity $pairing, SalesChannelContext $context): array
     {
         $customerData = $this->generateCustomerData($pairing, $context);
         $this->customerRepository->create([$customerData], $context->getContext());
@@ -40,7 +40,7 @@ class CustomerRegisterService
     /**
      * @throws Exception
      */
-    public function generateCustomerData(TwintPairingEntity $pairing, SalesChannelContext $context): array
+    public function generateCustomerData(PairingEntity $pairing, SalesChannelContext $context): array
     {
         /** @var CustomerData $customerData */
         $customerData = $pairing->getCustomerData();
@@ -54,8 +54,8 @@ class CustomerRegisterService
         $swAddress = [
             'salutationId' => $this->getSalutationId($context),
             'street' => $address->street(),
-            'city' => (string) $address->city(),
-            'zipcode' => (string) $address->zip(),
+            'city' => $address->city(),
+            'zipcode' => $address->zip(),
             'countryId' => (string) $this->getCountryId($context, $address->country() ->__toString()),
             'countryStateId' => null,
             'firstName' => $address->firstName(),
@@ -76,10 +76,10 @@ class CustomerRegisterService
             'languageId' => $channel->getLanguageId(),
             'groupId' => $channel->getCustomerGroupId(),
             'defaultPaymentMethodId' => $this->paymentMethodUtil->getExpressCheckoutMethodId(),
-            'firstName' => (string) $address->firstName(),
-            'lastName' => (string) $address->lastName(),
+            'firstName' => $address->firstName(),
+            'lastName' => $address->lastName(),
             'email' => (string) $customerData->email(),
-            'active' => true,
+            'active' => false,
             'firstLogin' => new DateTimeImmutable(),
             'password' => '12345678',
             'id' => Uuid::randomHex(),

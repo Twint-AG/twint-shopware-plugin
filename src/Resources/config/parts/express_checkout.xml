@@ -20,6 +20,7 @@
             <argument type="service" id="Twint\ExpressCheckout\Util\PaymentMethodUtil"/>
             <argument type="service" id="Twint\Core\Service\SettingServiceInterface"/>
             <argument type="service" id="Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRoute"/>
+            <argument type="service" id="Shopware\Core\System\Country\SalesChannel\CountryRoute"/>
         </service>
 
         <service id="twint.service.express.checkout" class="Twint\ExpressCheckout\Service\ExpressCheckoutService">
@@ -30,10 +31,10 @@
             <argument type="service" id="Shopware\Core\Checkout\Cart\Delivery\DeliveryBuilder"/>
             <argument type="service" id="Twint\ExpressCheckout\Service\ExpressPaymentService"/>
             <argument type="service" id="Twint\ExpressCheckout\Repository\PairingRepository"/>
-            <argument type="service" id="currency.repository"/>
             <argument type="service" id="Shopware\Core\System\SalesChannel\Context\CachedSalesChannelContextFactory"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\CartPersister"/>
             <argument type="service" id="Twint\Core\Service\SettingServiceInterface"/>
+            <argument type="service" id="Twint\Core\Service\CurrencyService"/>
         </service>
 
         <service id="Twint\ExpressCheckout\Service\ExpressPaymentService">
@@ -48,6 +49,33 @@
             <argument type="service" id="Twint\ExpressCheckout\Util\PaymentMethodUtil"/>
             <argument type="service" id="salutation.repository"/>
             <argument type="service" id="country.repository"/>
+        </service>
+
+        <service id="Twint\ExpressCheckout\Service\PairingService">
+            <argument type="service" id="Twint\ExpressCheckout\Repository\PairingRepository"/>
+        </service>
+
+        <service id="Twint\ExpressCheckout\Service\PaymentService">
+            <argument type="service" id="Twint\Core\Factory\ClientBuilder"/>
+            <argument type="service" id="logger"/>
+        </service>
+
+        <service id="Twint\ExpressCheckout\Service\Monitoring\ContextFactory">
+            <argument type="service" id="Shopware\Core\System\SalesChannel\Context\CachedSalesChannelContextFactory"/>
+        </service>
+
+        <service id="Twint\ExpressCheckout\Service\Monitoring\StateHandler\OnPaidHandler">
+            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
+            <argument type="service" id="Twint\ExpressCheckout\Service\Monitoring\ContextFactory"/>
+            <argument type="service" id="Twint\ExpressCheckout\Service\Monitoring\CustomerRegisterService"/>
+            <argument type="service" id="Twint\ExpressCheckout\Util\PaymentMethodUtil"/>
+            <argument type="service" id="order.repository"/>
+            <argument type="service"
+                      id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
+            <argument type="service" id="Twint\Core\Service\CurrencyService"/>
+            <argument type="service" id="Twint\ExpressCheckout\Service\PairingService"/>
+            <argument type="service" id="Twint\ExpressCheckout\Service\PaymentService"/>
+            <argument type="service" id="Twint\Core\Service\OrderService"/>
         </service>
 
     </services>

@@ -12,19 +12,16 @@ use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Shipping\SalesChannel\AbstractShippingMethodRoute;
 use Shopware\Core\Checkout\Shipping\ShippingMethodCollection;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
-use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\Context\AbstractSalesChannelContextFactory;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Event\RouteRequest\ShippingMethodRouteRequestEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Twint\Core\Service\CurrencyService;
 use Twint\Core\Service\SettingServiceInterface;
-use Twint\Core\Setting\Settings;
 use Twint\ExpressCheckout\Repository\PairingRepository;
 use Twint\Sdk\Exception\SdkError;
 use Twint\Sdk\Value\Money;
@@ -42,10 +39,10 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
         private readonly DeliveryBuilder $deliveryBuilder,
         private readonly ExpressPaymentService $paymentService,
         private readonly PairingRepository $loader,
-        private readonly EntityRepository $currencyRepository,
-        private AbstractSalesChannelContextFactory $contextFactory,
-        private CartPersister $cartPersister,
+        private readonly AbstractSalesChannelContextFactory $contextFactory,
+        private readonly CartPersister $cartPersister,
         private readonly SettingServiceInterface $settingService,
+        private readonly CurrencyService $currencyService,
     ) {
     }
 
@@ -105,7 +102,7 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
             if ($context->getShippingMethod()->getId() !== $method->getId()) {
                 $session = [
                     'shippingMethodId' => $method->getId(),
-                    'currencyId' => $this->getCurrencyId(),
+                    'currencyId' => $this->currencyService->getCurrencyId(),
                 ];
 
                 $context = $this->contextFactory->create(
@@ -168,14 +165,5 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
     public function getOpenedPairings(): mixed
     {
         return $this->loader->loadInProcessPairings();
-    }
-
-    protected function getCurrencyId(): ?string
-    {
-        $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('isoCode', Settings::ALLOWED_CURRENCY));
-
-        return $this->currencyRepository->searchIds($criteria, Context::createDefaultContext())
-            ->firstId();
     }
 }

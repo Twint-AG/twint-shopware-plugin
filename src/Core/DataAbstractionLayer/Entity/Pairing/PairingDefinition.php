@@ -18,7 +18,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\UpdatedAtField;
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelDefinition;
 
-class TwintPairingDefinition extends EntityDefinition
+class PairingDefinition extends EntityDefinition
 {
     final public const ENTITY_NAME = 'twint_pairing';
 
@@ -29,12 +29,12 @@ class TwintPairingDefinition extends EntityDefinition
 
     public function getCollectionClass(): string
     {
-        return TwintPairingCollection::class;
+        return PairingCollection::class;
     }
 
     public function getEntityClass(): string
     {
-        return TwintPairingEntity::class;
+        return PairingEntity::class;
     }
 
     protected function defineFields(): FieldCollection
