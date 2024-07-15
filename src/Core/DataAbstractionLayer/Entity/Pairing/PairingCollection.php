@@ -7,12 +7,12 @@ namespace Twint\Core\DataAbstractionLayer\Entity\Pairing;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 
 /**
- * @extends EntityCollection<TwintPairingEntity>
+ * @extends EntityCollection<PairingEntity>
  */
-class TwintPairingCollection extends EntityCollection
+class PairingCollection extends EntityCollection
 {
     protected function getExpectedClass(): string
     {
-        return TwintPairingEntity::class;
+        return PairingEntity::class;
     }
 }

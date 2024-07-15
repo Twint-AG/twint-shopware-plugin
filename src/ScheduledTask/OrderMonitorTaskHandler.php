@@ -5,60 +5,57 @@ declare(strict_types=1);
 namespace Twint\ScheduledTask;
 
 use Exception;
-use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
-use Twint\Core\Service\OrderService;
-use Twint\Core\Service\PaymentService;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Twint\Core\Service\OrderMonitoringService;
 
-class OrderMonitorTaskHandler extends ScheduledTaskHandler
-{
-    private PaymentService $paymentService;
+$interface = 'Symfony\Component\Messenger\Handler\MessageSubscriberInterface';
+$interfaces = class_implements(ScheduledTaskHandler::class);
 
-    private OrderService $orderService;
-
-    private LoggerInterface $logger;
-
-    public function __construct(
-        EntityRepository $scheduledTaskRepository,
-        LoggerInterface $logger,
-        PaymentService $paymentService,
-        OrderService $orderService
-    ) {
-        parent::__construct($scheduledTaskRepository);
-        $this->paymentService = $paymentService;
-        $this->orderService = $orderService;
-        $this->logger = $logger;
-    }
-
-    public static function getHandledMessages(): iterable
+if (interface_exists('Symfony\Component\Messenger\Handler\MessageSubscriberInterface') && in_array(
+    $interface,
+    $interfaces,
+    true
+)) {
+    class OrderMonitorTaskHandler extends ScheduledTaskHandler
     {
-        return [OrderMonitorTask::class];
-    }
+        private OrderMonitoringService $service;
 
-    /**
-     * @throws Exception
-     */
-    public function run(): void
-    {
-        $pendingOrders = $this->orderService->getPendingOrders();
-        if (count($pendingOrders) > 0) {
-            /** @var OrderEntity $order */
-            foreach ($pendingOrders as $order) {
-                try {
-                    $this->paymentService->checkOrderStatus($order);
-                } catch (Exception $e) {
-                    $this->logger->error(
-                        sprintf(
-                            'TWINT order status cannot be updated: %s with error code: %s',
-                            $e->getMessage(),
-                            $e->getCode()
-                        )
-                    );
-                }
-            }
+        public static function getHandledMessages(): iterable
+        {
+            return [OrderMonitorTask::class];
         }
-        $this->logger->info('Cron ran successfully');
+
+        public function setMonitoringService(OrderMonitoringService $service): void
+        {
+            $this->service = $service;
+        }
+
+        /**
+         * @throws Exception
+         */
+        public function run(): void
+        {
+            $this->service->monitor(null);
+        }
+    }
+} else {
+    #[AsMessageHandler(handles: OrderMonitorTask::class)]
+    class OrderMonitorTaskHandler extends ScheduledTaskHandler
+    {
+        private OrderMonitoringService $service;
+
+        public function setMonitoringService(OrderMonitoringService $service): void
+        {
+            $this->service = $service;
+        }
+
+        public function run(): void
+        {
+            $this->service->monitor($this->exceptionLogger);
+
+            // @phpstan-ignore-next-line: compatible backwards compatibility
+            $this->exceptionLogger?->info('Cron ran successfully');
+        }
     }
 }

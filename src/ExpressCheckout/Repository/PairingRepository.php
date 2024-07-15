@@ -14,7 +14,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Twint\Core\DataAbstractionLayer\Entity\Pairing\TwintPairingEntity;
+use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\ExpressCheckout\Exception\PairingException;
 use Twint\Sdk\Value\PairingStatus;
 
@@ -28,7 +28,7 @@ class PairingRepository
     ) {
     }
 
-    public function load(string $pairingId, SalesChannelContext $context): TwintPairingEntity
+    public function load(string $pairingId, SalesChannelContext $context): PairingEntity
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('id', $pairingId));
@@ -37,7 +37,7 @@ class PairingRepository
         $pairing = $this->pairingRepository->search($criteria, $context->getContext())
             ->first();
 
-        if (($pairing instanceof TwintPairingEntity) === false) {
+        if (($pairing instanceof PairingEntity) === false) {
             throw new PairingException("{$pairingId} not found");
         }
 
@@ -46,7 +46,7 @@ class PairingRepository
         return $pairing;
     }
 
-    public function fetchCart(TwintPairingEntity $entity, SalesChannelContext $context): TwintPairingEntity
+    public function fetchCart(PairingEntity $entity, SalesChannelContext $context): PairingEntity
     {
         $cart = $this->cartPersister->load($entity->getCartToken(), $context);
         $cart = $this->cartService->recalculate($cart, $context);
@@ -55,7 +55,7 @@ class PairingRepository
         return $entity;
     }
 
-    public function fetchOrder(TwintPairingEntity $entity, SalesChannelContext $context): TwintPairingEntity
+    public function fetchOrder(PairingEntity $entity, SalesChannelContext $context): PairingEntity
     {
         if ($entity->getOrderId() === null) {
             return $entity;

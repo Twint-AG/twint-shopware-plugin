@@ -7,6 +7,10 @@ namespace Twint\ExpressCheckout\Service;
 use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
 use Shopware\Core\Checkout\Payment\SalesChannel\AbstractPaymentMethodRoute;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\System\Country\CountryCollection;
+use Shopware\Core\System\Country\CountryEntity;
+use Shopware\Core\System\Country\SalesChannel\AbstractCountryRoute;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\Request;
 use Twint\Core\Service\SettingServiceInterface;
@@ -20,7 +24,8 @@ class ExpressCheckoutButtonService
     public function __construct(
         private readonly PaymentMethodUtil $paymentMethodUtil,
         private readonly SettingServiceInterface $settingService,
-        private readonly AbstractPaymentMethodRoute $paymentMethodRoute
+        private readonly AbstractPaymentMethodRoute $paymentMethodRoute,
+        private readonly AbstractCountryRoute $countryRoute
     ) {
     }
 
@@ -36,6 +41,20 @@ class ExpressCheckoutButtonService
 
         return $this->paymentMethodRoute->load($request, $context, new Criteria())
             ->getPaymentMethods();
+    }
+
+    private function getCountries(SalesChannelContext $salesChannelContext): CountryCollection
+    {
+        $criteria = (new Criteria())
+            ->addFilter(new EqualsFilter('active', true))
+            ->addAssociation('states');
+
+        $countries = $this->countryRoute->load(new Request(), $criteria, $salesChannelContext)
+            ->getCountries();
+
+        $countries->sortCountryAndStates();
+
+        return $countries;
     }
 
     public function getButtons(SalesChannelContext $context): array
@@ -81,8 +100,27 @@ class ExpressCheckoutButtonService
             return self::$buttons;
         }
 
+        //Check Sale channel countries
+        if (!$this->matchAllowedCountry($context)) {
+            self::$buttons = [];
+            return self::$buttons;
+        }
+
         self::$buttons = $settings->getScreens();
 
         return self::$buttons;
+    }
+
+    private function matchAllowedCountry(SalesChannelContext $context): bool
+    {
+        $countries = $this->getCountries($context);
+        /** @var CountryEntity $country */
+        foreach ($countries as $country) {
+            if ($country->getIso() === Settings::ALLOWED_COUNTRY) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

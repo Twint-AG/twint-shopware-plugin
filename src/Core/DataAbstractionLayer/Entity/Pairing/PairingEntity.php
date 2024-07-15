@@ -11,7 +11,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
-class TwintPairingEntity extends Entity
+class PairingEntity extends Entity
 {
     use EntityIdTrait;
 

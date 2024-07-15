@@ -84,10 +84,20 @@
             <argument type="service" id="twint_transaction_log.repository"/>
             <argument type="service" id="logger"/>
         </service>
+
         <service id="twint_reversal_history_writer"
                  class="Twint\Core\Handler\ReversalHistory\ReversalHistoryDatabaseWriter">
             <argument type="service" id="twint_reversal_history.repository"/>
             <argument type="service" id="logger"/>
+        </service>
+
+        <service id="Twint\Core\Service\OrderMonitoringService">
+            <argument type="service" id="Twint\Core\Service\PaymentService"/>
+            <argument type="service" id="Twint\Core\Service\PaymentService"/>
+        </service>
+
+        <service id="Twint\Core\Service\CurrencyService">
+            <argument type="service" id="currency.repository"/>
         </service>
     </services>
 </container>

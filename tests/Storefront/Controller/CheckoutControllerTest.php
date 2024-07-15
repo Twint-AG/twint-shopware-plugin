@@ -13,7 +13,7 @@ use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\Test\TestDefaults;
-use Twint\Core\DataAbstractionLayer\Entity\Pairing\TwintPairingEntity;
+use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\Core\Service\PaymentService;
 use Twint\ExpressCheckout\Repository\PairingRepository;
 use Twint\ExpressCheckout\Service\ExpressCheckoutServiceInterface;
@@ -103,7 +103,7 @@ class CheckoutControllerTest extends TestCase
             ->with($this->salesChannelContext, $request)
             ->willReturn($pairing);
 
-        $pairingEntity = new TwintPairingEntity();
+        $pairingEntity = new PairingEntity();
         $pairingEntity->setToken(self::TOKEN);
         $cart = new Cart(Uuid::randomHex());
         $cart->setPrice(new CartPrice(10, 10, 10, new CalculatedTaxCollection(), new TaxRuleCollection(), CartPrice::TAX_STATE_GROSS));
@@ -152,7 +152,7 @@ class CheckoutControllerTest extends TestCase
             ->with($pairingHash)
             ->willReturn('unhashedPairingUuid');
 
-        $pairingEntity = new TwintPairingEntity();
+        $pairingEntity = new PairingEntity();
         $pairingEntity->setToken(self::TOKEN);
         $cart = new Cart(Uuid::randomHex());
         $cart->setPrice(new CartPrice(10, 10, 10, new CalculatedTaxCollection(), new TaxRuleCollection(), CartPrice::TAX_STATE_GROSS));
@@ -191,7 +191,7 @@ class CheckoutControllerTest extends TestCase
             ->with($pairingHash)
             ->willReturn('unhashedPairingUuid');
 
-        $pairingEntity = new TwintPairingEntity();
+        $pairingEntity = new PairingEntity();
         $pairingEntity->setToken(self::TOKEN);
         $cart = new Cart(Uuid::randomHex());
         $cart->setPrice(new CartPrice(10, 10, 10, new CalculatedTaxCollection(), new TaxRuleCollection(), CartPrice::TAX_STATE_GROSS));

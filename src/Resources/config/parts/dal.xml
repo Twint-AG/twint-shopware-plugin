@@ -3,7 +3,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="Twint\Core\DataAbstractionLayer\Entity\Pairing\TwintPairingDefinition">
+        <service id="Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingDefinition">
             <tag name="shopware.entity.definition" entity="twint_transaction_log"/>
         </service>
         <service id="Twint\Core\DataAbstractionLayer\Entity\ReversalHistory\TwintReversalHistoryDefinition">

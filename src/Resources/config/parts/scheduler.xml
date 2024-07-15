@@ -23,7 +23,9 @@
         <service id="Twint\ScheduledTask\OrderMonitorTaskHandler">
             <argument type="service" id="scheduled_task.repository"/>
             <argument type="service" id="logger"/>
-            <argument type="service" id="Twint\Core\Service\PaymentService"/>
+            <call method="setMonitoringService">
+                <argument type="service" id="Twint\Core\Service\OrderMonitoringService"/>
+            </call>
             <tag name="messenger.message_handler"/>
         </service>
 

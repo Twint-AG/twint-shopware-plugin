@@ -28,6 +28,8 @@ class Settings
 
     public const ALLOWED_CURRENCY = 'CHF';
 
+    public const ALLOWED_COUNTRY = 'CH';
+
     public const CHECKOUT_SINGLE = self::PREFIX_EXPRESS . 'checkoutSingle';
 
     // Screen options
