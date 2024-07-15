@@ -9,15 +9,18 @@ use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Util\Random;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\Context\AbstractSalesChannelContextFactory;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Throwable;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\TwintPairingEntity;
+use Twint\Core\Setting\Settings;
 use Twint\ExpressCheckout\Repository\PairingRepository;
 use Twint\ExpressCheckout\Service\ExpressPaymentService;
 use Twint\ExpressCheckout\Util\PaymentMethodUtil;
@@ -39,6 +42,7 @@ class MonitoringService
         private CustomerRegisterService $customerService,
         private readonly PaymentMethodUtil $paymentMethodUtil,
         private readonly EntityRepository $orderRepository,
+        private readonly EntityRepository $currencyRepository,
         private readonly OrderTransactionStateHandler $transactionStateHandler,
     ) {
     }
@@ -116,7 +120,7 @@ class MonitoringService
         $data = [
             'id' => $pairingEntity->getUniqueIdentifier(),
             'status' => (string) $state->pairingStatus(),
-            'customerData' => $state->customerData(),
+            'customerData' => json_decode((string) json_encode($state->customerData()), true),
         ];
 
         if ($state->shippingMethodId() instanceof ShippingMethodId) {
@@ -182,6 +186,7 @@ class MonitoringService
             'shippingMethodId' => (string) $state->shippingMethodId(),
             'shippingAddressId' => $customerData['defaultShippingAddressId'], //TODO
             'paymentMethodId' => $this->paymentMethodUtil->getExpressCheckoutMethodId(),
+            'currencyId' => $this->getCurrencyId(),
         ]);
 
         if (!$entity->getCart() instanceof Cart) {
@@ -220,5 +225,14 @@ class MonitoringService
         }
 
         $this->transactionStateHandler->paid($transaction->getId(), $context->getContext());
+    }
+
+    protected function getCurrencyId(): ?string
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('symbol', Settings::ALLOWED_CURRENCY));
+
+        return $this->currencyRepository->searchIds($criteria, Context::createDefaultContext())
+            ->firstId();
     }
 }
