@@ -48,12 +48,15 @@ Shopware.Component.override('sw-order-detail', {
             return this.repositoryFactory.create('twint_pairing');
         },
         isTwintOrder() {
-            const customFields = this.order?.customFields || {};
-            let hasTwintApiResponse = false;
-            if (customFields['twint_api_response']) {
-                hasTwintApiResponse = true;
+            let transactions = this.order.transactions;
+
+            for (let transaction of transactions) {
+                if (transaction.paymentMethod.handlerIdentifier.includes('Twint')) {
+                    return true;
+                }
             }
-            return this.pairings?.length > 0 || hasTwintApiResponse;
+
+            return false;
         }
     }
 });
