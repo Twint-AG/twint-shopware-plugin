@@ -26,7 +26,7 @@ class Settings
 
     public const SCREENS = self::PREFIX_EXPRESS . 'screens';
 
-    public const ALLOWED_CURRENCIES = ['CHF'];
+    public const ALLOWED_CURRENCY = 'CHF';
 
     public const CHECKOUT_SINGLE = self::PREFIX_EXPRESS . 'checkoutSingle';
 

@@ -70,6 +70,7 @@ return static function (ECSConfig $ecsConfig): void {
         __DIR__ . '/build',
         __DIR__ . '/infra',
         __DIR__ . '/var',
+        __DIR__ . '/cypress',
         FinalClassFixer::class => [__DIR__ . '/src/Generated/'],
     ]);
 

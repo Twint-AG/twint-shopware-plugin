@@ -30,6 +30,7 @@
             <argument type="service" id="Shopware\Core\Checkout\Cart\Delivery\DeliveryBuilder"/>
             <argument type="service" id="Twint\ExpressCheckout\Service\ExpressPaymentService"/>
             <argument type="service" id="Twint\ExpressCheckout\Repository\PairingRepository"/>
+            <argument type="service" id="currency.repository"/>
             <argument type="service" id="Shopware\Core\System\SalesChannel\Context\CachedSalesChannelContextFactory"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\CartPersister"/>
             <argument type="service" id="Twint\Core\Service\SettingServiceInterface"/>
@@ -46,6 +47,7 @@
             <argument type="service" id="customer.repository"/>
             <argument type="service" id="Twint\ExpressCheckout\Util\PaymentMethodUtil"/>
             <argument type="service" id="salutation.repository"/>
+            <argument type="service" id="country.repository"/>
         </service>
 
     </services>
