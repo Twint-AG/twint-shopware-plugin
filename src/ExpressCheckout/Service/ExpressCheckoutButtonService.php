@@ -76,7 +76,7 @@ class ExpressCheckoutButtonService
         // Check if the currency is allowed
         $currency = $context->getCurrency()
             ->getIsoCode();
-        if (!in_array($currency, Settings::ALLOWED_CURRENCIES, true)) {
+        if ($currency === Settings::ALLOWED_CURRENCY) {
             self::$buttons = [];
             return self::$buttons;
         }
