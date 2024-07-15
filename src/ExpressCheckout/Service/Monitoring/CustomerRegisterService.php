@@ -14,6 +14,8 @@ use Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGenerator;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\TwintPairingEntity;
 use Twint\ExpressCheckout\Util\PaymentMethodUtil;
+use Twint\Sdk\Value\Address;
+use Twint\Sdk\Value\CustomerData;
 
 class CustomerRegisterService
 {
@@ -21,7 +23,8 @@ class CustomerRegisterService
         private readonly NumberRangeValueGenerator $numberRangeValueGenerator,
         private readonly EntityRepository $customerRepository,
         private readonly PaymentMethodUtil $paymentMethodUtil,
-        private readonly EntityRepository $salutationRepository
+        private readonly EntityRepository $salutationRepository,
+        private readonly EntityRepository $countryRepository
     ) {
     }
 
@@ -39,19 +42,24 @@ class CustomerRegisterService
      */
     public function generateCustomerData(TwintPairingEntity $pairing, SalesChannelContext $context): array
     {
+        /** @var CustomerData $customerData */
+        $customerData = $pairing->getCustomerData();
+
+        /** @var Address $address */
+        $address = $customerData->shippingAddress();
+
         $channel = $context->getSalesChannel();
         $id = Uuid::randomHex();
         $addressId = Uuid::randomHex();
-        $address = [
+        $swAddress = [
             'salutationId' => $this->getSalutationId($context),
-            'street' => 'Parallelweg 30',
-            'city' => 'City',
-            'zipcode' => '',
-            'countryId' => $context->getSalesChannel()
-                ->getCountryId(),
+            'street' => $address->street(),
+            'city' => (string) $address->city(),
+            'zipcode' => (string) $address->zip(),
+            'countryId' => (string) $this->getCountryId($context, $address->country() ->__toString()),
             'countryStateId' => null,
-            'firstName' => 'F_Name',
-            'lastName' => 'L_Name',
+            'firstName' => $address->firstName(),
+            'lastName' => $address->lastName(),
             'id' => $addressId,
             'customerId' => $id,
         ];
@@ -68,14 +76,14 @@ class CustomerRegisterService
             'languageId' => $channel->getLanguageId(),
             'groupId' => $channel->getCustomerGroupId(),
             'defaultPaymentMethodId' => $this->paymentMethodUtil->getExpressCheckoutMethodId(),
-            'firstName' => 'Express',
-            'lastName' => 'User',
-            'email' => Uuid::randomHex() . '@example.com',
+            'firstName' => (string) $address->firstName(),
+            'lastName' => (string) $address->lastName(),
+            'email' => (string) $customerData->email(),
             'active' => true,
             'firstLogin' => new DateTimeImmutable(),
             'password' => '12345678',
             'id' => Uuid::randomHex(),
-            'addresses' => [$address],
+            'addresses' => [$swAddress],
             'defaultBillingAddressId' => $addressId,
             'defaultShippingAddressId' => $addressId,
         ];
@@ -87,6 +95,15 @@ class CustomerRegisterService
         $criteria->addFilter(new EqualsFilter('salutationKey', 'not_specified'));
 
         return $this->salutationRepository->searchIds($criteria, $context->getContext())
+            ->firstId();
+    }
+
+    private function getCountryId(SalesChannelContext $context, string $iso): ?string
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('iso', $iso));
+
+        return $this->countryRepository->searchIds($criteria, $context->getContext())
             ->firstId();
     }
 }

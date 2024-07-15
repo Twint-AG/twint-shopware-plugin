@@ -44,7 +44,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
                     $currencyCode = $salesChannelContext->getCurrency()
                         ->getIsoCode();
 
-                    if (!in_array($currencyCode, Settings::ALLOWED_CURRENCIES, true)) {
+                    if ($currencyCode === Settings::ALLOWED_CURRENCY) {
                         $event->getPage()
                             ->getPaymentMethods()
                             ->remove($method->getId());
