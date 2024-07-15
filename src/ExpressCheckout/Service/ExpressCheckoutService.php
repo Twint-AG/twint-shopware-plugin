@@ -173,7 +173,7 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
     protected function getCurrencyId(): ?string
     {
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('symbol', Settings::ALLOWED_CURRENCY));
+        $criteria->addFilter(new EqualsFilter('isoCode', Settings::ALLOWED_CURRENCY));
 
         return $this->currencyRepository->searchIds($criteria, Context::createDefaultContext())
             ->firstId();
