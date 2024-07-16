@@ -5,6 +5,7 @@ namespace Twint\Tests\Storefront\Controller;
 
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
+use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
 use Shopware\Core\Framework\Context;
@@ -53,6 +54,9 @@ class CheckoutControllerTest extends TestCase
 
     private PaymentService $paymentService;
 
+    private CartService $cartService;
+
+
     /**
      * @return string
      */
@@ -75,11 +79,13 @@ class CheckoutControllerTest extends TestCase
         $this->cryptoService = $this->createMock(CryptoHandler::class);
         $this->pairingRepository = $this->createMock(PairingRepository::class);
         $this->paymentService = $this->createMock(PaymentService::class);
+        $this->cartService = $this->createMock(CartService::class);
         $this->controller = new CheckoutController(
             $this->checkoutService,
             $this->cryptoService,
             $this->pairingRepository,
-            $this->paymentService
+            $this->paymentService,
+            $this->cartService
         );
         $this->controller->setContainer($this->container);
     }

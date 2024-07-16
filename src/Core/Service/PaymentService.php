@@ -79,6 +79,7 @@ class PaymentService
         } finally {
             $this->transactionLogWriter->writeObjectLog(
                 $order->getId(),
+                $order->getVersionId(),
                 $transaction->getOrderTransaction()
                     ->getStateId(),
                 $transaction->getOrder()
@@ -123,6 +124,7 @@ class PaymentService
             $innovations = empty($client) ? [] : $client->flushInvocations();
             $this->transactionLogWriter->writeObjectLog(
                 $order->getId(),
+                $order->getVersionId(),
                 $order->getTransactions()
                     ?->first()
                     ?->getStateId() ?? '',
@@ -151,6 +153,7 @@ class PaymentService
                         $innovations = $client->flushInvocations();
                         $this->transactionLogWriter->writeReserveOrderLog(
                             $order->getId(),
+                            $order->getVersionId(),
                             $order->getTransactions()
                                 ?->first()
                                 ?->getStateId() ?? '',
@@ -180,6 +183,7 @@ class PaymentService
             $innovations = empty($client) ? [] : $client->flushInvocations();
             $this->transactionLogWriter->writeReserveOrderLog(
                 $order->getId(),
+                $order->getVersionId(),
                 $order->getTransactions()
                     ?->first()
                     ?->getStateId() ?? '',
@@ -217,6 +221,7 @@ class PaymentService
             $innovations = empty($client) ? [] : $client->flushInvocations();
             $this->transactionLogWriter->writeObjectLog(
                 $order->getId(),
+                $order->getVersionId(),
                 $order->getTransactions()
                     ?->first()
                     ?->getStateId() ?? '',

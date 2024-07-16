@@ -21,10 +21,10 @@ class Migration1715867057TwintTransactionLogCreateTable extends MigrationStep
     {
         $sql = 'CREATE TABLE IF NOT EXISTS `twint_transaction_log` (
             `id` BINARY(16) NOT NULL,
-            `order_id` BINARY(16) NOT NULL,
-            `order_version_id` BINARY(16) NOT NULL,
-            `payment_state_id` BINARY(16) NOT NULL,
-            `order_state_id` BINARY(16) NOT NULL,
+            `order_id` BINARY(16) NULL,
+            `order_version_id` BINARY(16) NULL,
+            `payment_state_id` BINARY(16) NULL,
+            `order_state_id` BINARY(16) NULL,
             `transaction_id` VARCHAR(255) NOT NULL,
             `api_method` VARCHAR(100) NOT NULL,
             `soap_action` json NOT NULL,
