@@ -7,9 +7,10 @@ namespace Twint\Core\Handler\TransactionLog;
 interface TransactionLogWriterInterface
 {
     public function write(
-        string $orderId,
-        string $paymentStateId,
-        string $orderStateId,
+        ?string $orderId,
+        ?string $orderVersionId,
+        ?string $paymentStateId,
+        ?string $orderStateId,
         string $transactionId,
         string $apiMethod,
         array $soapAction,
@@ -21,17 +22,19 @@ interface TransactionLogWriterInterface
     ): void;
 
     public function writeObjectLog(
-        string $orderId,
-        string $paymentStateId,
-        string $orderStateId,
+        ?string $orderId,
+        ?string $versionId,
+        ?string $paymentStateId,
+        ?string $orderStateId,
         string $transactionId,
         array $invocations
     ): void;
 
     public function writeReserveOrderLog(
-        string $orderId,
-        string $paymentStateId,
-        string $orderStateId,
+        ?string $orderId,
+        ?string $versionId,
+        ?string $paymentStateId,
+        ?string $orderStateId,
         string $transactionId,
         array $invocations
     ): void;

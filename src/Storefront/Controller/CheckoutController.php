@@ -7,6 +7,7 @@ namespace Twint\Storefront\Controller;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
 use Exception;
+use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
@@ -29,7 +30,8 @@ class CheckoutController extends StorefrontController
         private readonly ExpressCheckoutServiceInterface $checkoutService,
         private CryptoHandler $cryptoService,
         private readonly PairingRepository $paringLoader,
-        private PaymentService $paymentService
+        private PaymentService $paymentService,
+        private readonly CartService $cartService,
     ) {
     }
 
@@ -39,6 +41,15 @@ class CheckoutController extends StorefrontController
     ])]
     public function expressCheckout(Request $request, SalesChannelContext $context): Response
     {
+        $cart = $this->cartService->getCart($context->getToken(), $context);
+        $useCart = $request->request->get('useCart', false);
+        if ($cart->getLineItems()->count() >= 1 && !$useCart) {
+            $this->addFlash(self::SUCCESS, $this->trans('twintPayment.notice.hasProductInCart'));
+            return $this->json([
+                'success' => true,
+                'needAddProductToCart' => true,
+            ]);
+        }
         $pairing = $this->checkoutService->pairing($context, $request);
         return $this->json([
             'success' => true,

@@ -120,7 +120,7 @@ class OnPaidHandler implements StateHandlerInterface
         if ($order === null) {
             throw new Exception('Order not found: ' . $orderId);
         }
-
+        $this->cartService->deleteCart($this->context->getContext($entity->getSalesChannelId()));
         return $order;
     }
 

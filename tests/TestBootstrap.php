@@ -48,3 +48,5 @@ $loader = (new TestBootstrapper())
     ->bootstrap()
     ->getClassLoader();
 $loader->addPsr4('Twint\\Tests\\', __DIR__);
+
+DG\BypassFinals::enable();
