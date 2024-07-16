@@ -1,6 +1,6 @@
 {
     "name": "twint/twint",
-    "description": "TBU - TWINT Payment plugin",
+    "description": "TWINT Payment Plugin for Shopware 6",
     "type": "shopware-platform-plugin",
     "version": "0.0.2",
     "license": "MIT",
@@ -38,13 +38,14 @@
         "plugin-icon": "src/Resources/public/plugin.png",
         "copyright": "(c) by Twint 2024 (c) by NFQ",
         "label": {
-            "de-DE": "TBU - TWINT Payment",
-            "en-GB": "TBU - TWINT Payment",
-            "fr-FR": "TBU - TWINT Payment"
+            "de-DE": "TWINT Zahlung",
+            "en-GB": "TWINT Payment",
+            "fr-FR": "Paiement TWINT"
         },
         "description": {
-            "de-DE": "TBU - TWINT Payment",
-            "en-GB": "TBU - TWINT Payment"
+            "de-DE": "TWINT Zahlungs-Plugin für Shopware 6",
+            "en-GB": "TWINT Payment Plugin for Shopware 6",
+            "fr-FR": "Plugin de paiement TWINT pour Shopware 6"
         },
         "supportLink": {
             "de-DE": "https://www.twint.ch/privatkunden/support/?lang=de",
