@@ -44,13 +44,11 @@ class TwintTransactionLogDefinition extends EntityDefinition
         return new FieldCollection([
             (new IdField('id', 'id'))->setFlags(new PrimaryKey(), new Required()),
 
-            (new FkField('order_id', 'orderId', OrderDefinition::class))->addFlags(new Required()),
-            (new ReferenceVersionField(OrderDefinition::class, 'order_version_id'))->addFlags(new Required()),
+            (new FkField('order_id', 'orderId', OrderDefinition::class))->addFlags(),
+            (new ReferenceVersionField(OrderDefinition::class, 'order_version_id'))->addFlags(),
             new ManyToOneAssociationField('order', 'order_id', OrderDefinition::class, 'id', false),
 
-            (new FkField('payment_state_id', 'paymentStateId', StateMachineStateDefinition::class))->addFlags(
-                new Required()
-            ),
+            (new FkField('payment_state_id', 'paymentStateId', StateMachineStateDefinition::class))->addFlags(),
             (new ManyToOneAssociationField(
                 'paymentStateMachineState',
                 'payment_state_id',
@@ -59,9 +57,7 @@ class TwintTransactionLogDefinition extends EntityDefinition
                 false
             ))->addFlags(new ApiAware()),
 
-            (new FkField('order_state_id', 'orderStateId', StateMachineStateDefinition::class))->addFlags(
-                new Required()
-            ),
+            (new FkField('order_state_id', 'orderStateId', StateMachineStateDefinition::class))->addFlags(),
             (new ManyToOneAssociationField(
                 'orderStateMachineState',
                 'order_state_id',
@@ -70,7 +66,7 @@ class TwintTransactionLogDefinition extends EntityDefinition
                 false
             ))->addFlags(new ApiAware()),
 
-            (new StringField('transaction_id', 'transactionId'))->setFlags(new Required()),
+            (new StringField('transaction_id', 'transactionId'))->setFlags(),
             (new StringField('api_method', 'apiMethod'))->setFlags(new Required()),
             (new ListField('soap_action', 'soapAction'))->setFlags(new Required()),
             (new LongTextField('request', 'request'))->setFlags(new Required()),

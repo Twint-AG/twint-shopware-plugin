@@ -1,6 +1,7 @@
 import Plugin from 'src/plugin-system/plugin.class';
 import HttpClient from "src/service/http-client.service";
 import PseudoModalUtil from 'src/utility/modal-extension/pseudo-modal.util';
+import Iterator from 'src/helper/iterator.helper';
 
 export default class ExpressCheckoutButton extends Plugin {
 
@@ -106,8 +107,12 @@ export default class ExpressCheckoutButton extends Plugin {
         this.getLoadingPopup().hide();
         if(request.status === 200) {
             const response = JSON.parse(responseText);
-            this.onModalLoaded(response.content);
-
+            if(response.hasOwnProperty('needAddProductToCart') && response.needAddProductToCart && this.options.useCart === false){
+                this.onAddProductToCart();
+            }
+            else{
+                this.onModalLoaded(response.content);
+            }
             return;
         }
 
@@ -125,7 +130,26 @@ export default class ExpressCheckoutButton extends Plugin {
         window.PluginManager.initializePlugin('TwintAppSwitchHandler', '[data-app-selector]');
     }
 
+    onAddProductToCart(){
+        this.checking = false;
+        const requestUrl = window.router['frontend.checkout.line-item.add'];
+        let formData = new FormData();
+        for (const lineItem of this.getLineItems()) {
+            for(const [key, value] of Object.entries(lineItem)){
+                formData.append('lineItems[' + lineItem.id + '][' + key + ']', value);
+            }
+        }
+        formData.append('redirectTo', 'frontend.cart.offcanvas');
+        const offCanvasCartInstances = PluginManager.getPluginInstances('OffCanvasCart');
+        Iterator.iterate(offCanvasCartInstances, instance => {
+            instance.openOffCanvas(requestUrl, formData, () => {
+                this.$emitter.publish('openOffCanvasCart');
+            });
+        });
+    }
+
     onError(responseText) {
         console.log("Express checkout error: ", responseText);
     }
+
 }

@@ -4,6 +4,9 @@
             "invalidPaymentError": "Missing %currency% currency. %name%  is removed.",
             "orderNotFound": "This order cannot be found"
         },
+        "notice": {
+            "hasProductInCart": "You have existing products in the shopping cart. Please review your shopping cart before continue."
+        },
         "message": {
             "successPayment": "Your payment was successful"
         },
@@ -31,8 +34,8 @@
         },
         "administration": {
             "name": {
-                "twint_express_checkout": "TWINT - Express Checkout  | TBU - Twint Payment",
-                "twint_checkout": "TWINT - Regular Checkout  | TBU - Twint Payment"
+                "twint_express_checkout": "TWINT - Express Checkout  | Twint Payment",
+                "twint_checkout": "TWINT - Regular Checkout  | Twint Payment"
             },
             "extractPem": {
                 "success": {

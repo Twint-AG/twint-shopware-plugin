@@ -24,9 +24,10 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
     }
 
     public function write(
-        string $orderId,
-        string $paymentStateId,
-        string $orderStateId,
+        ?string $orderId,
+        ?string $orderVersionId,
+        ?string $paymentStateId,
+        ?string $orderStateId,
         string $transactionId,
         string $apiMethod,
         array $soapAction,
@@ -40,6 +41,7 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
             $this->repository->create([
                 [
                     'orderId' => $orderId,
+                    'orderVersionId' => $orderVersionId,
                     'paymentStateId' => $paymentStateId,
                     'orderStateId' => $orderStateId,
                     'transactionId' => $transactionId,
@@ -58,9 +60,10 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
     }
 
     public function writeObjectLog(
-        string $orderId,
-        string $paymentStateId,
-        string $orderStateId,
+        ?string $orderId,
+        ?string $orderVersionId,
+        ?string $paymentStateId,
+        ?string $orderStateId,
         string $transactionId,
         array $invocations
     ): void {
@@ -86,6 +89,7 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
         try {
             $record = [
                 'orderId' => $orderId,
+                'orderVersionId' => $orderVersionId,
                 'paymentStateId' => $paymentStateId,
                 'orderStateId' => $orderStateId,
                 'transactionId' => $transactionId,
@@ -106,9 +110,10 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
     }
 
     public function writeReserveOrderLog(
-        string $orderId,
-        string $paymentStateId,
-        string $orderStateId,
+        ?string $orderId,
+        ?string $orderVersionId,
+        ?string $paymentStateId,
+        ?string $orderStateId,
         string $transactionId,
         array $invocations
     ): void {
@@ -134,6 +139,7 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
         try {
             $record = [
                 'orderId' => $orderId,
+                'orderVersionId' => $orderVersionId,
                 'paymentStateId' => $paymentStateId,
                 'orderStateId' => $orderStateId,
                 'transactionId' => $transactionId,

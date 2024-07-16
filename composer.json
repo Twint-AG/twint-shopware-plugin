@@ -25,7 +25,8 @@
         "symplify/easy-coding-standard": "^12.1",
         "slevomat/coding-standard": "^8.15",
         "rector/rector": "^1.0",
-        "symfony/browser-kit": "*"
+        "symfony/browser-kit": "*",
+        "dg/bypass-finals": "^1.8"
     },
     "repositories": [
         {

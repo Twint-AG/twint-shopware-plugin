@@ -9,6 +9,7 @@ use Shopware\Core\Framework\Test\TestCaseBase\AdminFunctionalTestBehaviour;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Test\TestCaseBase\QueueTestBehaviour;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Twint\Core\Service\OrderMonitoringService;
 use Twint\Core\Service\OrderService;
 use Twint\Core\Service\PaymentService;
 use Twint\ScheduledTask\OrderMonitorTaskHandler;
@@ -26,6 +27,7 @@ class OrderMonitorTaskHandlerTest extends TestCase
     private OrderService $orderService;
     private OrderMonitorTaskHandler $orderMonitorHandler;
     private array $twintCustomFields;
+    private OrderMonitoringService $service;
 
     /**
      * @return string
@@ -40,6 +42,7 @@ class OrderMonitorTaskHandlerTest extends TestCase
         $this->messageBusMock = $this->createMock(MessageBusInterface::class);
         $this->paymentService = $this->getContainer()->get(PaymentService::class);
         $this->orderService = $this->getContainer()->get(OrderService::class);
+        $this->service = $this->getContainer()->get(OrderMonitoringService::class);
         $this->twintCustomFields = [
             'twint_api_response' => '{"id":"40684cd7-66a0-4118-92e0-5b06b5459f59","status":"IN_PROGRESS","transactionStatus":"ORDER_RECEIVED","pairingToken":"74562","merchantTransactionReference":"10095"}'
         ];
@@ -49,6 +52,7 @@ class OrderMonitorTaskHandlerTest extends TestCase
             $this->paymentService,
             $this->orderService
         );
+        $this->orderMonitorHandler->setMonitoringService($this->service);
 
     }
     public function testScheduledTaskExecutionWithNoMessages()
