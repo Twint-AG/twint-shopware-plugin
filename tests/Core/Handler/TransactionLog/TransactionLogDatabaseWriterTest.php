@@ -35,6 +35,7 @@ class TransactionLogDatabaseWriterTest extends TestCase
         $this->writer = new TransactionLogDatabaseWriter($this->repositoryMock, $this->loggerMock);
         $this->transactionLogItem = [
             'orderId' => 'order123',
+            'orderVersionId' => 'orderVersion123',
             'paymentStateId' => 'payment456',
             'orderStateId' => 'state789',
             'transactionId' => 'trans123',
@@ -75,6 +76,7 @@ class TransactionLogDatabaseWriterTest extends TestCase
 
         $this->writer->write(
             $this->transactionLogItem['orderId'],
+            $this->transactionLogItem['orderVersionId'],
             $this->transactionLogItem['paymentStateId'],
             $this->transactionLogItem['orderStateId'],
             $this->transactionLogItem['transactionId'],
@@ -97,7 +99,7 @@ class TransactionLogDatabaseWriterTest extends TestCase
                 $this->transactionLogItem,
             ], Context::createDefaultContext());
 
-        $this->writer->writeObjectLog($this->transactionLogItem['orderId'], $this->transactionLogItem['paymentStateId'], $this->transactionLogItem['orderStateId'], $this->transactionLogItem['transactionId'], $invocations);
+        $this->writer->writeObjectLog($this->transactionLogItem['orderId'], $this->transactionLogItem['orderVersionId'], $this->transactionLogItem['paymentStateId'], $this->transactionLogItem['orderStateId'], $this->transactionLogItem['transactionId'], $invocations);
         $this->expectOutputString('');
     }
 
@@ -109,7 +111,7 @@ class TransactionLogDatabaseWriterTest extends TestCase
             ->with([
                 $this->transactionLogItem,
             ], Context::createDefaultContext());
-        $this->writer->writeReserveOrderLog($this->transactionLogItem['orderId'], $this->transactionLogItem['paymentStateId'], $this->transactionLogItem['orderStateId'], $this->transactionLogItem['transactionId'], $invocations);
+        $this->writer->writeReserveOrderLog($this->transactionLogItem['orderId'], $this->transactionLogItem['orderVersionId'], $this->transactionLogItem['paymentStateId'], $this->transactionLogItem['orderStateId'], $this->transactionLogItem['transactionId'], $invocations);
 
         $this->expectOutputString('');
     }

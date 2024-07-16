@@ -77,11 +77,12 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
     protected function cloneCart(SalesChannelContext $context): Cart
     {
         $cart = $this->cartService->getCart($context->getToken(), $context);
+        $cloneCart = clone $cart;
         $token = Uuid::randomHex();
-        $this->cartPersister->replace($context->getToken(), $token, $context);
-        $cart->setToken($token);
-
-        return $cart;
+        $cloneCart->setToken($token);
+        $cloneCart->setCustomerComment($context->getToken());
+        $this->cartPersister->save($cloneCart, $context);
+        return $cloneCart;
     }
 
     public function monitoring(string $pairingUUid, SalesChannelContext $context): mixed
