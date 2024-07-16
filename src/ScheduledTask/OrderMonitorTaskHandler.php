@@ -52,6 +52,7 @@ if (interface_exists('Symfony\Component\Messenger\Handler\MessageSubscriberInter
 
         public function run(): void
         {
+            // @phpstan-ignore-next-line: compatible backwards compatibility
             $this->service->monitor($this->exceptionLogger);
 
             // @phpstan-ignore-next-line: compatible backwards compatibility
