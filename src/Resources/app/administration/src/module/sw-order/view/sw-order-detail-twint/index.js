@@ -50,7 +50,7 @@ Shopware.Component.register('sw-order-detail-twint', {
             criteria.addAssociation('order');
             criteria.addAssociation('paymentStateMachineState');
             criteria.addAssociation('orderStateMachineState');
-            criteria.addFilter(Criteria.equals('order.id', this.orderId))
+            criteria.addFilter(Criteria.equals('orderId', this.orderId))
 
             this.isLoading = true;
             this.transactionLogRepository.search(criteria).then((transactionLogs) => {

@@ -67,6 +67,7 @@ class TwintTransactionLogDefinition extends EntityDefinition
             ))->addFlags(new ApiAware()),
 
             (new StringField('transaction_id', 'transactionId'))->setFlags(),
+            (new StringField('pairing_id', 'pairingId'))->setFlags(),
             (new StringField('api_method', 'apiMethod'))->setFlags(new Required()),
             (new ListField('soap_action', 'soapAction'))->setFlags(new Required()),
             (new LongTextField('request', 'request'))->setFlags(new Required()),

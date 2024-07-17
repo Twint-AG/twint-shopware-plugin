@@ -151,8 +151,8 @@ class OrderService
                 TransactionStatus::fromString($twintApiResponse['transactionStatus']),
                 new Money($twintApiResponse['amount']['currency'], $twintApiResponse['amount']['amount']),
                 PairingStatus::fromString($twintApiResponse['pairingStatus']),
-                new NumericPairingToken(uint()->assert($twintApiResponse['pairingToken'])),
-                new QrCode(non_empty_string()->assert($twintApiResponse['qrCode']))
+                new NumericPairingToken(uint()->assert($twintApiResponse['pairingToken'] ?? 0)),
+                null
             );
         }
         return null;

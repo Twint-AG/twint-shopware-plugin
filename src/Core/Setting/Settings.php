@@ -6,6 +6,8 @@ namespace Twint\Core\Setting;
 
 class Settings
 {
+    public const PLATFORM = 'Shopware';
+
     public const ENVIRONMENT_PROD = false;
 
     public const ENVIRONMENT_TEST = true;

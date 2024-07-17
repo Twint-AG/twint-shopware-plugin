@@ -4,41 +4,50 @@ declare(strict_types=1);
 
 namespace Twint\ExpressCheckout\Service\Monitoring\StateHandler;
 
+use Defuse\Crypto\Encoding;
 use Doctrine\DBAL\Exception;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
+use Twint\Core\DataAbstractionLayer\Entity\TransactionLog\TwintTransactionLogDefinition;
 use Twint\Core\Service\CurrencyService;
 use Twint\Core\Service\OrderService;
+use Twint\ExpressCheckout\Service\ExpressPaymentService;
 use Twint\ExpressCheckout\Service\Monitoring\ContextFactory as TwintContext;
 use Twint\ExpressCheckout\Service\Monitoring\CustomerRegisterService;
 use Twint\ExpressCheckout\Service\PairingService;
-use Twint\ExpressCheckout\Service\PaymentService;
 use Twint\ExpressCheckout\Util\PaymentMethodUtil;
 use Twint\Sdk\Value\FastCheckoutCheckIn;
 use Twint\Sdk\Value\Order;
 use Twint\Util\OrderCustomFieldInstaller;
+use Doctrine\DBAL\Connection;
 
 class OnPaidHandler implements StateHandlerInterface
 {
     public function __construct(
-        private CartService $cartService,
-        private TwintContext $context,
-        private CustomerRegisterService $customerService,
-        private readonly PaymentMethodUtil $paymentMethodUtil,
-        private readonly EntityRepository $orderRepository,
+        private CartService                           $cartService,
+        private TwintContext                          $context,
+        private CustomerRegisterService               $customerService,
+        private readonly PaymentMethodUtil            $paymentMethodUtil,
+        private readonly EntityRepository             $orderRepository,
         private readonly OrderTransactionStateHandler $transactionStateHandler,
-        private readonly CurrencyService $currencyService,
-        private readonly PairingService $pairingService,
-        private readonly PaymentService $paymentService,
-        private readonly OrderService $orderService,
-    ) {
+        private readonly CurrencyService              $currencyService,
+        private readonly PairingService               $pairingService,
+        private readonly ExpressPaymentService        $paymentService,
+        private readonly OrderService                 $orderService,
+        private readonly Connection                   $connection
+    )
+    {
     }
 
     /**
@@ -60,7 +69,9 @@ class OnPaidHandler implements StateHandlerInterface
         $order = $this->placeOrder($entity);
 
         //Start TWINT order
-        $twint = $this->paymentService->startFastCheckoutOrder($order, $entity);
+        $res = $this->paymentService->startFastCheckoutOrder($order, $entity);
+
+        $twint = $res->getReturn();
 
         //Update custom field
         $this->updateCustomFields($order, $twint);
@@ -68,8 +79,54 @@ class OnPaidHandler implements StateHandlerInterface
         // Change payment status
         $this->markTransactionAsPaid($order, $entity);
 
+
+        // Append fields to transaction log
+        $this->appendLogFields($order, $res->getLog());
+
+        $this->massUpdateLogs($order, $entity->getId());
+
         //Update order_id in Pairing table
         $this->pairingService->persistOrderId($entity, $order->getId());
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function massUpdateLogs(OrderEntity $order, string $pairingId)
+    {
+        $table = TwintTransactionLogDefinition::ENTITY_NAME;
+        // Your SQL query
+        $sql = "UPDATE $table SET order_id = :order_id WHERE pairing_id = :pairing_id";
+
+        // Execute the query
+        $this->connection->executeQuery($sql, [
+            'order_id' => Encoding::hexToBin($order->getId()),
+            'pairing_id' => $pairingId
+        ]);
+    }
+
+    protected function appendLogFields(OrderEntity $order, array $log): EntityWrittenContainerEvent
+    {
+        $order = $this->reloadOrder($order->getId());
+
+        /** @var OrderTransactionEntity $transaction */
+        $transaction = $order->getTransactions()->first();
+
+        if ($transaction instanceof OrderTransactionEntity) {
+            $trans = [
+                'paymentStateId' => $transaction->getStateId(),
+                'transactionId' => $transaction->getId()
+            ];
+        }
+
+        $appends = [
+            'orderId' => $order->getId(),
+            'orderVersionId' => $order->getVersionId(),
+            'orderStateId' => $order->getStateId(),
+        ];
+
+        $log = array_merge($log, $appends, $trans ?? []);
+        return $this->paymentService->api->saveLog($log);
     }
 
     protected function updateCustomFields(OrderEntity $order, ?Order $twint): void
@@ -82,15 +139,16 @@ class OnPaidHandler implements StateHandlerInterface
     }
 
     protected function createContext(
-        PairingEntity $entity,
+        PairingEntity       $entity,
         FastCheckoutCheckIn $state,
-        CustomerEntity $customerEntity,
-        array $customerData
-    ): void {
+        CustomerEntity      $customerEntity,
+        array               $customerData
+    ): void
+    {
         //Create new context for the customer
         $this->context->createContext($entity->getSalesChannelId(), [
             'customerId' => $customerEntity->getId(),
-            'shippingMethodId' => (string) $state->shippingMethodId(),
+            'shippingMethodId' => (string)$state->shippingMethodId(),
             'shippingAddressId' => $customerData['defaultShippingAddressId'],
             'paymentMethodId' => $this->paymentMethodUtil->getExpressCheckoutMethodId(),
             'currencyId' => $this->currencyService->getCurrencyId(),
@@ -109,19 +167,24 @@ class OnPaidHandler implements StateHandlerInterface
             new RequestDataBag()
         );
 
-        $context = $this->context->getContext($entity->getSalesChannelId());
-        $criteria = new Criteria([$orderId]);
-        $criteria->addAssociation('transactions');
-
-        /** @var OrderEntity $order */
-        $order = $this->orderRepository->search($criteria, $context->getContext())
-            ->first();
+        $order = $this->reloadOrder($orderId);
 
         if ($order === null) {
             throw new Exception('Order not found: ' . $orderId);
         }
+
         $this->cartService->deleteCart($this->context->getContext($entity->getSalesChannelId()));
+
         return $order;
+    }
+
+    private function reloadOrder(string $orderId): OrderEntity
+    {
+        $criteria = new Criteria([$orderId]);
+        $criteria->addAssociation('transactions');
+
+        return $this->orderRepository->search($criteria, Context::createDefaultContext())
+            ->first();
     }
 
     protected function registerCustomer(PairingEntity $entity): array

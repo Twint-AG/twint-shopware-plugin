@@ -8,6 +8,7 @@ use Soap\Engine\Transport;
 use Throwable;
 use Twint\Core\Exception\InvalidConfigException;
 use Twint\Core\Service\SettingServiceInterface;
+use Twint\Core\Setting\Settings;
 use Twint\Core\Util\CryptoHandler;
 use Twint\Sdk\Certificate\CertificateContainer;
 use Twint\Sdk\Certificate\Pkcs12Certificate;
@@ -19,6 +20,7 @@ use Twint\Sdk\InvocationRecorder\Soap\RecordingTransport;
 use Twint\Sdk\Io\InMemoryStream;
 use Twint\Sdk\Value\Environment;
 use Twint\Sdk\Value\MerchantId;
+use Twint\Sdk\Value\PrefixedCashRegisterId;
 use Twint\Sdk\Value\Version;
 
 class ClientBuilder
@@ -69,7 +71,8 @@ class ClientBuilder
             $client = new InvocationRecordingClient(
                 new Client(
                     CertificateContainer::fromPkcs12(new Pkcs12Certificate(new InMemoryStream($cert), $passphrase)),
-                    MerchantId::fromString($merchantId),
+//                    MerchantId::fromString($merchantId),
+                    new PrefixedCashRegisterId(MerchantId::fromString($merchantId), Settings::PLATFORM),
                     // @phpstan-ignore-next-line
                     new Version($version),
                     $environment,

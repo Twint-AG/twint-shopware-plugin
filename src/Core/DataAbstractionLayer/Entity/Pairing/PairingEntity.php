@@ -23,7 +23,7 @@ class PairingEntity extends Entity
 
     protected string $token;
 
-    protected string $shippingMethodId;
+    protected ?string $shippingMethodId = null;
 
     protected ?ShippingMethodEntity $shippingMethod = null;
 
@@ -97,7 +97,7 @@ class PairingEntity extends Entity
         $this->token = $value;
     }
 
-    public function getShippingMethodId(): string
+    public function getShippingMethodId(): ?string
     {
         return $this->shippingMethodId;
     }
