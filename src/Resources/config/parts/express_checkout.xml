@@ -40,6 +40,7 @@
         <service id="Twint\ExpressCheckout\Service\ExpressPaymentService">
             <argument type="service" id="Twint\Core\Factory\ClientBuilder"/>
             <argument type="service" id="twint_pairing.repository"/>
+            <argument type="service" id="Twint\ExpressCheckout\Service\ApiService"/>
         </service>
 
         <service id="Twint\ExpressCheckout\Service\Monitoring\CustomerRegisterService">
@@ -53,11 +54,6 @@
 
         <service id="Twint\ExpressCheckout\Service\PairingService">
             <argument type="service" id="Twint\ExpressCheckout\Repository\PairingRepository"/>
-        </service>
-
-        <service id="Twint\ExpressCheckout\Service\PaymentService">
-            <argument type="service" id="Twint\Core\Factory\ClientBuilder"/>
-            <argument type="service" id="logger"/>
         </service>
 
         <service id="Twint\ExpressCheckout\Service\Monitoring\ContextFactory">
@@ -74,8 +70,9 @@
                       id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Twint\Core\Service\CurrencyService"/>
             <argument type="service" id="Twint\ExpressCheckout\Service\PairingService"/>
-            <argument type="service" id="Twint\ExpressCheckout\Service\PaymentService"/>
+            <argument type="service" id="Twint\ExpressCheckout\Service\ExpressPaymentService"/>
             <argument type="service" id="Twint\Core\Service\OrderService"/>
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
         </service>
 
     </services>

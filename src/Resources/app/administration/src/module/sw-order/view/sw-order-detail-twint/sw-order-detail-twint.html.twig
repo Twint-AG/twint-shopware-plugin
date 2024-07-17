@@ -61,17 +61,21 @@
 
                                 {% block twint_transaction_log_list_content_payment %}
                                     <template #column-paymentStateId="{ item }">
-                                        <sw-label :variant="getVariantState('order_transaction', item.paymentStateMachineState)" appearance="badged">
-                                            {{ item.paymentStateMachineState.name }}
-                                        </sw-label>
+                                        {% if item.paymentStateId %}
+                                            <sw-label :variant="getVariantState('order_transaction', item.paymentStateMachineState)" appearance="badged">
+                                                {{ item.paymentStateMachineState.name }}
+                                            </sw-label>
+                                        {% endif %}
                                     </template>
                                 {% endblock %}
 
                                 {% block twint_transaction_log_list_content_order %}
                                     <template #column-orderStateId="{ item }">
-                                        <sw-label :variant="getVariantState('order', item.orderStateMachineState)" appearance="badged">
-                                            {{ item.orderStateMachineState.name }}
-                                        </sw-label>
+                                        {% if item.orderStateId %}
+                                            <sw-label :variant="getVariantState('order', item.orderStateMachineState)" appearance="badged">
+                                                {{ item.orderStateMachineState.name }}
+                                            </sw-label>
+                                        {% endif %}
                                     </template>
                                 {% endblock %}
 

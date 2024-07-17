@@ -146,6 +146,7 @@ class TwintController extends AbstractController
                 $this->translator->trans('twintPayment.administration.refund.error.negativeAmount'),
             ]);
         }
+
         try {
             $order = $this->orderService->getOrder($orderId, new Context(new SystemSource()));
             if (($twintOrder = $this->orderService->getTwintOrder($order)) instanceof Order) {
@@ -198,7 +199,8 @@ class TwintController extends AbstractController
                 'success' => false,
                 'error' => $this->translator->trans('twintPayment.administration.refund.error.missingResponse'),
             ]);
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
+            dd($e);
             return $this->json([
                 'success' => false,
                 'error' => $e->getMessage(),

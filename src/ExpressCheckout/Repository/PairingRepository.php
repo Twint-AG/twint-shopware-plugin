@@ -12,6 +12,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
@@ -83,7 +84,7 @@ class PairingRepository
     public function loadInProcessPairings(): EntitySearchResult
     {
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('status', PairingStatus::PAIRING_IN_PROGRESS));
+        $criteria->addFilter(new EqualsAnyFilter('status', [PairingStatus::PAIRING_IN_PROGRESS]));
         $criteria->addAssociation('shippingMethod');
 
         return $this->pairingRepository->search($criteria, Context::createDefaultContext());

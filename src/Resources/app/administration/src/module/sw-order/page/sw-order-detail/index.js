@@ -48,7 +48,7 @@ Shopware.Component.override('sw-order-detail', {
             return this.repositoryFactory.create('twint_pairing');
         },
         isTwintOrder() {
-            let transactions = this.order.transactions;
+            let transactions = this.order?.transactions ?? [];
 
             for (let transaction of transactions) {
                 if (transaction.paymentMethod.handlerIdentifier.includes('Twint')) {

@@ -9,6 +9,7 @@
             <argument type="service" id="Twint\ExpressCheckout\Service\Monitoring\ContextFactory"/>
             <argument type="service" id="Twint\ExpressCheckout\Service\Monitoring\StateHandler\OnPaidHandler"/>
             <argument type="service" id="Twint\ExpressCheckout\Service\PairingService"/>
+            <argument type="service" id="Twint\ExpressCheckout\Service\ApiService"/>
         </service>
 
     </services>
