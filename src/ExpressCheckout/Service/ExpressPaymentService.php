@@ -61,7 +61,7 @@ class ExpressPaymentService
                 'salesChannelId' => $context->getSalesChannel()
                     ->getId(),
                 'cart' => $cart,
-                'cartToken' => $cart->getToken(),
+                'cartToken' => $context->getToken() . ':' . $cart->getToken(),
                 'status' => (string) $pairing->pairingStatus(),
                 'token' => (string) $pairing->pairingToken(),
                 'shippingMethodId' => null,
