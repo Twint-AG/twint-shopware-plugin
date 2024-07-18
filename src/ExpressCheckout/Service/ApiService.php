@@ -18,25 +18,24 @@ class ApiService
 {
     public function __construct(
         private readonly EntityRepository $repository,
-        private readonly LoggerInterface  $logger
-    )
-    {
+        private readonly LoggerInterface $logger
+    ) {
     }
 
     /**
-     * @param InvocationRecordingClient $client
-     * @param string $method
-     * @param array $args
-     * @param bool $save
      * @param callable|null $buildLogCallback A callback function to build the log. It should accept two parameters.
-     * @return ApiResponse
      */
-    public function call(InvocationRecordingClient $client, string $method, array $args, bool $save = true, callable $buildLogCallback = null): ApiResponse
-    {
+    public function call(
+        InvocationRecordingClient $client,
+        string $method,
+        array $args,
+        bool $save = true,
+        callable $buildLogCallback = null
+    ): ApiResponse {
         try {
             $returnValue = $client->{$method}(...$args);
         } catch (Throwable $e) {
-            $this->logger->error("TWINT API error: " . $e->getMessage());
+            $this->logger->error('TWINT API error: ' . $e->getMessage());
         } finally {
             $invocations = $client->flushInvocations();
 
@@ -49,8 +48,13 @@ class ApiService
     /**
      * @param Invocation[] $invocation
      */
-    protected function log(mixed $returnValue, string $method, array $invocation, bool $save = true, callable $callback = null): array
-    {
+    protected function log(
+        mixed $returnValue,
+        string $method,
+        array $invocation,
+        bool $save = true,
+        callable $callback = null
+    ): array {
         $log = [];
 
         try {
@@ -77,9 +81,13 @@ class ApiService
             }
 
             $event = $this->repository->create([$log], Context::createDefaultContext());
-            return $event->getEvents()->first()->getPayloads()[0];
+
+            // @phpstan-ignore-next-line: Always has record here
+            return $event->getEvents()
+                ?->first()
+                ?->getPayloads()[0];
         } catch (Throwable $e) {
-            $this->logger->error("Cannot log TWINT transaction");
+            $this->logger->error('Cannot log TWINT transaction');
         }
 
         return $log;
@@ -102,7 +110,7 @@ class ApiService
         $soapActions = [];
         foreach ($soapMessages as $soapMessage) {
             $soapRequests[] = $soapMessage->request()->body();
-            $soapResponses[] = $soapMessage->response()->body();
+            $soapResponses[] = $soapMessage->response()?->body();
             $soapActions[] = $soapMessage->request()->action();
         }
 
@@ -114,8 +122,9 @@ class ApiService
      */
     public function saveLog(array $log): EntityWrittenContainerEvent
     {
-        if (isset($log['id']))
+        if (isset($log['id'])) {
             return $this->repository->update([$log], Context::createDefaultContext());
+        }
 
         return $this->repository->create([$log], Context::createDefaultContext());
     }

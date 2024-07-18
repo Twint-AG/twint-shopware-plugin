@@ -42,7 +42,7 @@ class PaymentMethodUtil
 
         $paymentMethods = $salesChannelContext->getSalesChannel()
             ->getPaymentMethods();
-        if ($paymentMethods !== null) {
+        if ($paymentMethods instanceof PaymentMethodCollection) {
             return $paymentMethods->filterByProperty('active', true)
                 ->has($methodId);
         }

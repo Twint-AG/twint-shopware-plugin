@@ -12,10 +12,7 @@ use Shopware\Core\Framework\Uuid\Uuid;
 
 class StockManager implements StockManagerInterface
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private Connection $connection;
 
     public function __construct(Connection $connection)
     {

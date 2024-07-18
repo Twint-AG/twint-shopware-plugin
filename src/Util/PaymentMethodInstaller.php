@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Twint\Util;
 
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
+use Shopware\Core\Content\Rule\RuleEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -89,7 +90,7 @@ class PaymentMethodInstaller
             }
 
             $rule = $entity->getAvailabilityRule();
-            if ($rule === null) {
+            if (!$rule instanceof RuleEntity) {
                 continue;
             }
 

@@ -59,7 +59,11 @@ export default class PaymentStatusRefresh extends Plugin {
             const data = JSON.parse(response);
             this.checking = false;
             if (data.completed) {
-                this.loadThankYouPage();
+                if(data.orderId)
+                    this.loadThankYouPage();
+                else
+                    ExpressCheckoutButton.modal.close();
+
             } else {
                 setTimeout(this.checkExpressCheckoutStatus.bind(this), this.options.interval);
             }

@@ -136,4 +136,9 @@ class PairingEntity extends Entity
     {
         $this->order = $order;
     }
+
+    public function setOrderId(?string $id = null): void
+    {
+        $this->orderId = $id;
+    }
 }

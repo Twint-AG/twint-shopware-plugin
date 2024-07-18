@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Twint\Core\Service;
 
 use Exception;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\PaymentException;
@@ -25,11 +26,9 @@ use Twint\Sdk\Value\Order;
 use Twint\Sdk\Value\OrderId;
 use Twint\Sdk\Value\OrderStatus;
 use Twint\Sdk\Value\PairingStatus;
-use Twint\Sdk\Value\QrCode;
 use Twint\Sdk\Value\TransactionStatus;
 use Twint\Util\Method\RegularPaymentMethod;
 use Twint\Util\OrderCustomFieldInstaller;
-use function Psl\Type\non_empty_string;
 use function Psl\Type\uint;
 
 class OrderService
@@ -162,7 +161,7 @@ class OrderService
     {
         $transactions = $order->getTransactions();
 
-        if ($transactions === null) {
+        if (!$transactions instanceof OrderTransactionCollection) {
             return false;
         }
 
@@ -182,7 +181,7 @@ class OrderService
     {
         $transactions = $order->getTransactions();
 
-        if ($transactions === null) {
+        if (!$transactions instanceof OrderTransactionCollection) {
             return false;
         }
 

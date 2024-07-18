@@ -8,6 +8,7 @@ use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Content\Media\File\FileSaver;
 use Shopware\Core\Content\Media\File\MediaFile;
+use Shopware\Core\Content\Media\MediaEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -102,7 +103,7 @@ class MediaInstaller
     private function getMediaId(string $fileName, PaymentMethodEntity $paymentMethod, Context $context): string
     {
         $media = $paymentMethod->getMedia();
-        if ($media !== null && $media->getFileName() === $fileName) {
+        if ($media instanceof MediaEntity && $media->getFileName() === $fileName) {
             return $media->getId();
         }
 

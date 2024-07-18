@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Throwable;
 use Twint\Core\Handler\ReversalHistory\ReversalHistoryWriterInterface;
 use Twint\Core\Service\OrderService;
 use Twint\Core\Service\PaymentService;
@@ -199,8 +200,7 @@ class TwintController extends AbstractController
                 'success' => false,
                 'error' => $this->translator->trans('twintPayment.administration.refund.error.missingResponse'),
             ]);
-        } catch (\Throwable $e) {
-            dd($e);
+        } catch (Throwable $e) {
             return $this->json([
                 'success' => false,
                 'error' => $e->getMessage(),

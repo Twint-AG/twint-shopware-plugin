@@ -80,7 +80,7 @@ abstract class AbstractPaymentHandler implements AsynchronousPaymentHandlerInter
             );
         }
         // Redirect to external gateway
-        if (!empty($transaction->getOrder()->getOrderNumber())) {
+        if ($transaction->getOrder()->getOrderNumber() !== null && $transaction->getOrder()->getOrderNumber() !== '' && $transaction->getOrder()->getOrderNumber() !== '0') {
             $hashOrderNumber = $this->cryptoService->hash($transaction->getOrder()->getOrderNumber());
             return new RedirectResponse($this->router->generate('frontend.twint.waiting', [
                 'orderNumber' => $hashOrderNumber,

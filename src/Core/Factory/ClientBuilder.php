@@ -71,7 +71,7 @@ class ClientBuilder
             $client = new InvocationRecordingClient(
                 new Client(
                     CertificateContainer::fromPkcs12(new Pkcs12Certificate(new InMemoryStream($cert), $passphrase)),
-//                    MerchantId::fromString($merchantId),
+                    //                    MerchantId::fromString($merchantId),
                     new PrefixedCashRegisterId(MerchantId::fromString($merchantId), Settings::PLATFORM),
                     // @phpstan-ignore-next-line
                     new Version($version),
