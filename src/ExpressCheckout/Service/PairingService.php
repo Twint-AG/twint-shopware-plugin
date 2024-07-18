@@ -16,6 +16,10 @@ use Twint\Sdk\Value\ShippingMethodId;
 
 class PairingService
 {
+    public const STATUS_DONE = 'DONE';
+
+    public const STATUS_CANCELED = 'CANCELLED';
+
     public function __construct(
         private readonly PairingRepository $repository,
     ) {
@@ -40,15 +44,17 @@ class PairingService
 
     public function markAsDone(PairingEntity $pairing): EntityWrittenContainerEvent
     {
+        $pairing->setStatus(self::STATUS_DONE);
         return $this->persist($pairing, [
-            'status' => 'DONE',
+            'status' => self::STATUS_DONE,
         ]);
     }
 
-    public function markAsError(PairingEntity $pairing): EntityWrittenContainerEvent
+    public function markAsCancelled(PairingEntity $pairing): EntityWrittenContainerEvent
     {
+        $pairing->setStatus(self::STATUS_CANCELED);
         return $this->persist($pairing, [
-            'status' => 'ERROR',
+            'status' => self::STATUS_CANCELED,
         ]);
     }
 

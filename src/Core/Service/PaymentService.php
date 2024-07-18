@@ -6,6 +6,7 @@ namespace Twint\Core\Service;
 
 use Exception;
 use Shopware\Core\Checkout\Cart\Price\CashRounding;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -21,6 +22,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\AggregationResult\Metric
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid as ShopwareUuid;
+use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Twint\Core\Factory\ClientBuilder;
 use Twint\Core\Handler\TransactionLog\TransactionLogWriterInterface;
@@ -52,7 +54,7 @@ class PaymentService
     public function createOrder(AsyncPaymentTransactionStruct $transaction): Order
     {
         $order = $transaction->getOrder();
-        if (!$order instanceof OrderEntity || $order->getCurrency() === null) {
+        if (!$order->getCurrency() instanceof CurrencyEntity) {
             throw PaymentException::asyncProcessInterrupted(
                 $transaction->getOrderTransaction()
                     ->getId(),
@@ -64,7 +66,7 @@ class PaymentService
         $client = $this->clientBuilder->build($order->getSalesChannelId());
         try {
             /** @var non-empty-string $orderId * */
-            $orderId = empty($order->getId()) ? ShopwareUuid::randomHex() : $order->getId();
+            $orderId = $order->getId() === '' || $order->getId() === '0' ? ShopwareUuid::randomHex() : $order->getId();
             /** @var Order * */
             return $client->startOrder(
                 new UnfiledMerchantTransactionReference($orderId),
@@ -145,7 +147,7 @@ class PaymentService
                 }
                 $orderTransactionId = $order->getTransactions()?->first()?->getId();
                 $currency = $order->getCurrency()?->getIsoCode();
-                if ($orderTransactionId && !empty($currency) && $twintOrder->amount()->amount() > 0) {
+                if ($orderTransactionId && ($currency !== null && $currency !== '' && $currency !== '0') && $twintOrder->amount()->amount() > 0) {
                     $client = $this->clientBuilder->build($order->getSalesChannelId());
                     /** @var Order * */
                     $twintOrder = $client->monitorOrder($twintOrder->id());
@@ -318,7 +320,7 @@ class PaymentService
                 $this->transactionStateHandler->refund($orderTransactionId, $this->context);
                 if ($stockRecovery) {
                     $lineItems = $order->getLineItems();
-                    if ($lineItems) {
+                    if ($lineItems instanceof OrderLineItemCollection) {
                         foreach ($lineItems as $lineItem) {
                             $this->stockManager->increaseStock($lineItem, $lineItem->getQuantity());
                         }

@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace Twint\ExpressCheckout\Model;
 
-
 class ApiResponse
 {
     public function __construct(
         private readonly mixed $return,
         private readonly array $log
-    )
-    {
+    ) {
     }
 
     public function getLog(): array

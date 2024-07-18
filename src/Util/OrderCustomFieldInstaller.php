@@ -101,7 +101,7 @@ class OrderCustomFieldInstaller
             $customFieldIds = $this->customFieldRepository->search((new Criteria())
                 ->addFilter(new EqualsFilter('customFieldSetId', $customFieldSetId->getId())), $context)->getIds();
             $ids = [];
-            if ($customFieldIds) {
+            if ($customFieldIds !== []) {
                 foreach ($customFieldIds as $id) {
                     $ids[] = [
                         'id' => $id,
@@ -119,7 +119,7 @@ class OrderCustomFieldInstaller
                     )
                 ), $context)->getIds();
             $snippetIds = [];
-            if ($snippetEntries) {
+            if ($snippetEntries !== []) {
                 foreach ($snippetEntries as $id) {
                     $snippetIds[] = [
                         'id' => $id,

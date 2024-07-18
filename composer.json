@@ -26,7 +26,8 @@
         "slevomat/coding-standard": "^8.15",
         "rector/rector": "^1.0",
         "symfony/browser-kit": "*",
-        "dg/bypass-finals": "^1.8"
+        "dg/bypass-finals": "^1.8",
+        "shopware/core": ">=6.5.0.0"
     },
     "repositories": [
         {
@@ -66,7 +67,8 @@
     "config": {
         "allow-plugins": {
             "php-http/discovery": true,
-            "dealerdirect/phpcodesniffer-composer-installer": true
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "symfony/runtime": true
         }
     }
 }

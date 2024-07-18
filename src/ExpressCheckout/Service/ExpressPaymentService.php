@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Twint\ExpressCheckout\Service;
 
+use Closure;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -25,11 +26,10 @@ use Twint\Sdk\Value\Version;
 class ExpressPaymentService
 {
     public function __construct(
-        private readonly ClientBuilder    $clientBuilder,
+        private readonly ClientBuilder $clientBuilder,
         private readonly EntityRepository $pairingRepository,
-        public readonly ApiService       $api,
-    )
-    {
+        public readonly ApiService $api,
+    ) {
     }
 
     /**
@@ -37,30 +37,33 @@ class ExpressPaymentService
      */
     public function requestFastCheckOutCheckIn(
         SalesChannelContext $context,
-        Cart                $cart,
-        ShippingMethods     $methods
-    ): InteractiveFastCheckoutCheckIn
-    {
+        Cart $cart,
+        ShippingMethods $methods
+    ): InteractiveFastCheckoutCheckIn {
         $client = $this->clientBuilder->build($context->getSalesChannel()->getId(), Version::NEXT);
 
-        $res = $this->api->call($client, 'requestFastCheckOutCheckIn', [
-            Money::CHF($cart->getPrice()->getPositionPrice()),
-            new CustomerDataScopes(...CustomerDataScopes::all()),
-            $methods
-        ], true,
+        $res = $this->api->call(
+            $client,
+            'requestFastCheckOutCheckIn',
+            [
+                Money::CHF($cart->getPrice()->getPositionPrice()),
+                new CustomerDataScopes(...CustomerDataScopes::all()),
+                $methods,
+            ],
+            true,
             $this->getLogCallback()
         );
 
         $pairing = $res->getReturn();
         $this->pairingRepository->create([
             [
-                'id' => (string)$pairing->pairingUuid(),
+                'id' => (string) $pairing->pairingUuid(),
                 'salesChannelId' => $context->getSalesChannel()
                     ->getId(),
                 'cart' => $cart,
                 'cartToken' => $cart->getToken(),
-                'status' => (string)$pairing->pairingStatus(),
-                'token' => (string)$pairing->pairingToken(),
+                'status' => (string) $pairing->pairingStatus(),
+                'token' => (string) $pairing->pairingToken(),
                 'shippingMethodId' => null,
                 'customerData' => null,
             ],
@@ -73,7 +76,13 @@ class ExpressPaymentService
     {
         $client = $this->clientBuilder->build($channelId, Version::NEXT);
 
-        return $this->api->call($client, 'monitorFastCheckOutCheckIn', [PairingUuid::fromString($pairingUUid)], false, $this->getLogCallback());
+        return $this->api->call(
+            $client,
+            'monitorFastCheckOutCheckIn',
+            [PairingUuid::fromString($pairingUUid)],
+            false,
+            $this->getLogCallback()
+        );
     }
 
     public function startFastCheckoutOrder(OrderEntity $order, PairingEntity $pairing): ApiResponse
@@ -86,13 +95,13 @@ class ExpressPaymentService
         return $this->api->call($client, 'startFastCheckoutOrder', [
             PairingUuid::fromString($pairing->getId()),
             new UnfiledMerchantTransactionReference($orderId),
-            new Money($order->getCurrency()?->getIsoCode() ?? Settings::ALLOWED_CURRENCY, $order->getAmountTotal())
+            new Money($order->getCurrency()?->getIsoCode() ?? Settings::ALLOWED_CURRENCY, $order->getAmountTotal()),
         ], true);
     }
 
-    protected function getLogCallback(): \Closure
+    protected function getLogCallback(): Closure
     {
-        return function (array $log, mixed $return) {
+        return static function (array $log, mixed $return) {
             if ($return instanceof InteractiveFastCheckoutCheckIn || $return instanceof FastCheckoutCheckIn) {
                 $log['pairingId'] = $return->pairingUuid()->__toString();
                 return $log;

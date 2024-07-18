@@ -20,6 +20,8 @@ use Twint\Core\Util\CryptoHandler;
 use Twint\ExpressCheckout\Exception\PairingException;
 use Twint\ExpressCheckout\Repository\PairingRepository;
 use Twint\ExpressCheckout\Service\ExpressCheckoutServiceInterface;
+use Twint\ExpressCheckout\Service\Monitoring\MonitoringService;
+use Twint\ExpressCheckout\Service\PairingService;
 
 #[Route(defaults: [
     '_routeScope' => ['storefront'],
@@ -32,6 +34,7 @@ class CheckoutController extends StorefrontController
         private readonly PairingRepository $paringLoader,
         private PaymentService $paymentService,
         private readonly CartService $cartService,
+        private readonly MonitoringService $monitor,
     ) {
     }
 
@@ -75,7 +78,9 @@ class CheckoutController extends StorefrontController
             return $this->redirectToRoute('frontend.account.order.page');
         }
 
-        if ($paring->getOrderId()) {
+        $this->monitor->monitorOne($paring);
+
+        if (in_array($paring->getStatus(), [PairingService::STATUS_DONE, PairingService::STATUS_CANCELED], true)) {
             return $this->json([
                 'completed' => true,
                 'orderId' => $paring->getOrderId(),
