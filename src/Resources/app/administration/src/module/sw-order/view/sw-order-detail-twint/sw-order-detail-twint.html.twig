@@ -35,9 +35,7 @@
 
                                 {% block twint_transaction_log_list_content_order %}
                                     <template #column-orderId="{ item }">
-                                        <router-link :to="{ name: 'sw.order.detail', params: { id: item.orderId }, query: { edit: false } }">
-                                            {{ item.order.orderNumber }}
-                                        </router-link>
+                                        {{ item.orderId }}
                                     </template>
                                 {% endblock %}
 
@@ -61,7 +59,7 @@
 
                                 {% block twint_transaction_log_list_content_payment %}
                                     <template #column-paymentStateId="{ item }">
-                                        {% if item.paymentStateId %}
+                                        {% if item.paymentStateMachineState %}
                                             <sw-label :variant="getVariantState('order_transaction', item.paymentStateMachineState)" appearance="badged">
                                                 {{ item.paymentStateMachineState.name }}
                                             </sw-label>
@@ -71,7 +69,7 @@
 
                                 {% block twint_transaction_log_list_content_order %}
                                     <template #column-orderStateId="{ item }">
-                                        {% if item.orderStateId %}
+                                        {% if item.orderStateMachineState %}
                                             <sw-label :variant="getVariantState('order', item.orderStateMachineState)" appearance="badged">
                                                 {{ item.orderStateMachineState.name }}
                                             </sw-label>

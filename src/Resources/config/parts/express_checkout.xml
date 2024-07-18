@@ -73,6 +73,7 @@
             <argument type="service" id="Twint\ExpressCheckout\Service\ExpressPaymentService"/>
             <argument type="service" id="Twint\Core\Service\OrderService"/>
             <argument type="service" id="Doctrine\DBAL\Connection"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\CartPersister"/>
         </service>
 
     </services>

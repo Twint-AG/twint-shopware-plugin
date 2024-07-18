@@ -55,6 +55,8 @@ Shopware.Component.register('sw-order-detail-twint', {
             this.isLoading = true;
             this.transactionLogRepository.search(criteria).then((transactionLogs) => {
                 this.transactionLogs = transactionLogs;
+                console.log(transactionLogs)
+                window.a = transactionLogs
                 this.isLoading = false;
             }).catch(() => {
                 this.isLoading = false;

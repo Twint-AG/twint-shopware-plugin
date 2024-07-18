@@ -8,6 +8,7 @@ use Defuse\Crypto\Encoding;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Shopware\Core\Checkout\Cart\Cart;
+use Shopware\Core\Checkout\Cart\CartPersister;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
@@ -44,7 +45,8 @@ class OnPaidHandler implements StateHandlerInterface
         private readonly PairingService $pairingService,
         private readonly ExpressPaymentService $paymentService,
         private readonly OrderService $orderService,
-        private readonly Connection $connection
+        private readonly Connection $connection,
+        private readonly CartPersister $cartPersister
     ) {
     }
 
@@ -89,10 +91,17 @@ class OnPaidHandler implements StateHandlerInterface
         $this->pairingService->persistOrderId($entity, $order->getId());
 
         // Delete cart
-        $this->cartService->deleteCart($this->context->getContext($entity->getSalesChannelId()));
+        $this->cleanUpCurrentCart($entity);
 
         //Flag as done
         $this->pairingService->markAsDone($entity);
+    }
+
+    protected function cleanUpCurrentCart(PairingEntity $entity): void
+    {
+        $context = $this->context->getContext($entity->getSalesChannelId());
+
+        $this->cartPersister->delete($entity->getCartToken(true), $context);
     }
 
     /**
