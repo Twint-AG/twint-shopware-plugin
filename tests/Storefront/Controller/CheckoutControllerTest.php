@@ -26,6 +26,7 @@ use Twint\Tests\Helper\ServicesTrait;
 use Twint\Core\Util\CryptoHandler;
 use Shopware\Storefront\Test\Controller\StorefrontControllerTestBehaviour;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twint\ExpressCheckout\Service\Monitoring\MonitoringService;
 
 /**
  * @internal
@@ -56,6 +57,8 @@ class CheckoutControllerTest extends TestCase
 
     private CartService $cartService;
 
+    private MonitoringService $monitor;
+
 
     /**
      * @return string
@@ -80,12 +83,14 @@ class CheckoutControllerTest extends TestCase
         $this->pairingRepository = $this->createMock(PairingRepository::class);
         $this->paymentService = $this->createMock(PaymentService::class);
         $this->cartService = $this->createMock(CartService::class);
+        $this->monitor = $this->createMock(MonitoringService::class);
         $this->controller = new CheckoutController(
             $this->checkoutService,
             $this->cryptoService,
             $this->pairingRepository,
             $this->paymentService,
-            $this->cartService
+            $this->cartService,
+            $this->monitor,
         );
         $this->controller->setContainer($this->container);
     }
@@ -212,3 +217,4 @@ class CheckoutControllerTest extends TestCase
         $this->assertTrue(true);
     }
 }
+

@@ -98,7 +98,7 @@ class OnPaidHandler implements StateHandlerInterface
     /**
      * @throws Exception
      */
-    public function massUpdateLogs(OrderEntity $order, string $pairingId) : void
+    public function massUpdateLogs(OrderEntity $order, string $pairingId): void
     {
         $table = TwintTransactionLogDefinition::ENTITY_NAME;
         // Your SQL query
