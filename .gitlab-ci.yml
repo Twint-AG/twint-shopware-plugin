@@ -65,7 +65,7 @@ test:
       composer config minimum-stability dev
       composer config repositories.local-plugins '{ "type": "path", "url": "custom/plugins/*", "options": { "symlink": true } }'
       composer config repositories.twint-sdk vcs https://git.nfq.asia/twint-ag/php-sdk.git
-    - composer require twint/twint --no-progress --no-scripts > /dev/null
+    - composer require twint-ag/twint-shopware-plugin --no-progress --no-scripts > /dev/null
     
     # Install DEV-Tools
     - cd "$CI_PROJECT_DIR/shopware/custom/plugins/TwintPayment"
