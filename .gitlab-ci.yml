@@ -94,6 +94,7 @@ test:
     
     # Run unit test
     - cd custom/plugins/TwintPayment
+    - composer remove shopware/core --dev
     - ./bin/phpunit.sh
   
   cache:
