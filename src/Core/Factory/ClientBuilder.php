@@ -66,24 +66,22 @@ class ClientBuilder
             if ($passphrase === '' || $cert === '') {
                 throw new InvalidConfigException(InvalidConfigException::ERROR_INVALID_CERTIFICATE);
             }
-            $messageRecorder = new MessageRecorder();
+            $recorder = new MessageRecorder();
 
             $client = new InvocationRecordingClient(
                 new Client(
                     CertificateContainer::fromPkcs12(new Pkcs12Certificate(new InMemoryStream($cert), $passphrase)),
-                    //                    MerchantId::fromString($merchantId),
                     new PrefixedCashRegisterId(MerchantId::fromString($merchantId), Settings::PLATFORM),
-                    // @phpstan-ignore-next-line
                     new Version($version),
                     $environment,
                     soapEngineFactory: new DefaultSoapEngineFactory(
                         wrapTransport: static fn (Transport $transport) => new RecordingTransport(
                             $transport,
-                            $messageRecorder
+                            $recorder
                         )
                     )
                 ),
-                $messageRecorder
+                $recorder
             );
 
             self::$instances[$salesChannelId] = $client;
