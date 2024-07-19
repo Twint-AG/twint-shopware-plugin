@@ -2,6 +2,7 @@ import Plugin from 'src/plugin-system/plugin.class';
 import HttpClient from "src/service/http-client.service";
 import DomAccess from 'src/helper/dom-access.helper';
 import ExpressCheckoutButton from './express-checkout-button';
+import AjaxOffCanvas from 'src/plugin/offcanvas/ajax-offcanvas.plugin';
 
 export default class PaymentStatusRefresh extends Plugin {
 
@@ -59,8 +60,10 @@ export default class PaymentStatusRefresh extends Plugin {
             const data = JSON.parse(response);
             this.checking = false;
             if (data.completed) {
-                if(data.orderId)
+                if(data.orderId){
+                    AjaxOffCanvas.close();
                     this.loadThankYouPage();
+                }
                 else
                     ExpressCheckoutButton.modal.close();
 
