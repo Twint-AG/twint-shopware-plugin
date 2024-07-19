@@ -7,7 +7,7 @@ cd /var/www/plugin
 composer install
 ```
 ##unit tests
-Right now have no way to test the plugin in the vendor/twint/twint so I have to create symlink
+Right now have no way to test the plugin in the vendor/twint-ag/twint-shopware-plugin so I have to create symlink
 sudo ln -s /var/www/plugin /var/www/html/custom/plugins/TwintPayment
 ./bin/phpunit.sh
 ##phpstan

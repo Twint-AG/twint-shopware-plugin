@@ -1,21 +1,31 @@
 {
-    "name": "twint/twint",
-    "description": "TWINT Payment Plugin for Shopware 6",
+    "name": "twint-ag/twint-shopware-plugin",
+    "description": "TWINT payment plugin for Shopware 6",
+    "keywords": [
+        "twint",
+        "twint.ch",
+        "switzerland",
+        "checkout",
+        "express checkout",
+        "payment",
+        "shopware",
+        "shopware6"
+    ],
     "type": "shopware-platform-plugin",
-    "version": "0.0.2",
+    "version": "1.0.0",
     "license": "MIT",
     "authors": [
         {
-            "name": "TWINT"
-        },
-        {
-            "name": "NFQ"
+            "name": "TWINT",
+            "email": "plugin@twint.ch",
+            "role": "Maintainer",
+            "homepage": "https://www.twint.ch/"
         }
     ],
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "twint-ch/twint-sdk": "dev-develop",
+        "twint-ag/sdk": "^1.0",
         "chillerlan/php-qrcode": "4.3.4",
         "ext-openssl": "*"
     },
@@ -38,20 +48,16 @@
     "extra": {
         "shopware-plugin-class": "Twint\\TwintPayment",
         "plugin-icon": "src/Resources/public/plugin.png",
-        "copyright": "(c) by Twint 2024 (c) by NFQ",
+        "copyright": "(c) by TWINT 2024",
         "label": {
             "de-DE": "TWINT Zahlung",
             "en-GB": "TWINT Payment",
             "fr-FR": "Paiement TWINT"
         },
         "description": {
-            "de-DE": "TWINT Zahlungs-Plugin für Shopware 6",
-            "en-GB": "TWINT Payment Plugin for Shopware 6",
+            "de-DE": "TWINT Zahlungs-plugin für Shopware 6",
+            "en-GB": "TWINT Payment plugin for Shopware 6",
             "fr-FR": "Plugin de paiement TWINT pour Shopware 6"
-        },
-        "supportLink": {
-            "de-DE": "https://www.twint.ch/privatkunden/support/?lang=de",
-            "en-GB": "https://www.twint.ch/en/private-customers/support/"
         }
     },
     "autoload": {
