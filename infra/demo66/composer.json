@@ -9,7 +9,7 @@
     "shopware/storefront": "*",
     "swag/swag-extension-store": "^3.0",
     "symfony/flex": "~2",
-    "twint/twint": "^0.0.2"
+    "twint-ag/twint-shopware-plugin": "^1.0.0"
   },
   "repositories": [
     {
@@ -34,13 +34,13 @@
       }
     },
     {
-      "name": "twint/twint",
+      "name": "twint-ag/twint-shopware-plugin",
       "type": "path",
       "url": "/var/www/plugin",
       "options": {
         "symlink": true,
         "versions": {
-          "twint/twint": "0.0.2"
+          "twint-ag/twint-shopware-plugin": "1.0.0"
         }
       }
     },
