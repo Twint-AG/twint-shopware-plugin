@@ -39,12 +39,6 @@
         "dg/bypass-finals": "^1.8",
         "shopware/core": ">=6.5.0.0"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://git.nfq.asia/twint-ag/php-sdk.git"
-        }
-    ],
     "extra": {
         "shopware-plugin-class": "Twint\\TwintPayment",
         "plugin-icon": "src/Resources/public/plugin.png",
@@ -53,11 +47,6 @@
             "de-DE": "TWINT Zahlung",
             "en-GB": "TWINT Payment",
             "fr-FR": "Paiement TWINT"
-        },
-        "description": {
-            "de-DE": "TWINT Zahlungs-plugin für Shopware 6",
-            "en-GB": "TWINT Payment plugin for Shopware 6",
-            "fr-FR": "Plugin de paiement TWINT pour Shopware 6"
         }
     },
     "autoload": {
