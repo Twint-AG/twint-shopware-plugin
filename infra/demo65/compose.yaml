@@ -20,7 +20,7 @@ services:
       - web
     environment:
       - XDEBUG_ENABLED=0
-      - PHP_VERSION=8.1
+      - PHP_VERSION=8.2
 volumes:
   sw65_volume:
     driver: local
