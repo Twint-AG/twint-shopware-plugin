@@ -127,9 +127,6 @@ class TwintControllerTest extends TestCase
         $this->assertInstanceOf(Response::class, $response);
         $data = json_decode($response->getContent(), true);
         $this->assertFalse($data['success']);
-        //for real p12 file
-        /*$this->assertArrayHasKey('certificate', $data['data']);
-        $this->assertArrayHasKey('passphrase', $data['data']);*/
     }
 
     public function testExtractPemForValidFileWrongPassword(): void{
