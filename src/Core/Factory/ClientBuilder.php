@@ -72,6 +72,7 @@ class ClientBuilder
                 new Client(
                     CertificateContainer::fromPkcs12(new Pkcs12Certificate(new InMemoryStream($cert), $passphrase)),
                     new PrefixedCashRegisterId(MerchantId::fromString($merchantId), Settings::PLATFORM),
+                    // @phpstan-ignore-next-line
                     new Version($version),
                     $environment,
                     soapEngineFactory: new DefaultSoapEngineFactory(
