@@ -1,1 +1,10 @@
 infra/ export-ignore
+Jenkinsfile export-ignore
+releases/ export-ignore
+.gitlab-ci.yml export-ignore
+README.md export-ignore
+vendor/ export-ignore
+tests/ export-ignore
+cypress/ export-ignore
+document/ export-ignore
+bin/ export-ignore
