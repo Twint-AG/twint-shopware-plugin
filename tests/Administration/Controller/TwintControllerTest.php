@@ -107,11 +107,16 @@ class TwintControllerTest extends TestCase
 
         $request = $this->createRequest('api.action.twint.extract_pem', ['password' => '']);
         $response = $this->controller->extractPem($request, $this->context);
+
+        $this->assertInstanceOf(Response::class, $response);
+        $data = json_decode($response->getContent(), true);
         static::assertSame(400, $response->getStatusCode());
-        static::assertSame('{"success":false,"message":"Please upload a valid certificate file"}', (string)$response->getContent());
+        $this->assertFalse($data['success']);
+        static::assertSame('Please upload a valid certificate file', $data['message']);
     }
 
     public function testExtractPemWithValidFile(): void{
+
         $translatorMock = $this->createMock(TranslatorInterface::class);
         $translatorMock->method('trans')->willReturn('Certificate validation successful');
 
@@ -119,14 +124,16 @@ class TwintControllerTest extends TestCase
         $this->controller->setEncryptor($this->cryptoHandlerMock);
         // Prepare a mock Request
         $file = new UploadedFile(dirname(__DIR__, 2).'/_fixture/test.p12', 'test.p12');
-        $request = $this->createRequest('api.action.twint.extract_pem', ['password' => '']);
+        $request = $this->createRequest('api.action.twint.extract_pem', ['password' => '1234']);
         $request->files->set('file', $file);
-        // Call the method
+
         $response = $this->controller->extractPem($request, $this->context);
-        // Assertions
+
         $this->assertInstanceOf(Response::class, $response);
         $data = json_decode($response->getContent(), true);
-        $this->assertFalse($data['success']);
+        $this->assertTrue($data['success']);
+        $this->assertArrayHasKey('certificate', $data['data']);
+        $this->assertArrayHasKey('passphrase', $data['data']);
     }
 
     public function testExtractPemForValidFileWrongPassword(): void{
@@ -134,15 +141,19 @@ class TwintControllerTest extends TestCase
         $translatorMock->method('trans')->willReturn('Invalid certificate file');
         $this->controller->setTranslator($translatorMock);
 
-        $file = new UploadedFile(dirname(__DIR__, 2).'/_fixture/certificate.p12', 'certificate.p12', null, null, true);
-
-        // Prepare a mock Request
-        $request = $this->createRequest('api.action.twint.extract_pem', ['password' => '1234']);
+        $file = new UploadedFile(dirname(__DIR__, 2).'/_fixture/test.p12', 'test.p12', null, null, true);
+        $request = $this->createRequest('api.action.twint.extract_pem', ['password' => '12345']);
         $request->files->set('file', $file);
-        // Call the method
+
+
         $response = $this->controller->extractPem($request, $this->context);
+
+        $this->assertInstanceOf(Response::class, $response);
+        $data = json_decode($response->getContent(), true);
         static::assertSame(400, $response->getStatusCode());
-        static::assertSame('{"success":false,"message":"Invalid certificate file","errorCode":"ERROR_INVALID_PASSPHRASE"}', (string)$response->getContent());
+        $this->assertFalse($data['success']);
+        static::assertSame('Invalid certificate file', $data['message']);
+        static::assertSame('ERROR_INVALID_PASSPHRASE', $data['errorCode']);
     }
 
     public function testRefundWithValidOrder(): void
