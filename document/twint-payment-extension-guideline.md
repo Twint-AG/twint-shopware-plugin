@@ -17,7 +17,7 @@ Or download form the Shopware Extensions Store.
 
 <img src="./screenshots/upload-extension.png" alt="Enable the TWINT Payment extension" width="900" height="auto">
 
-- Click `Confirm` on the warning popup.
+- If the warning popup displayed, click `Confirm` to acknowledge.
 
 <img src="./screenshots/warning-popup.png" alt="Confirm the warning popup" width="600" height="auto">
 
@@ -119,3 +119,7 @@ Under the `Display options` section -> Choose the placement for displaying the `
 - Ensure CHF currency is added to your sale channel.
 
 <img src="./screenshots/sale-channel.png" alt="Add payment methods and currencies to the Sale channel" width="900" height="auto">
+
+- Ensure `Switzerland` is added to `Countries`
+
+<img src="./screenshots/storefront-country.png" alt="Add Switzerland to the Sale channel's supported countries" width="900" height="auto">
