@@ -2,9 +2,31 @@
 
 ## Installation
 
-```
-🔔 To do - Waiting for anh Truong
-```
+### 1. Download the extension
+
+Download the plugin zip file from out git repo
+
+Or download form the Shopware Extensions Store. 
+
+<img src="./screenshots/download-zip.png" alt="Download the extension in zip" width="600" height="auto">
+
+### 2. Upload the extension
+
+- Go to `Extensions -> My extensions`.
+- Click the `Upload extension`.
+
+<img src="./screenshots/upload-extension.png" alt="Enable the TWINT Payment extension" width="900" height="auto">
+
+- Click `Confirm` on the warning popup.
+
+<img src="./screenshots/warning-popup.png" alt="Confirm the warning popup" width="600" height="auto">
+
+### 3 Install the extension
+
+After the extension was imported -> Click the `Install` link to install the extention
+
+<img src="./screenshots/extension-imported.png" alt="Enable the TWINT Payment extension" width="900" height="auto">
+
 
 ## Enable the extension
 
@@ -12,7 +34,7 @@
 
 #### 2. Go to `Extensions -> My extensions`
 
-Under the `Apps` tab -> Ensure that `TBU - Twint Payment` is enabled
+Under the `Apps` tab -> Ensure that `TWINT Payment` is enabled
 
 <img src="./screenshots/twint-enable-extension.png" alt="Enable the TWINT Payment extension" width="900" height="auto">
 
@@ -41,22 +63,14 @@ Under the `Apps` tab -> Ensure that `TBU - Twint Payment` is enabled
 
 #### 3. Go to `Settings -> Extensions -> TWINT Express Checkout`
 
-Under the `Display options` section -> Select where you want the `Twint Express Checkout` button to be displayed.
-
-```
-🔔 To do - "Checkout options" section | Waiting for the update wording
-```
+Under the `Display options` section -> Choose the placement for displaying the `TWINT Express Checkout` button.
 
 #### 4. Go to `Settings -> Payment methods`
 
 - Ensure that the below payment methods are enabled:
-    - TWINT - Express Checkout | TBU - Twint Payment
-    - TWINT - Regular Checkout | TBU - Twint Payment
-- You can further custom the payment method (e.g. add logo) by click the `Edit details` link next to each payment method.
-
-```
-🔔 To do - Payment methods' name will be changed soon, to be updated later.
-```
+    - TWINT - Express Checkout
+    - TWINT - Regular Checkout
+- The payment method can be customized (e.g. add logo) by clicking the "Edit details" link next to each payment method.
 
 <img src="./screenshots/twint-payment-methods.png" alt="Active TWINT payment methods" width="900" height="auto">
 
@@ -68,7 +82,7 @@ Under the `Display options` section -> Select where you want the `Twint Express 
 >
 > TWINT payment extension supports **CHF** currency only. Please make sure CHF currency is added to the Sale channel (also know as the Storefront).
 >
-> If you already have **CHF** currency created please ignore this section.
+> If **CHF** currency was already created, please skip this section.
 
 #### 1. Login to the Admin console panel
 
@@ -97,15 +111,11 @@ Under the `Display options` section -> Select where you want the `Twint Express 
 > 🚩 **Note:**
 >
 > At this stage, the Sale channel should be set up and configured. The information below serves as kind reminder.  
-> Below are just some information need you attention on.
+> Below are some information that need our attention on.
 
-```
-🔔 To do - Payment methods' name will be changed soon, to be updated later.
-```
-
-- Please ensure the below payment methods are added for the Sale channel:
-    - TWINT - Express Checkout | TBU - Twint Payment
-    - TWINT - Regular Checkout | TBU - Twint Payment
+- Ensure CHF currency is added to the desired sale channel.:
+    - TWINT - Express Checkout
+    - TWINT - Regular Checkout
 - Ensure CHF currency is added to your sale channel.
 
 <img src="./screenshots/sale-channel.png" alt="Add payment methods and currencies to the Sale channel" width="900" height="auto">
