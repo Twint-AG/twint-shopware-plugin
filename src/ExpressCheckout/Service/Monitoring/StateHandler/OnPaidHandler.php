@@ -175,9 +175,10 @@ class OnPaidHandler implements StateHandlerInterface
         if (!$entity->getCart() instanceof Cart) {
             throw new Exception('Cart not found');
         }
-
+        $cart = $entity->getCart();
+        $cart->setCustomerComment('');
         $orderId = $this->cartService->order(
-            $entity->getCart(),
+            $cart,
             $this->context->getContext($entity->getSalesChannelId()),
             new RequestDataBag()
         );

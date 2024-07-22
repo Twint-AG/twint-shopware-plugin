@@ -80,7 +80,7 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
         $cloneCart = clone $cart;
         $token = Uuid::randomHex();
         $cloneCart->setToken($token);
-        $cloneCart->setCustomerComment($context->getToken());
+        $cloneCart->setCustomerComment($token);
         $this->cartPersister->save($cloneCart, $context);
         return $cloneCart;
     }
