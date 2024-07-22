@@ -2,7 +2,8 @@
     "twintPayment": {
         "error": {
             "invalidPaymentError": "Missing %currency% currency. %name%  is removed.",
-            "orderNotFound": "This order cannot be found"
+            "orderNotFound": "This order cannot be found",
+            "pairingNotFound": "Invalid transaction"
         },
         "notice": {
             "hasProductInCart": "You have existing products in the shopping cart. Please review your shopping cart before continue."
