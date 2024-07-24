@@ -54,8 +54,20 @@ Shopware.Component.register('sw-order-detail-twint', {
 
             this.isLoading = true;
             this.transactionLogRepository.search(criteria).then((transactionLogs) => {
+                transactionLogs.forEach((transactionLog, index) => {
+                    if (transactionLog.order === undefined) {
+                        transactionLogs[index].order = {
+                            'orderNumber' : ''
+                        };
+                    }
+                    if (transactionLog.paymentStateMachineState === undefined) {
+                        transactionLogs[index].paymentStateMachineState = {};
+                    }
+                    if (transactionLog.orderStateMachineState === undefined) {
+                        transactionLogs[index].orderStateMachineState = {};
+                    }
+                });
                 this.transactionLogs = transactionLogs;
-                console.log(transactionLogs)
                 window.a = transactionLogs
                 this.isLoading = false;
             }).catch(() => {
@@ -72,7 +84,12 @@ Shopware.Component.register('sw-order-detail-twint', {
             this.showTransactionLogDetailModal = false;
         },
         getVariantState(entity, state) {
-            return this.stateStyleDataProviderService.getStyle(`${entity}.state`, state.technicalName).variant;
+            if(state){
+                return this.stateStyleDataProviderService.getStyle(`${entity}.state`, state.technicalName).variant;
+            }
+            else{
+                console.log(state);
+            }
         }
     },
     destroyed() {
