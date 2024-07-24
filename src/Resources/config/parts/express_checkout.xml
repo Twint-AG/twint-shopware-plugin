@@ -33,7 +33,6 @@
             <argument type="service" id="Twint\ExpressCheckout\Repository\PairingRepository"/>
             <argument type="service" id="Shopware\Core\System\SalesChannel\Context\CachedSalesChannelContextFactory"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\CartPersister"/>
-            <argument type="service" id="Twint\Core\Service\SettingServiceInterface"/>
             <argument type="service" id="Twint\Core\Service\CurrencyService"/>
         </service>
 
