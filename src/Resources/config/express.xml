@@ -52,26 +52,4 @@
             <defaultValue>["PDP", "PLP", "CART"]</defaultValue>
         </input-field>
     </card>
-
-    <card>
-        <title>Checkout options</title>
-        <title lang="de-DE">Checkout options</title>
-        <title lang="fr-FR">Checkout options</title>
-        <title lang="it-IT">Checkout options</title>
-
-        <input-field type="bool">
-            <name>checkoutSingle</name>
-            <label>Checkout the whole current cart (PLP and PDP page)</label>
-            <label lang="de-DE">Den gesamten aktuellen Warenkorb auschecken</label>
-            <label lang="fr-FR">Checkout the whole current cart (PLP and PDP page)</label>
-            <label lang="it-IT">Checkout the whole current cart (PLP and PDP page)</label>
-
-            <helpText>Allow customers to express checkout of a single item on the PLP and PDP pages. If not, the product has to be added to the cart before checkout the whole cart</helpText>
-            <helpText lang="de-DE">Ermöglichen Sie Kunden, einen einzelnen Artikel auf den PLP- und PDP-Seiten schnell zu bezahlen. Andernfalls muss das Produkt in den Warenkorb gelegt werden, bevor der gesamte Warenkorb bezahlt werden kann.</helpText>
-            <helpText lang="fr-FR">Allow customers to express checkout of a single item on the PLP and PDP pages. If not, the product has to be added to the cart before checkout the whole cart</helpText>
-            <helpText lang="it-IT">Allow customers to express checkout of a single item on the PLP and PDP pages. If not, the product has to be added to the cart before checkout the whole cart</helpText>
-
-            <defaultValue>false</defaultValue>
-        </input-field>
-    </card>
 </config>

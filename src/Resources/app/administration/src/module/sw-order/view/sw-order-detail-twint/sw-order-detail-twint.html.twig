@@ -35,7 +35,13 @@
 
                                 {% block twint_transaction_log_list_content_order %}
                                     <template #column-orderId="{ item }">
-                                        {{ item.orderId }}
+                                        {% if item.order is not null and item.order.orderNumber is not null %}
+                                            <router-link :to="{ name: 'sw.order.detail', params: { id: item.orderId }, query: { edit: false } }">
+                                                {{ item.order.orderNumber }}
+                                            </router-link>
+                                        {% else %}
+                                            {{ item.orderId }}
+                                        {% endif %}
                                     </template>
                                 {% endblock %}
 
@@ -59,7 +65,7 @@
 
                                 {% block twint_transaction_log_list_content_payment %}
                                     <template #column-paymentStateId="{ item }">
-                                        {% if item.paymentStateMachineState %}
+                                        {% if item.paymentStateMachineState is not null %}
                                             <sw-label :variant="getVariantState('order_transaction', item.paymentStateMachineState)" appearance="badged">
                                                 {{ item.paymentStateMachineState.name }}
                                             </sw-label>
@@ -69,7 +75,7 @@
 
                                 {% block twint_transaction_log_list_content_order %}
                                     <template #column-orderStateId="{ item }">
-                                        {% if item.orderStateMachineState %}
+                                        {% if item.orderStateMachineState is not null %}
                                             <sw-label :variant="getVariantState('order', item.orderStateMachineState)" appearance="badged">
                                                 {{ item.orderStateMachineState.name }}
                                             </sw-label>
@@ -112,7 +118,13 @@
                                                                     </div>
                                                                 </td>
                                                                 <td class="sw-data-grid__cell">
-                                                                    <div class="sw-data-grid__cell-content"> {{ item.order.orderNumber }}</div>
+                                                                    <div class="sw-data-grid__cell-content">
+                                                                        {% if item.order is not null and item.order.orderNumber is not null %}
+                                                                            {{ item.order.orderNumber }}
+                                                                        {% else %}
+                                                                            {{ item.orderId }}
+                                                                        {% endif %}
+                                                                    </div>
                                                                 </td>
                                                             </tr>
                                                             <tr class="sw-data-grid__row">
@@ -143,9 +155,13 @@
                                                                 </td>
                                                                 <td class="sw-data-grid__cell">
                                                                     <div class="sw-data-grid__cell-content">
-                                                                        <sw-label :variant="getVariantState('order_transaction', item.paymentStateMachineState)" appearance="badged">
-                                                                            {{ item.paymentStateMachineState.name }}
-                                                                        </sw-label>
+                                                                        {% if item.paymentStateMachineState is not null %}
+                                                                            <sw-label :variant="getVariantState('order_transaction', item.paymentStateMachineState)" appearance="badged">
+                                                                                {{ item.paymentStateMachineState.name }}
+                                                                            </sw-label>
+                                                                        {% else %}
+                                                                            {{ item.paymentStateId }}
+                                                                        {% endif %}
                                                                     </div>
                                                                 </td>
                                                             </tr>
@@ -157,9 +173,13 @@
                                                                 </td>
                                                                 <td class="sw-data-grid__cell">
                                                                     <div class="sw-data-grid__cell-content">
-                                                                        <sw-label :variant="getVariantState('order', item.orderStateMachineState)" appearance="badged">
-                                                                            {{ item.orderStateMachineState.name }}
-                                                                        </sw-label>
+                                                                        {% if item.orderStateMachineState is not null %}
+                                                                            <sw-label :variant="getVariantState('order', item.orderStateMachineState)" appearance="badged">
+                                                                                {{ item.orderStateMachineState.name }}
+                                                                            </sw-label>
+                                                                        {% else %}
+                                                                            {{ item.orderStateId }}
+                                                                        {% endif %}
                                                                     </div>
                                                                 </td>
                                                             </tr>
