@@ -21,7 +21,6 @@ use Shopware\Storefront\Event\RouteRequest\ShippingMethodRouteRequestEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Twint\Core\Service\CurrencyService;
-use Twint\Core\Service\SettingServiceInterface;
 use Twint\ExpressCheckout\Repository\PairingRepository;
 use Twint\Sdk\Exception\SdkError;
 use Twint\Sdk\Value\Money;
@@ -41,7 +40,6 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
         private readonly PairingRepository $loader,
         private readonly AbstractSalesChannelContextFactory $contextFactory,
         private readonly CartPersister $cartPersister,
-        private readonly SettingServiceInterface $settingService,
         private readonly CurrencyService $currencyService,
     ) {
     }
@@ -58,13 +56,8 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
         if ($useCart) {
             $cart = $this->cloneCart($context);
         } else {
-            $setting = $this->settingService->getSetting($context->getSalesChannel()->getId());
-            if ($setting->getCheckoutSingle()) {
-                $cart = $this->createCart($context, $payload['lineItems']);
-            } else {
-                $cart = $this->cloneCart($context);
-                $cart = $this->cartService->add($cart, $this->getLineItems($payload['lineItems'], $context), $context);
-            }
+            $cart = $this->cloneCart($context);
+            $cart = $this->cartService->add($cart, $this->getLineItems($payload['lineItems'], $context), $context);
         }
 
         $methods = $this->getShippingMethods($context, $request);
@@ -151,16 +144,6 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
         }
 
         return $lineItems;
-    }
-
-    private function createCart(SalesChannelContext $context, array $items): Cart
-    {
-        $token = Uuid::randomHex();
-        $cart = $this->cartService->createNew($token);
-
-        $lineItems = $this->getLineItems($items, $context);
-
-        return $this->cartService->add($cart, $lineItems, $context);
     }
 
     public function getOpenedPairings(): mixed

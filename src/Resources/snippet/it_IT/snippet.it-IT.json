@@ -1,7 +1,6 @@
 {
     "twintPayment": {
         "error": {
-            "invalidPaymentError": "Missing %currency% currency. %name%  is removed.",
             "orderNotFound": "This order cannot be found",
             "pairingNotFound": "Invalid transaction"
         },
@@ -23,7 +22,6 @@
         "appSelector": {
             "title": "Choose your TWINT app",
             "otherBankOption": "Other banks",
-            "enterCode" : "Or enter this code<br>in your app:",
             "switchLinkLabel": "Switch to the TWINT app now"
         },
         "modal": {
