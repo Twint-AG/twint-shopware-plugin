@@ -134,7 +134,7 @@ export default {
                 };
             });
 
-            this.TwintPaymentSettingsService.validateCredential(credential).then((response) => {
+            this.TwintPaymentSettingsService.validateCredentials(credential).then((response) => {
                 const success = response.success ?? false;
 
                 if (success) {

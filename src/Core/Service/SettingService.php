@@ -47,7 +47,7 @@ class SettingService implements SettingServiceInterface
      * Validate Twint credentials.
      * And store the validation status in the configuration.
      */
-    public function validateCredential(?string $saleChannel = null): void
+    public function validateCredentials(?string $saleChannel = null): void
     {
         $config = $this->configService->getDomain(self::SYSTEM_CONFIG_DOMAIN, $saleChannel, true);
         $valid = $this->validator->validate(
