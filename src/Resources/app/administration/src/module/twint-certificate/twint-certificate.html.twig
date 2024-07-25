@@ -8,10 +8,10 @@
                 required
         >
             <template #caption-label>
-                {% if certificate is not empty %}
-                    {{ $tc('twint.settings.certificate.notice.label') }}
-                {% else %}
+                {% if certificate == '' or certificate is null %}
                     {{ $tc('twint.settings.certificate.placeholder') }}
+                {% else %}
+                    {{ $tc('twint.settings.certificate.notice.label') }}
                 {% endif %}
             </template>
         </sw-file-input>

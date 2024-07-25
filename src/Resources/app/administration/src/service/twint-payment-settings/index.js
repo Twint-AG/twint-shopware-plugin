@@ -5,7 +5,7 @@ export default class TwintPaymentSettingsService extends ApiService {
         super(httpClient, loginService, apiEndpoint);
     }
 
-    validateCredential(credential) {
+    validateCredentials(credential) {
         const headers = this.getBasicHeaders();
 
         return this.httpClient

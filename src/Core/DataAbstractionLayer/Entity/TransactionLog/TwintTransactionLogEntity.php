@@ -19,15 +19,15 @@ class TwintTransactionLogEntity extends Entity
 
     protected ?StateMachineStateEntity $orderState = null;
 
-    protected string $orderId;
+    protected ?string $orderId;
 
-    protected string $paymentStateId;
+    protected ?string $paymentStateId;
 
-    protected string $orderStateId;
+    protected ?string $orderStateId;
 
-    protected string $transactionId;
+    protected ?string $transactionId;
 
-    protected string $pairingId;
+    protected ?string $pairingId;
 
     protected string $apiMethod;
 
@@ -41,19 +41,19 @@ class TwintTransactionLogEntity extends Entity
 
     protected array $soapResponse;
 
-    protected string $exception;
+    protected ?string $exception;
 
     public function getOrder(): ?OrderEntity
     {
         return $this->order;
     }
 
-    public function getOrderId(): string
+    public function getOrderId(): ?string
     {
         return $this->orderId;
     }
 
-    public function getPaymentStateId(): string
+    public function getPaymentStateId(): ?string
     {
         return $this->paymentStateId;
     }
@@ -63,7 +63,7 @@ class TwintTransactionLogEntity extends Entity
         return $this->paymentState;
     }
 
-    public function getOrderStateId(): string
+    public function getOrderStateId(): ?string
     {
         return $this->orderStateId;
     }
@@ -73,12 +73,12 @@ class TwintTransactionLogEntity extends Entity
         return $this->orderState;
     }
 
-    public function getTransactionId(): string
+    public function getTransactionId(): ?string
     {
         return $this->transactionId;
     }
 
-    public function getPairingId(): string
+    public function getPairingId(): ?string
     {
         return $this->pairingId;
     }
@@ -108,7 +108,7 @@ class TwintTransactionLogEntity extends Entity
         return $this->soapResponse;
     }
 
-    public function getException(): string
+    public function getException(): ?string
     {
         return $this->exception;
     }
