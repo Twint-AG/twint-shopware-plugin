@@ -6,8 +6,7 @@
       "menuItem": "TWINT Express Checkout"
     },
     "general": {
-      "menuItem": "TWINT-Anmeldeinformationen",
-      "descriptionTextModule": "TWINT ist eine Schweizer Bezahl-App, mit der Sie in Geschäften, online und Geld an Freunde und Familie überweisen können."
+      "menuItem": "TWINT-Anmeldeinformationen"
     },
     "settings": {
       "button": {
@@ -54,6 +53,12 @@
         "password": {
           "label": "Zertifikatspasswort",
           "helpText": "Das Passwort für die Zertifikatsdatei "
+        },
+        "notice": {
+          "label": "Certificate encrypted and stored"
+        },
+        "button": {
+          "label": "Upload new certificate"
         }
       }
     },

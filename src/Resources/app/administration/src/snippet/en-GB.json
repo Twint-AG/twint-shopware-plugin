@@ -7,8 +7,7 @@
       "menuItem": "TWINT Express Checkout"
     },
     "general": {
-      "menuItem": "TWINT Credentials",
-      "descriptionTextModule": "TWINT is a Swiss payment app that allows you to pay in stores and online shops digitally and cashlessly"
+      "menuItem": "TWINT Credentials"
     },
     "settings": {
       "button": {
@@ -41,7 +40,7 @@
           "ERROR_INVALID_INPUT": "Certificate file and password are required",
           "ERROR_INVALID_UNKNOWN": "Certificate cannot be validated. Please try again",
           "ERROR_INVALID_CERTIFICATE_FORMAT": "Invalid certificate format",
-          "ERROR_INVALID_PASSPHRASE": "Invalid passphrase",
+          "ERROR_INVALID_PASSPHRASE": "Invalid password",
           "ERROR_INVALID_ISSUER_COUNTRY": "Invalid issuer country",
           "ERROR_INVALID_ISSUER_ORGANIZATION": "Invalid issuer organization",
           "ERROR_INVALID_EXPIRY_DATE": "Invalid expiry date",
@@ -55,6 +54,12 @@
         "password": {
           "label": "Certificate Password",
           "helpText": "Please enter the password for the certificate"
+        },
+        "notice": {
+          "label": "Certificate encrypted and stored"
+        },
+        "button": {
+          "label": "Upload new certificate"
         }
       }
     },
