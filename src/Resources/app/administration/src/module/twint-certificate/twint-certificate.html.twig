@@ -8,11 +8,16 @@
                 required
         >
             <template #caption-label>
-                {{ $tc('twint.settings.certificate.placeholder') }}
+                {% if certificate is not empty %}
+                    {{ $tc('twint.settings.certificate.notice.label') }}
+                {% else %}
+                    {{ $tc('twint.settings.certificate.placeholder') }}
+                {% endif %}
             </template>
         </sw-file-input>
 
         <sw-password-field
+                v-if="certificate == '' || certificate == null"
                 v-model:value="currentPassword"
                 :entity-collection="null"
                 :error="passwordError"
@@ -20,6 +25,7 @@
                 :label="$tc('twint.settings.certificate.password.label')"
                 :help-text="$tc('twint.settings.certificate.password.helpText')"
                 @blur="updatePassword"
+                autocomplete="off"
                 required
         >
             <template #suffix>
