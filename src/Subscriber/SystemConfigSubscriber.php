@@ -26,9 +26,6 @@ class SystemConfigSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    /**
-     * @return array<mixed>>
-     */
     public static function getSubscribedEvents(): array
     {
         $subcribers = [
@@ -55,7 +52,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
         if (in_array($key, [Settings::CERTIFICATE, Settings::MERCHANT_ID, Settings::TEST_MODE], true)) {
             // Need to read the config values from the database and validate the credentials
             // While user is updating any of the Twint settings
-            $this->settingService->validateCredential($channel);
+            $this->settingService->validateCredentials($channel);
         }
     }
 
@@ -84,7 +81,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
         if (array_intersect($keys, $credentialKeys) !== []) {
             // Need to read the config values from the database and validate the credentials
             // While user is updating any of the Twint settings
-            $this->settingService->validateCredential($channel);
+            $this->settingService->validateCredentials($channel);
         }
     }
 

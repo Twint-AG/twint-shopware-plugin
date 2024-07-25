@@ -6,7 +6,6 @@ namespace Twint\Core\Service;
 
 use Exception;
 use Shopware\Core\Checkout\Cart\Price\CashRounding;
-use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -44,7 +43,6 @@ class PaymentService
         private readonly OrderTransactionStateHandler $transactionStateHandler,
         private readonly ClientBuilder $clientBuilder,
         private readonly TransactionLogWriterInterface $transactionLogWriter,
-        private readonly StockManagerInterface $stockManager,
         private readonly CashRounding $rounding,
         private readonly OrderService $orderService
     ) {
@@ -294,7 +292,7 @@ class PaymentService
         return $totalReversal->getSum() ?? -1;
     }
 
-    public function changePaymentStatus(OrderEntity $order, float $amount = 0, bool $stockRecovery = false): void
+    public function changePaymentStatus(OrderEntity $order, float $amount = 0): void
     {
         $orderTransactionId = $order->getTransactions()?->first()?->getId();
         $lastTransactionStateName = $order->getTransactions()?->first()
@@ -318,14 +316,6 @@ class PaymentService
                 $totalReversalMoney
             ) === 0 && $lastTransactionStateName !== OrderTransactionStates::STATE_REFUNDED) {
                 $this->transactionStateHandler->refund($orderTransactionId, $this->context);
-                if ($stockRecovery) {
-                    $lineItems = $order->getLineItems();
-                    if ($lineItems instanceof OrderLineItemCollection) {
-                        foreach ($lineItems as $lineItem) {
-                            $this->stockManager->increaseStock($lineItem, $lineItem->getQuantity());
-                        }
-                    }
-                }
             } elseif ($lastTransactionStateName !== OrderTransactionStates::STATE_PARTIALLY_REFUNDED) {
                 $this->transactionStateHandler->refundPartially($orderTransactionId, $this->context);
             }

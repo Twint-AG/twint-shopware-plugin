@@ -42,24 +42,23 @@ class OrderMonitorCommand extends Command
         if (count($pendingOrders) > 0) {
             $style->info(sprintf('These total: %d TWINT orders will be processed', count($pendingOrders)));
             foreach ($pendingOrders as $order) {
-                if ($order instanceof OrderEntity) {
-                    $style->info('Process for order ' . $order->getOrderNumber());
-                    try {
-                        $twintOrder = $this->paymentService->checkOrderStatus($order);
-                        if ($twintOrder instanceof Order) {
-                            $style->success(
-                                sprintf('TWINT order "%s" was updated successfully!', $order->getOrderNumber())
-                            );
-                        }
-                    } catch (Exception $e) {
-                        $style->error(
-                            sprintf(
-                                'TWINT order status cannot be updated: %s with error code: %s',
-                                $e->getMessage(),
-                                $e->getCode()
-                            )
+                /** @var OrderEntity $order */
+                $style->info('Process for order ' . $order->getOrderNumber());
+                try {
+                    $twintOrder = $this->paymentService->checkOrderStatus($order);
+                    if ($twintOrder instanceof Order) {
+                        $style->success(
+                            sprintf('TWINT order "%s" was updated successfully!', $order->getOrderNumber())
                         );
                     }
+                } catch (Exception $e) {
+                    $style->error(
+                        sprintf(
+                            'TWINT order status cannot be updated: %s with error code: %s',
+                            $e->getMessage(),
+                            $e->getCode()
+                        )
+                    );
                 }
             }
         }
