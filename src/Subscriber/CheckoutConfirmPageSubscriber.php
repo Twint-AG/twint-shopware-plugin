@@ -14,9 +14,6 @@ use Twint\Core\Setting\Settings;
 
 class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @return array<mixed>>
-     */
     public static function getSubscribedEvents(): array
     {
         return [

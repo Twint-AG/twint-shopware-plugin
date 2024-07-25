@@ -172,9 +172,6 @@ class TwintController extends AbstractController
                 }
                 $twintReverseOrder = $this->paymentService->reverseOrder($order, $amount);
                 if ($twintReverseOrder instanceof Order) {
-                    if (empty($reason)) {
-                        $reason = ' ';
-                    }
                     $this->reversalHistoryWriter->write(
                         $orderId,
                         $twintReverseOrder->merchantTransactionReference()
