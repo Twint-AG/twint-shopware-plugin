@@ -5,24 +5,32 @@ import './twint-certificate.scss';
 const {Component, Mixin} = Shopware;
 const { ShopwareError } = Shopware.Classes;
 
+
 Component.register('twint-certificate', {
     template: Shopware.Feature.isActive('v6.6.0.0') ? template : template65,
 
     mixins: [
         Mixin.getByName('notification'),
     ],
-    inject: ['feature'],
+    inject: ['feature', 'systemConfigApiService'],
     data() {
         return {
             currentPassword: null,
             currentCertFile: null,
             passwordError: null,
-            validatePassword: ''
+            validatePassword: '',
+            merchantId: null,
+            certificate: null,
+            validated: null,
+            buttonSelector: '.sw-file-input__dropzone .sw-file-input__button',
         };
     },
-
+    created() {
+        this.loadSettings();
+    },
     methods: {
         onFileChange(file) {
+            this.certificate = null;
             this.currentCertFile = file;
             if (this.currentCertFile && (!this.currentPassword || this.currentPassword.length === 0)) {
                 this.passwordError = new ShopwareError({
@@ -57,9 +65,11 @@ Component.register('twint-certificate', {
             if (!this.currentCertFile || !this.currentPassword || this.currentPassword.length === 0) {
                 return;
             }
-
+            const inputElement = this.$refs.myInput;
             service.uploadFile(this.currentCertFile, this.currentPassword ?? '').then((res) => {
                 this.updateCertificate(res.data.data);
+                this.certificate = res.data.data;
+                this.changeButtonText();
                 this.createNotification({
                     title: this.$tc('twint.settings.certificate.success.title'),
                     message: this.$tc('twint.settings.certificate.success.message'),
@@ -69,6 +79,8 @@ Component.register('twint-certificate', {
                 });
 
             }).catch((err) => {
+                this.certificate = null;
+                this.changeButtonText();
                 //specific error handling
                 if (err.response.status === 400) {
                     let errorCode = err.response.data.errorCode;
@@ -96,6 +108,33 @@ Component.register('twint-certificate', {
             }
 
             this.$emit('input', value);
+            this.changeButtonText();
+        },
+
+        async loadSettings() {
+            this.isLoading = true;
+
+            const settings = await this.systemConfigApiService.getValues('TwintPayment.settings');
+            if (Object.keys(settings).length > 0) {
+                this.merchantId = settings['TwintPayment.settings.merchantId'];
+                this.certificate = settings['TwintPayment.settings.certificate'];
+                this.validated = settings['TwintPayment.settings.validated'];
+
+            }
+            this.changeButtonText();
+            this.isLoading = false;
+        },
+
+        changeButtonText() {
+            this.button = document.querySelector(this.buttonSelector);
+            if(this.button){
+                if(this.certificate != null && this.certificate != ''){
+                    this.button.textContent = this.$tc('twint.settings.certificate.button.label');
+                }
+                else{
+                    this.button.textContent = this.$tc('global.sw-file-input.buttonChoose');
+                }
+            }
         }
     }
 });
