@@ -17,17 +17,17 @@
       "testCredentials": {
         "error": {
           "title": "Credential Error",
-          "message": "Invalid credentials. Please check again: Merchant ID, certificate and environment (mode)"
+          "message": "Invalid credentials. Please check again: Store UUID, certificate and environment (mode)"
         }
       },
       "merchantId": {
-        "label": "Merchant ID",
-        "placeholder": "Enter your Merchant ID",
-        "helpText": "The Merchant ID is provided by TWINT",
+        "label": "Store UUID",
+        "placeholder": "Enter your Store UUID",
+        "helpText": "The Store UUID is provided by TWINT",
         "error" : {
-          "title": "Merchant ID",
-          "invalidFormat": "Invalid Merchant ID. Merchant ID needs to be a UUIDv4",
-          "required": "Merchant ID is required"
+          "title": "Store UUID",
+          "invalidFormat": "Invalid Store UUID. Store UUID needs to be a UUIDv4",
+          "required": "Store UUID is required"
         }
       },
       "certificate": {
