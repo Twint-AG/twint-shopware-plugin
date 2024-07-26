@@ -52,7 +52,7 @@
           "message": "Your certificate is successfully validated"
         },
         "password": {
-          "label": "Certificate Password",
+          "label": "Certificate password",
           "helpText": "Please enter the password for the certificate"
         },
         "notice": {
