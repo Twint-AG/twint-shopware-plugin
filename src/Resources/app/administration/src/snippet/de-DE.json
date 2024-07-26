@@ -16,17 +16,17 @@
       "testCredentials": {
         "error": {
           "title": "Anmeldeinformationen ungültig",
-          "message": "Die Anmeldeinformationen sind ungültig. Bitte überprüfen Sie die Händler-ID, das Zertifikat und die Umgebung (Modus)."
+          "message": "Invalid credentials. Please check again: Store UUID, certificate and environment (mode)"
         }
       },
       "merchantId": {
-        "label": "Händler-ID",
-        "placeholder": "Geben Sie Ihre Händler-ID ein",
-        "helpText": "Die von TWINT bereitgestellte Händler-ID",
+        "label": "Store UUID",
+        "placeholder": "Enter your Store UUID",
+        "helpText": "The Store UUID is provided by TWINT",
         "error" : {
-          "title": "Händler-ID",
-          "invalidFormat": "Die Händler-ID hat ein ungültiges Format. Muss eine UUIDv4 sein",
-          "required": "Händler-ID ist erforderlich"
+          "title": "Store UUID",
+          "invalidFormat": "Invalid Store UUID. Store UUID needs to be a UUIDv4",
+          "required": "Store UUID is required"
         }
       },
       "certificate": {

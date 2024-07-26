@@ -29,7 +29,7 @@
             "finish": "Fertig"
         },
         "express": {
-            "checkingOut": "Express-Checkout läuft"
+            "checkingOut": "Express Checkout in progress"
         },
         "administration": {
            "name": {
