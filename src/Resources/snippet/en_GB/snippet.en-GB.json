@@ -29,7 +29,7 @@
             "finish": "Continue shopping"
         },
         "express": {
-            "checkingOut": "Express checkout in progress"
+            "checkingOut": "Express Checkout in progress"
         },
         "administration": {
             "name": {
