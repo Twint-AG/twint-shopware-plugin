@@ -43,10 +43,10 @@
 
         <component name="twint-certificate">
             <name>certificate</name>
-            <label>Certificate File</label>
-            <label lang="de-DE">Zertifikat Passwort</label>
-            <label lang="fr-FR">Certificate File</label>
-            <label lang="it-IT">Certificate File</label>
+            <label>Certificate file</label>
+            <label lang="de-DE">Certificate file</label>
+            <label lang="fr-FR">Certificate file</label>
+            <label lang="it-IT">Certificate file</label>
 
             <helpText>Enter the certificate password</helpText>
             <helpText lang="de-DE">Enter the certificate password</helpText>

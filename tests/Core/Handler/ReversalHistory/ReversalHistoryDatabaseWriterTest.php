@@ -41,7 +41,7 @@ class ReversalHistoryDatabaseWriterTest extends TestCase
                 $this->reversalItem,
             ], Context::createDefaultContext());
 
-        $this->writer->write($this->reversalItem['orderId'], $this->reversalItem['reversalId'], $this->reversalItem['amount'], $this->reversalItem['currency'], $this->reversalItem['reason']);
+        $this->writer->write($this->reversalItem['orderId'], $this->reversalItem['reversalId'], $this->reversalItem['amount'], $this->reversalItem['currency'], $this->reversalItem['reason'], Context::createDefaultContext());
         $this->expectOutputString('');
     }
 
@@ -55,7 +55,7 @@ class ReversalHistoryDatabaseWriterTest extends TestCase
             ->method('error')
             ->with('Repository error');
 
-        $this->writer->write($this->reversalItem['orderId'], $this->reversalItem['reversalId'], $this->reversalItem['amount'], $this->reversalItem['currency'], $this->reversalItem['reason']);
+        $this->writer->write($this->reversalItem['orderId'], $this->reversalItem['reversalId'], $this->reversalItem['amount'], $this->reversalItem['currency'], $this->reversalItem['reason'], Context::createDefaultContext());
         $this->expectOutputString('');
     }
 }

@@ -45,7 +45,7 @@ class TransactionLogDatabaseWriterTest extends TestCase
             'response' => '[]',
             'soapRequest' => [],
             'soapResponse' => [],
-            'exception' => ' '
+            'exception' => ''
         ];
         $this->invocationMock = new class(){
             public function arguments(){
@@ -86,7 +86,9 @@ class TransactionLogDatabaseWriterTest extends TestCase
             $this->transactionLogItem['response'],
             $this->transactionLogItem['soapRequest'],
             $this->transactionLogItem['soapResponse'],
-            $this->transactionLogItem['exception']);
+            $this->transactionLogItem['exception'],
+            Context::createDefaultContext());
+
         $this->expectOutputString('');
     }
 
@@ -99,7 +101,7 @@ class TransactionLogDatabaseWriterTest extends TestCase
                 $this->transactionLogItem,
             ], Context::createDefaultContext());
 
-        $this->writer->writeObjectLog($this->transactionLogItem['orderId'], $this->transactionLogItem['orderVersionId'], $this->transactionLogItem['paymentStateId'], $this->transactionLogItem['orderStateId'], $this->transactionLogItem['transactionId'], $invocations);
+        $this->writer->writeObjectLog($this->transactionLogItem['orderId'], $this->transactionLogItem['orderVersionId'], $this->transactionLogItem['paymentStateId'], $this->transactionLogItem['orderStateId'], $this->transactionLogItem['transactionId'], $invocations, Context::createDefaultContext());
         $this->expectOutputString('');
     }
 
@@ -111,7 +113,7 @@ class TransactionLogDatabaseWriterTest extends TestCase
             ->with([
                 $this->transactionLogItem,
             ], Context::createDefaultContext());
-        $this->writer->writeReserveOrderLog($this->transactionLogItem['orderId'], $this->transactionLogItem['orderVersionId'], $this->transactionLogItem['paymentStateId'], $this->transactionLogItem['orderStateId'], $this->transactionLogItem['transactionId'], $invocations);
+        $this->writer->writeReserveOrderLog($this->transactionLogItem['orderId'], $this->transactionLogItem['orderVersionId'], $this->transactionLogItem['paymentStateId'], $this->transactionLogItem['orderStateId'], $this->transactionLogItem['transactionId'], $invocations, Context::createDefaultContext());
 
         $this->expectOutputString('');
     }
@@ -126,7 +128,7 @@ class TransactionLogDatabaseWriterTest extends TestCase
                 $this->assertCount(8, $filters);
                 return new EntitySearchResult(TwintTransactionLogEntity::class, 1, new EntityCollection([]), null, $criteria, $context);
         });
-        $result = $this->writer->checkDuplicatedTransactionLogInLastMinutes($this->transactionLogItem);
+        $result = $this->writer->checkDuplicatedTransactionLogInLastMinutes($this->transactionLogItem, Context::createDefaultContext());
         $this->assertFalse($result);
     }
 }
