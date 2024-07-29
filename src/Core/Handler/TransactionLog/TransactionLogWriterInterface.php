@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Twint\Core\Handler\TransactionLog;
 
+use Shopware\Core\Framework\Context;
+
 interface TransactionLogWriterInterface
 {
     public function write(
@@ -18,7 +20,8 @@ interface TransactionLogWriterInterface
         string $response,
         array $soapRequest,
         array $soapResponse,
-        string $exception
+        string $exception,
+        Context $context = null
     ): void;
 
     public function writeObjectLog(
@@ -27,7 +30,8 @@ interface TransactionLogWriterInterface
         ?string $paymentStateId,
         ?string $orderStateId,
         string $transactionId,
-        array $invocations
+        array $invocations,
+        Context $context = null
     ): void;
 
     public function writeReserveOrderLog(
@@ -36,6 +40,7 @@ interface TransactionLogWriterInterface
         ?string $paymentStateId,
         ?string $orderStateId,
         string $transactionId,
-        array $invocations
+        array $invocations,
+        Context $context = null
     ): void;
 }

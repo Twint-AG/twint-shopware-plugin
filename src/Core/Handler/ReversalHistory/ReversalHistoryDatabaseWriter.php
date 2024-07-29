@@ -17,8 +17,17 @@ class ReversalHistoryDatabaseWriter implements ReversalHistoryWriterInterface
     ) {
     }
 
-    public function write(string $orderId, string $reversalId, float $amount, string $currency, string $reason): void
-    {
+    public function write(
+        string $orderId,
+        string $reversalId,
+        float $amount,
+        string $currency,
+        string $reason,
+        Context $context = null
+    ): void {
+        if (!$context instanceof Context) {
+            $context = Context::createDefaultContext();
+        }
         try {
             $this->repository->create([
                 [
@@ -28,7 +37,7 @@ class ReversalHistoryDatabaseWriter implements ReversalHistoryWriterInterface
                     'currency' => $currency,
                     'reason' => $reason,
                 ],
-            ], Context::createDefaultContext());
+            ], $context);
         } catch (Exception $e) {
             $this->logger->error($e->getMessage());
         }
