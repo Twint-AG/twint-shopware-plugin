@@ -35,8 +35,12 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
         string $response,
         array $soapRequest,
         array $soapResponse,
-        string $exception
+        string $exception,
+        Context $context = null
     ): void {
+        if (!$context instanceof Context) {
+            $context = Context::createDefaultContext();
+        }
         try {
             $this->repository->create([
                 [
@@ -53,7 +57,7 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
                     'soapResponse' => $soapResponse,
                     'exception' => $exception,
                 ],
-            ], Context::createDefaultContext());
+            ], $context);
         } catch (Exception $e) {
             $this->logger->error($e->getMessage());
         }
@@ -65,17 +69,21 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
         ?string $paymentStateId,
         ?string $orderStateId,
         string $transactionId,
-        array $invocations
+        array $invocations,
+        Context $context = null
     ): void {
+        if (!$context instanceof Context) {
+            $context = Context::createDefaultContext();
+        }
         if ($invocations === []) {
             return;
         }
         $request = json_encode($invocations[0]->arguments());
-        $exception = $invocations[0]->exception() ?? ' ';
+        $exception = $invocations[0]->exception() ?? '';
         if ($exception instanceof ApiFailure) {
             $exception = $exception->getMessage();
         }
-        $apiMethod = $invocations[0]->methodName() ?? ' ';
+        $apiMethod = $invocations[0]->methodName() ?? 'unknown';
         $response = json_encode($invocations[0]->returnValue());
         $soapMessages = $invocations[0]->messages();
         $soapRequests = [];
@@ -101,8 +109,8 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
                 'soapResponse' => $soapResponses,
                 'exception' => $exception,
             ];
-            if (!$this->checkDuplicatedTransactionLogInLastMinutes($record)) {
-                $this->repository->create([$record], Context::createDefaultContext());
+            if (!$this->checkDuplicatedTransactionLogInLastMinutes($record, $context)) {
+                $this->repository->create([$record], $context);
             }
         } catch (Exception $e) {
             $this->logger->error($e->getMessage());
@@ -115,17 +123,21 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
         ?string $paymentStateId,
         ?string $orderStateId,
         string $transactionId,
-        array $invocations
+        array $invocations,
+        Context $context = null
     ): void {
+        if (!$context instanceof Context) {
+            $context = Context::createDefaultContext();
+        }
         if ($invocations === []) {
             return;
         }
         $request = json_encode($invocations[0]->arguments());
-        $exception = $invocations[0]->exception() ?? ' ';
+        $exception = $invocations[0]->exception() ?? '';
         if ($exception instanceof ApiFailure) {
             $exception = $exception->getMessage();
         }
-        $apiMethod = $invocations[0]->methodName() ?? ' ';
+        $apiMethod = $invocations[0]->methodName() ?? 'unknown';
         $response = json_encode($invocations[0]->returnValue());
         $soapMessages = $invocations[0]->messages();
         $soapRequests = [];
@@ -151,14 +163,17 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
                 'soapResponse' => $soapResponses,
                 'exception' => $exception,
             ];
-            $this->repository->create([$record], Context::createDefaultContext());
+            $this->repository->create([$record], $context);
         } catch (Exception $e) {
             $this->logger->error($e->getMessage());
         }
     }
 
-    public function checkDuplicatedTransactionLogInLastMinutes(array $record): bool
+    public function checkDuplicatedTransactionLogInLastMinutes(array $record, Context $context = null): bool
     {
+        if (!$context instanceof Context) {
+            $context = Context::createDefaultContext();
+        }
         $lastTime = Settings::CHECK_DUPLICATED_TRANSACTION_LOG_FROM_MINUTES;
         $criteria = new Criteria();
         $criteria->addFilter(
@@ -186,6 +201,7 @@ class TransactionLogDatabaseWriter implements TransactionLogWriterInterface
                 ]
             )
         );
-        return (bool) $this->repository->search($criteria, Context::createDefaultContext())->first();
+        return (bool) $this->repository->search($criteria, $context)
+            ->first();
     }
 }
