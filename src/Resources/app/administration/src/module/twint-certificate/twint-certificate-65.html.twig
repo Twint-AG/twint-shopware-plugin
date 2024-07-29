@@ -8,7 +8,7 @@
                 required
         >
             <template #caption-label>
-                {% if certificate == '' or certificate is null %}
+                {% if certificate == '' or certificate == null %}
                     {{ $tc('twint.settings.certificate.placeholder') }}
                 {% else %}
                     {{ $tc('twint.settings.certificate.notice.label') }}
