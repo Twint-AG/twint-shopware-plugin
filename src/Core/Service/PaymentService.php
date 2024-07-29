@@ -86,7 +86,8 @@ class PaymentService
                     ->getStateId(),
                 $transaction->getOrderTransaction()
                     ->getId(),
-                $client->flushInvocations()
+                $client->flushInvocations(),
+                $this->context
             );
         }
     }
@@ -130,7 +131,8 @@ class PaymentService
                     ?->getStateId() ?? '',
                 $order->getStateId(),
                 $transactionId ?? '',
-                $innovations
+                $innovations,
+                $this->context
             );
         }
     }
@@ -160,7 +162,8 @@ class PaymentService
                             $order
                                 ->getStateId(),
                             $order->getTransactions()?->first()?->getId() ?? '',
-                            $innovations
+                            $innovations,
+                            $this->context
                         );
                         $reversalIndex = $this->getReversalIndex($order->getId());
                         $reversalId = 'R-' . $twintOrder->id()->__toString() . '-' . $reversalIndex;
@@ -190,7 +193,8 @@ class PaymentService
                 $order
                     ->getStateId(),
                 $order->getTransactions()?->first()?->getId() ?? '',
-                $innovations
+                $innovations,
+                $this->context
             );
         }
     }
@@ -227,7 +231,8 @@ class PaymentService
                     ?->getStateId() ?? '',
                 $order->getStateId(),
                 $order->getTransactions()?->first()?->getId() ?? '',
-                $innovations
+                $innovations,
+                $this->context
             );
         }
     }
