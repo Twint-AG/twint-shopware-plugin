@@ -33,8 +33,8 @@
         },
         "administration": {
            "name": {
-                "twint_express_checkout": "TWINT Express Checkout | TWINT Bezahlung",
-                "twint_checkout": "TWINT Regular Checkout | TWINT Bezahlung"
+                "twint_express_checkout": "TWINT Express Checkout",
+                "twint_checkout": "TWINT Checkout"
             },
             "extractPem": {
                 "success": {
