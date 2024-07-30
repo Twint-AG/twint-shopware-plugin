@@ -12,11 +12,11 @@
     "settings": {
       "button": {
         "save": "Save",
-        "testing": "Verifying credentials ..."
+        "testing": "Verifying the credentials..."
       },
       "testCredentials": {
         "error": {
-          "title": "Credential Error",
+          "title": "Credentials Error",
           "message": "Invalid credentials. Please check again: Store UUID, certificate and environment (mode)"
         }
       },
@@ -33,8 +33,8 @@
       "certificate": {
         "placeholder": "Upload a certificate file (.p12)",
         "error": {
-          "title": "Invalid Certificate",
-          "message": "An error occurred reading the certificate. Please try again ",
+          "title": "Invalid certificate",
+          "message": "An error occurred reading the certificate. Please try again",
           "general": "An error occurred reading the certificate. Please try again",
           "required": "Certificate file is required",
           "ERROR_INVALID_INPUT": "Certificate file and password are required",
@@ -53,7 +53,7 @@
         },
         "password": {
           "label": "Certificate password",
-          "helpText": "Please enter the password for the certificate"
+          "helpText": "Enter the certificate password"
         },
         "notice": {
           "label": "Certificate encrypted and stored"
@@ -66,7 +66,7 @@
     "order": {
       "stateCard": {
         "label": "Payment has been processed by TWINT",
-        "showTransactionLogModal": "Show transaction logs"
+        "showTransactionLogModal": "Show TWINT transaction logs"
       },
       "transactionLog": {
         "cardTitle": "Transaction logs",
@@ -90,25 +90,25 @@
             }
           },
           "modal": {
-            "title": "TWINT Transaction log",
+            "title": "Log details",
             "close": "Close",
-            "soapMethod": "SOAP method"
+            "soapMethod": "Soap method"
           }
         }
       },
       "reversalHistory": {
-        "cardTitle": "Refund history",
+        "cardTitle": "Reversal history",
         "columns": {
           "amount": "Amount",
           "currency": "Currency",
-          "reason": "Reason",
+          "reason": "Note",
           "createdAt": "Created at"
         }
       },
       "refundAction": {
         "cardTitle": "Refund",
         "reason": {
-          "label": "Reason",
+          "label": "Note",
           "placeholder": "Add note to this refund"
         },
         "refundAmount": {
@@ -116,7 +116,7 @@
           "helpText": "The refund amount cannot exceed the total order amount"
         },
         "confirmButton": {
-          "text": "Refund"
+          "text": "Execute"
         }
       }
     },

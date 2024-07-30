@@ -51,8 +51,7 @@ class OrderCustomFieldInstaller
                 'active' => true,
                 'config' => [
                     'label' => [
-                        'en-GB' => 'Twint',
-                        'de-DE' => 'Twint',
+                        'en-GB' => 'TWINT'
                     ],
                 ],
                 'customFields' => [
@@ -65,8 +64,8 @@ class OrderCustomFieldInstaller
                             'customFieldType' => CustomFieldTypes::JSON,
                             'customFieldPosition' => 1,
                             'label' => [
-                                'en-GB' => 'Twint API Response',
-                                'de-DE' => 'Twint-API-Antwort',
+                                'en-GB' => 'TWINT API Response',
+                                'de-CH' => 'TWINT API-Antwort'
                             ],
                         ],
                     ],

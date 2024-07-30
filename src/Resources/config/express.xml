@@ -4,52 +4,52 @@
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/trunk/src/Core/System/SystemConfig/Schema/config.xsd">
     <card>
         <title>Display options</title>
-        <title lang="de-DE">Display options</title>
-        <title lang="fr-FR">Display options</title>
-        <title lang="it-IT">Display options</title>
+        <title lang="de-CH">Optionen anzeigen</title>
+        <title lang="fr-CH">Options d’affichage</title>
+        <title lang="it-CH">Opzioni di visualizzazione</title>
 
         <input-field type="multi-select">
             <name>screens</name>
             <label>Display screens</label>
-            <label lang="de-DE">Display screens</label>
-            <label lang="fr-FR">Display screens</label>
-            <label lang="it-IT">Display screens</label>
+            <label lang="de-CH">Screens anzeigen</label>
+            <label lang="fr-CH">Écrans d’affichage</label>
+            <label lang="it-CH">Schermate di visualizzazione</label>
 
-            <helpText>Where users see the TWINT checkout button</helpText>
-            <helpText lang="de-DE">Where users see the TWINT checkout button</helpText>
-            <helpText lang="fr-FR">Where users see the TWINT checkout button</helpText>
-            <helpText lang="it-IT">Where users see the TWINT checkout button</helpText>
+            <helpText>Where users see the TWINT Express Checkout button</helpText>
+            <helpText lang="de-CH">Hier sehen die Nutzerinnen und Nutzer die Schaltfläche TWINT Express Checkout</helpText>
+            <helpText lang="fr-CH">Où les utilisateurs voient le bouton TWINT Express Checkout</helpText>
+            <helpText lang="it-CH">Dove gli utenti visualizzano il pulsante per TWINT Express Checkout</helpText>
             <options>
                 <option>
                     <id>PDP</id>
-                    <name>Product detail page</name>
-                    <name lang="de-DE">Product detail page</name>
-                    <name lang="fr-FR">Product detail page</name>
-                    <name lang="it-IT">Product detail page</name>
+                    <name>Product details page</name>
+                    <name lang="de-CH">Zur Produktdetailseite</name>
+                    <name lang="fr-CH">Page de détail des produits</name>
+                    <name lang="it-CH">Pagina dettagli prodotto</name>
                 </option>
                 <option>
                     <id>PLP</id>
                     <name>Product listing page</name>
-                    <name lang="de-DE">Product listing page</name>
-                    <name lang="fr-FR">Product listing page</name>
-                    <name lang="it-IT">Product listing page</name>
+                    <name lang="de-CH">Zur Produktliste</name>
+                    <name lang="fr-CH">Page de liste des produits</name>
+                    <name lang="it-CH">Pagina elenco prodotti</name>
                 </option>
                 <option>
                     <id>CART</id>
                     <name>Cart page</name>
-                    <name lang="de-DE">Cart page</name>
-                    <name lang="fr-FR">Cart page</name>
-                    <name lang="it-IT">Cart page</name>
+                    <name lang="de-CH">Warenkorb</name>
+                    <name lang="fr-CH">Page du panier</name>
+                    <name lang="it-CH">Pagina carrello</name>
                 </option>
                 <option>
                     <id>CART_FLYOUT</id>
                     <name>Cart flyout</name>
-                    <name lang="de-DE">Cart flyout</name>
-                    <name lang="fr-FR">Cart flyout</name>
-                    <name lang="it-IT">Cart flyout</name>
+                    <name lang="de-CH">Warenkorb-Flyout</name>
+                    <name lang="fr-CH">Affichage du panier</name>
+                    <name lang="it-CH">Carrello a comparsa</name>
                 </option>
             </options>
-            <defaultValue>["PDP", "PLP", "CART"]</defaultValue>
+            <defaultValue>["PDP", "PLP", "CART", "CART_FLYOUT"]</defaultValue>
         </input-field>
     </card>
 </config>
