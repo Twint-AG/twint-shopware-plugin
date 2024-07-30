@@ -51,7 +51,7 @@ class OrderCustomFieldInstaller
                 'active' => true,
                 'config' => [
                     'label' => [
-                        'en-GB' => 'TWINT'
+                        'en-GB' => 'TWINT',
                     ],
                 ],
                 'customFields' => [
@@ -65,7 +65,7 @@ class OrderCustomFieldInstaller
                             'customFieldPosition' => 1,
                             'label' => [
                                 'en-GB' => 'TWINT API Response',
-                                'de-CH' => 'TWINT API-Antwort'
+                                'de-CH' => 'TWINT API-Antwort',
                             ],
                         ],
                     ],
