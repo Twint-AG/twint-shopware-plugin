@@ -18,7 +18,8 @@ export default {
             isTesting: false,
             isSaveSuccessful: false,
             isTestSuccessful: false,
-            isDisabled: false
+            isDisabled: false,
+            validators: []
         };
     },
 
@@ -29,8 +30,12 @@ export default {
     },
     created() {
         this.$root.$on('update-lock', this.updateLock);
+        document.addEventListener('twint-add-validators', this.onAddValidator.bind(this));
     },
     methods: {
+        onAddValidator(event){
+            this.validators.push(event.detail.validator);
+        },
         onChanged(config) {
             this.isTestSuccessful = false;
             this.isSaveSuccessful = false;
@@ -84,10 +89,10 @@ export default {
 
         checkRequiredFields() {
             let isValid = true;
-            const merchantId = this.getConfigValue('merchantId');
+            const storeUuid = this.getConfigValue('merchantId');
             const certificate = this.getConfigValue('certificate');
 
-            if (!merchantId || merchantId.trim() === '') {
+            if (!storeUuid || storeUuid.trim() === '') {
                 this.createNotificationError({
                     title: this.$tc('twint.settings.merchantId.error.title'),
                     message: this.$tc('twint.settings.merchantId.error.required')
@@ -96,7 +101,7 @@ export default {
                 isValid = false;
             }
 
-            if (isValid && !this.isValidUUIDv4(merchantId)) {
+            if (isValid && !this.isValidUUIDv4(storeUuid)) {
                 this.createNotificationError({
                     title: this.$tc('twint.settings.merchantId.error.title'),
                     message: this.$tc('twint.settings.merchantId.error.invalidFormat')
@@ -107,11 +112,16 @@ export default {
 
             if (!certificate) {
                 this.createNotificationError({
-                    title: this.$tc('twint.settings.merchantId.error.title'),
+                    title: this.$tc('twint.settings.certificate.error.title'),
                     message: this.$tc('twint.settings.certificate.error.required')
                 });
 
                 isValid = false;
+            }
+
+            for(let i = 0; i < this.validators.length; ++i){
+                let valid = (this.validators[i])();
+                isValid = isValid && valid;
             }
 
             return isValid;

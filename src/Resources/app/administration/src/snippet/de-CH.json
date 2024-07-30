@@ -53,7 +53,8 @@
         },
         "password": {
           "label": "Zertifikatspasswort",
-          "helpText": "Zertifikatspasswort erfassen"
+          "helpText": "Zertifikatspasswort erfassen",
+          "error": "Zertifikatsdatei erforderlich"
         },
         "notice": {
           "label": "Zertifikat verschlüsselt und gespeichert"
