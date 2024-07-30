@@ -44,10 +44,7 @@
         "plugin-icon": "src/Resources/public/plugin.png",
         "copyright": "(c) by TWINT 2024",
         "label": {
-            "en-GB": "TWINT Payment",
-            "de-CH": "TWINT Bezahlung",
-            "fr-CH": "Paiement TWINT",
-            "it-CH": "Pagamento TWINT"
+            "en-GB": "TWINT"
         }
     },
     "autoload": {
