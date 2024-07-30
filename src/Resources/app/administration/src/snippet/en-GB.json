@@ -7,7 +7,7 @@
       "menuItem": "TWINT Express Checkout"
     },
     "general": {
-      "menuItem": "TWINT Credentials"
+      "menuItem": "TWINT credentials"
     },
     "settings": {
       "button": {
@@ -16,7 +16,7 @@
       },
       "testCredentials": {
         "error": {
-          "title": "Credentials Error",
+          "title": "Credentials error",
           "message": "Invalid credentials. Please check again: Store UUID, certificate and environment (mode)"
         }
       },
