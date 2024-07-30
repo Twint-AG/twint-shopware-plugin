@@ -1,0 +1,147 @@
+{
+  "twint": {
+    "name": "Pagamento TWINT",
+    "title": "Pagamento TWINT",
+    "express": {
+      "title": "TWINT Express Checkout",
+      "menuItem": "TWINT Express Checkout"
+    },
+    "general": {
+      "menuItem": "Credenziali TWINT"
+    },
+    "settings": {
+      "button": {
+        "save": "Salva",
+        "testing": "Verifica delle credenziali in corso..."
+      },
+      "testCredentials": {
+        "error": {
+          "title": "Errore credenziali",
+          "message": "Credenziali non valide. Ti preghiamo di ricontrollare: UUID del suo negozio, certificato e ambiente (modalità)"
+        }
+      },
+      "merchantId": {
+        "label": "UUID del suo negozio",
+        "placeholder": "Inserisci l’UUID del suo negozio",
+        "helpText": "L’UUID del suo negozio è fornito da TWINT.",
+        "error" : {
+          "title": "UUID del suo negozio",
+          "invalidFormat": "UUID del suo negozio non valido. L’UUID del suo negozio deve essere un UUIDv4.",
+          "required": "L’UUID del suo negozio è necessario."
+        }
+      },
+      "certificate": {
+        "placeholder": "Carica un file del certificato (.p12)",
+        "error": {
+          "title": "Certificato non valido",
+          "message": "Si è verificato un errore durante la lettura del certificato. Ti preghiamo di riprovare",
+          "general": "Si è verificato un errore durante la lettura del certificato. Ti preghiamo di riprovare",
+          "required": "Il file del certificato è necessario",
+          "ERROR_INVALID_INPUT": "Il file del certificato e la password sono necessari.",
+          "ERROR_INVALID_UNKNOWN": "Il certificato non può essere convalidato. Ti preghiamo di riprovare.",
+          "ERROR_INVALID_CERTIFICATE_FORMAT": "Formato certificato non valido",
+          "ERROR_INVALID_PASSPHRASE": "Password non valida",
+          "ERROR_INVALID_ISSUER_COUNTRY": "Paese emittente non valido",
+          "ERROR_INVALID_ISSUER_ORGANIZATION": "Organizzazione emittente non valida",
+          "ERROR_INVALID_EXPIRY_DATE": "Data di scadenza non valida",
+          "ERROR_CERTIFICATE_EXPIRED": "Certificato scaduto",
+          "ERROR_CERTIFICATE_NOT_YET_VALID": "Il certificato non è ancora valido."
+        },
+        "success": {
+          "title": "Convalida certificato andata a buon fine",
+          "message": "Il tuo certificato è stato convalidato con successo."
+        },
+        "password": {
+          "label": "Password del certificato",
+          "helpText": "Si prega di inserire la password del certificato"
+        },
+        "notice": {
+          "label": "Certificato crittografato e archiviato"
+        },
+        "button": {
+          "label": "Carica nuovo certificato"
+        }
+      }
+    },
+    "order": {
+      "stateCard": {
+        "label": "Il pagamento è stato processato da TWINT",
+        "showTransactionLogModal": "Mostra log transazioni TWINT"
+      },
+      "transactionLog": {
+        "cardTitle": "Log transazioni",
+        "list": {
+          "title" : "Transactions",
+          "columns": {
+            "createdAt": "Creato a",
+            "orderID": "ID ordine",
+            "apiMethod": "Metodo API",
+            "soapAction": "SOAP action",
+            "order": "Stato dell’ordine",
+            "transaction": "ID transazione ordine",
+            "request": "Richiesta",
+            "response": "Risposta",
+            "soapRequest": "Request",
+            "soapResponse": "Response",
+            "exception": "Exception",
+            "payment": "Stato del pagamento",
+            "action": {
+              "view": "Visualizza dettagli"
+            }
+          },
+          "modal": {
+            "title": "Dettagli del log",
+            "close": "Chiudi",
+            "soapMethod": "Metodo Soap"
+          }
+        }
+      },
+      "reversalHistory": {
+        "cardTitle": "Cronologia storni",
+        "columns": {
+          "amount": "Importo",
+          "currency": "Valuta",
+          "reason": "Nota",
+          "createdAt": "Creato a"
+        }
+      },
+      "refundAction": {
+        "cardTitle": "Rimborso",
+        "reason": {
+          "label": "Nota",
+          "placeholder": "Aggiungi nota a questo rimborso"
+        },
+        "refundAmount": {
+          "label": "Importo",
+          "helpText": "L’importo del rimborso non può superare l’importo totale dell’ordine."
+        },
+        "confirmButton": {
+          "text": "Esegui"
+        }
+      }
+    },
+    "refund": {
+      "modal": {
+        "title": "Crea nuovo rimborso"
+      },
+      "buttons": {
+        "refund": {
+          "label": "Refund"
+        }
+      },
+      "refundable": {
+        "title": "Importo totale rimborsabile rimanente",
+        "notice": "Importo totale automaticamente adattato all’importo massimo del rimborso.",
+        "fullRefundNotice": "No refundable amount left for this order"
+      },
+      "error": {
+        "title" : "Errore rimborso"
+      }
+    }
+  },
+  "sw-order": {
+    "detail": {
+      "twint": "TWINT"
+    }
+  }
+}

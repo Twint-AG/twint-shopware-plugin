@@ -13,7 +13,7 @@ class RegularPaymentMethod extends AbstractMethod
     public function getTranslations(): array
     {
         return [
-            'de-DE' => [
+            'de-CH' => [
                 'description' => '',
                 'name' => 'TWINT',
             ],

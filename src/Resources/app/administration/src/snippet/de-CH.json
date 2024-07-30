@@ -1,0 +1,147 @@
+{
+  "twint": {
+    "title": "TWINT Bezahlung",
+    "name": "TWINT Bezahlung",
+    "express": {
+      "title": "TWINT Express Checkout",
+      "menuItem": "TWINT Express Checkout"
+    },
+    "general": {
+      "menuItem": "TWINT Zugangsdaten"
+    },
+    "settings": {
+      "button": {
+        "save": "Speichern",
+        "testing": "Zugangsdaten überprüfen …"
+      },
+      "testCredentials": {
+        "error": {
+          "title": "Fehler bei den Zugangsdaten",
+          "message": "Ungültige Zugangsdaten. Bitte überprüfen: UUID Ihres Stores, Zertifikat und Umfeld (Modus)"
+        }
+      },
+      "merchantId": {
+        "label": "UUID Ihres Stores",
+        "placeholder": "UUID Ihres Stores eingeben",
+        "helpText": "Die UUID Ihres Stores wird von TWINT bereitgestellt",
+        "error" : {
+          "title": "UUID Ihres Stores",
+          "invalidFormat": "Ungültige UUID Ihres Stores. UUID Ihres Stores muss eine UUIDv4 sein",
+          "required": "UUID Ihres Stores erforderlich"
+        }
+      },
+      "certificate": {
+        "placeholder": "Zertifikatsdatei hochladen (.p12)",
+        "error": {
+          "title": "Ungültiges Zertifikat",
+          "message": "Fehler beim Lesen des Zertifikats. Bitte erneut versuchen",
+          "general": "Fehler beim Lesen des Zertifikats. Bitte erneut versuchen",
+          "required": "Zertifikatsdatei erforderlich",
+          "ERROR_INVALID_INPUT": "Zertifikatsdatei und Passwort erforderlich",
+          "ERROR_INVALID_UNKNOWN": "Zertifikat kann nicht validiert werden. Bitte erneut versuchen",
+          "ERROR_INVALID_CERTIFICATE_FORMAT": "Zertifikatsformat ungültig",
+          "ERROR_INVALID_PASSPHRASE": "Passwort ungültig",
+          "ERROR_INVALID_ISSUER_COUNTRY": "Land des Herausgebers ungültig",
+          "ERROR_INVALID_ISSUER_ORGANIZATION": "Organisation des Herausgebers ungültig",
+          "ERROR_INVALID_EXPIRY_DATE": "Verfalldatum ungültig",
+          "ERROR_CERTIFICATE_EXPIRED": "Zertifikat abgelaufen",
+          "ERROR_CERTIFICATE_NOT_YET_VALID": "Zertifikat noch nicht gültig"
+        },
+        "success": {
+          "title": "Zertifikat erfolgreich validiert",
+          "message": "Ihr Zertifikat wurde erfolgreich validiert"
+        },
+        "password": {
+          "label": "Zertifikatspasswort",
+          "helpText": "Zertifikatspasswort erfassen"
+        },
+        "notice": {
+          "label": "Zertifikat verschlüsselt und gespeichert"
+        },
+        "button": {
+          "label": "Neues Zertifikat hochladen"
+        }
+      }
+    },
+    "order": {
+      "stateCard": {
+        "label": "Zahlung wurde von TWINT bearbeitet",
+        "showTransactionLogModal": "TWINT Transaktionsverlauf (Logs) anzeigen"
+      },
+      "transactionLog": {
+        "cardTitle": "Transaktionsverlauf (Logs)",
+        "list": {
+          "title" : "Transaktionen",
+          "columns": {
+            "createdAt": "Erstellt am",
+            "apiMethod": "API-Methode",
+            "soapAction": "SOAP action",
+            "orderID": "Order ID",
+            "order": "Bestellstatus",
+            "transaction": "Transaktions-Nummer",
+            "request": "Anfrage",
+            "response": "Antwort",
+            "soapRequest": "Anfrage",
+            "soapResponse": "Antwort",
+            "exception": "Ausnahme",
+            "payment": "Zahlungsstatus",
+            "action": {
+              "view": "Details ansehen"
+            }
+          },
+          "modal": {
+            "title": "Verlaufsdetails",
+            "close": "Schliessen",
+            "soapMethod": "Soap-Methode"
+          }
+        }
+      },
+      "reversalHistory": {
+        "cardTitle": "Stornierungsverlauf",
+        "columns": {
+          "amount": "Betrag",
+          "currency": "Währung",
+          "reason": "Hinweis",
+          "createdAt": "Erstellt am"
+        }
+      },
+      "refundAction": {
+        "cardTitle": "Rückerstattung",
+        "reason": {
+          "label": "Hinweis",
+          "placeholder": "Rückerstattung mit Hinweis versehen"
+        },
+        "refundAmount": {
+          "label": "Betrag",
+          "helpText": "Der Rückerstattungsbetrag darf den Totalbetrag der Bestellung nicht überschreiten"
+        },
+        "confirmButton": {
+          "text": "Ausführen"
+        }
+      }
+    }
+  },
+  "refund": {
+    "modal": {
+      "title": "Neue Rückerstattung erstellen"
+    },
+    "buttons": {
+      "refund": {
+        "label": "Rückerstattung"
+      }
+    },
+    "refundable": {
+      "title": "Total Restbetrag Rückerstattung",
+      "notice": "Automatische Anpassung des Totalbetrags an den Höchstbetrag der Rückerstattung",
+      "fullRefundNotice": "No refundable amount left for this order"
+    },
+    "error": {
+      "title" : "Fehler bei der Rückerstattung"
+    }
+  },
+  "sw-order": {
+    "detail": {
+      "twint": "TWINT"
+    }
+  }
+}

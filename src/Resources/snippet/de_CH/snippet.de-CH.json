@@ -1,0 +1,58 @@
+{
+    "twintPayment": {
+        "error": {
+            "orderNotFound": "Diese Bestellung ist nicht auffindbar",
+            "pairingNotFound": "Invalid transaction"
+        },
+        "notice": {
+            "hasProductInCart": "Es sind bereits Produkte im Warenkorb. Bitte überprüfen Sie Ihren Warenkorb, bevor Sie fortfahren."
+        },
+        "message": {
+            "successPayment": "Ihre Zahlung war erfolgreich"
+        },
+        "appSelector": {
+            "title": "TWINT App auswählen",
+            "otherBankOption": "Andere Banken",
+            "switchLinkLabel": "Jetzt zur TWINT App wechseln"
+        },
+        "instruction": {
+            "scanQR": "Diesen QR-Code mit der TWINT App  scannen, um den Bestellvorgang abzuschliessen.",
+            "selectAddress": "Lieferadresse auswählen und Kauf in der App abschliessen",
+            "inputCode": "Diesen Code in der TWINT App eingeben:",
+            "oder": "oder"
+        },
+        "button": {
+            "copyCode": "Code kopieren"
+        },
+        "modal": {
+            "cancelCheckout": "Checkout abbrechen",
+            "finish": "Weiter einkaufen"
+        },
+        "express": {
+            "checkingOut": "TWINT Express Checkout wird durchgeführt"
+        },
+        "administration": {
+           "name": {
+                "twint_express_checkout": "TWINT Express Checkout | TWINT Bezahlung",
+                "twint_checkout": "TWINT Regular Checkout | TWINT Bezahlung"
+            },
+            "extractPem": {
+                "success": {
+                    "message": "Zertifikat erfolgreich validiert"
+                },
+                "error": {
+                    "invalidFile": "Zertifikatsdatei ungültig",
+                    "emptyFile": "Bitte eine gültige Zertifikatsdatei hochladen"
+                }
+            },
+            "refund": {
+                "error": {
+                    "negativeAmount": "The refund amount cannot be negative",
+                    "exceededAmount": "Der Rückerstattungsbetrag darf den Totalbetrag der Bestellung nicht überschreiten %amount% %currency%",
+                    "fail": "Die Rückerstattung für diese Bestellung kann nicht bearbeitet werden – bitte erneut versuchen",
+                    "missingResponse": "Missing TWINT response for this order"
+                }
+            }
+        }
+    }
+}

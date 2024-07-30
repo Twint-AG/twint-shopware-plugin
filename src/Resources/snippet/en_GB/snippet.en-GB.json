@@ -29,12 +29,12 @@
             "finish": "Continue shopping"
         },
         "express": {
-            "checkingOut": "Express Checkout in progress"
+            "checkingOut": "TWINT Express Checkout in progress"
         },
         "administration": {
             "name": {
-                "twint_express_checkout": "TWINT - Express Checkout  | TWINT Payment",
-                "twint_checkout": "TWINT - Regular Checkout  | TWINT Payment"
+                "twint_express_checkout": "TWINT Express Checkout | TWINT Payment",
+                "twint_checkout": "TWINT Regular Checkout | TWINT Payment"
             },
             "extractPem": {
                 "success": {
