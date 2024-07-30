@@ -33,7 +33,7 @@
       "certificate": {
         "placeholder": "Upload a certificate file (.p12)",
         "error": {
-          "title": "Invalid certificate",
+          "title": "Certificate",
           "message": "An error occurred reading the certificate. Please try again",
           "general": "An error occurred reading the certificate. Please try again",
           "required": "Certificate file is required",
@@ -53,6 +53,7 @@
         },
         "password": {
           "label": "Certificate password",
+          "error": "Certificate password is required",
           "helpText": "Enter the certificate password"
         },
         "notice": {
