@@ -7,12 +7,12 @@
                 @change="onFileChange"
                 required
         >
-            <template #caption-label>
-                {% if certificate is null or certificate == ''  %}
-                    {{ $tc('twint.settings.certificate.placeholder') }}
-                {% else %}
-                    {{ $tc('twint.settings.certificate.notice.label') }}
-                {% endif %}
+            <template #caption-label v-if="certificate === null">
+                {{ $tc('twint.settings.certificate.placeholder') }}
+            </template>
+
+            <template #caption-label v-if="certificate !== null">
+                {{ $tc('twint.settings.certificate.notice.label') }}
             </template>
         </sw-file-input>
 
