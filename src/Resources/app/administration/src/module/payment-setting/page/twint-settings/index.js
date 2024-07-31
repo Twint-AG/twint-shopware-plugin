@@ -34,7 +34,7 @@ export default {
     },
     methods: {
         onAddValidator(event){
-            this.validators.push(event.detail.validator);
+            this.validators.push(event.detail);
         },
         onChanged(config) {
             this.isTestSuccessful = false;
@@ -110,21 +110,24 @@ export default {
                 isValid = false;
             }
 
-            let certificateValid = true;
-            for(let i = 0; i < this.validators.length; ++i){
-                let valid = (this.validators[i])();
-                certificateValid = certificateValid && valid;
-            }
+            if (!certificate) {
+                let certificateValid = true;
+                for (let i = 0; i < this.validators.length; ++i) {
+                    const validator = this.validators[i];
+                    let valid = validator.method(validator.self);
+                    certificateValid = certificateValid && valid;
+                }
 
-            isValid = isValid && certificateValid;
+                isValid = isValid && certificateValid;
 
-            if (!certificate && certificateValid) {
-                this.createNotificationError({
-                    title: this.$tc('twint.settings.certificate.error.title'),
-                    message: this.$tc('twint.settings.certificate.error.invalid')
-                });
+                if (certificateValid) {
+                    this.createNotificationError({
+                        title: this.$tc('twint.settings.certificate.error.title'),
+                        message: this.$tc('twint.settings.certificate.error.invalid')
+                    });
 
-                isValid = false;
+                    isValid = false;
+                }
             }
 
             return isValid;
