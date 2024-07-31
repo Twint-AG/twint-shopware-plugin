@@ -37,6 +37,7 @@
           "message": "An error occurred reading the certificate. Please try again",
           "general": "An error occurred reading the certificate. Please try again",
           "required": "Certificate file is required",
+          "invalid": "Certificate is invalid",
           "ERROR_INVALID_INPUT": "Certificate file and password are required",
           "ERROR_INVALID_UNKNOWN": "Certificate cannot be validated. Please try again",
           "ERROR_INVALID_CERTIFICATE_FORMAT": "Invalid certificate format",

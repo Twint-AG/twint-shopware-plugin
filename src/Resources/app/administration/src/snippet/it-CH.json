@@ -37,6 +37,7 @@
           "message": "Si è verificato un errore durante la lettura del certificato. Ti preghiamo di riprovare",
           "general": "Si è verificato un errore durante la lettura del certificato. Ti preghiamo di riprovare",
           "required": "Il file del certificato è necessario",
+          "invalid": "Il certificato non è valido",
           "ERROR_INVALID_INPUT": "Il file del certificato e la password sono necessari.",
           "ERROR_INVALID_UNKNOWN": "Il certificato non può essere convalidato. Ti preghiamo di riprovare.",
           "ERROR_INVALID_CERTIFICATE_FORMAT": "Formato certificato non valido",

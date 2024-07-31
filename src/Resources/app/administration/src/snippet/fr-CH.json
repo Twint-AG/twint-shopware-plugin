@@ -37,6 +37,7 @@
           "message": "Une erreur s’est produite lors de la lecture du certificat. Veuillez réessayer",
           "general": "Une erreur s’est produite lors de la lecture du certificat. Veuillez réessayer",
           "required": "Le fichier de certificat est requis",
+          "invalid": "Le certificat est invalide",
           "ERROR_INVALID_INPUT": "Le fichier de certificat et le mot de passe sont requis",
           "ERROR_INVALID_UNKNOWN": "Le certificat ne peut pas être validé. Veuillez réessayer",
           "ERROR_INVALID_CERTIFICATE_FORMAT": "Format du certificat invalide",
