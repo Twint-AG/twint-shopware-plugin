@@ -61,10 +61,14 @@ Shopware.Component.register('sw-order-detail-twint', {
                         };
                     }
                     if (transactionLog.paymentStateMachineState === undefined) {
-                        transactionLogs[index].paymentStateMachineState = {};
+                        transactionLogs[index].paymentStateMachineState = {
+                            'name' : ''
+                        };
                     }
                     if (transactionLog.orderStateMachineState === undefined) {
-                        transactionLogs[index].orderStateMachineState = {};
+                        transactionLogs[index].orderStateMachineState = {
+                            'name' : ''
+                        };
                     }
                 });
                 this.transactionLogs = transactionLogs;
