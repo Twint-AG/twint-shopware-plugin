@@ -42,6 +42,9 @@
                                         {% else %}
                                             {{ item.orderId }}
                                         {% endif %}
+                                        {% if item.order.orderNumber is not empty %}
+                                        xx{{ item.order.orderNumber }}xxx
+                                        {% endif %}
                                     </template>
                                 {% endblock %}
 
@@ -66,7 +69,7 @@
                                 {% block twint_transaction_log_list_content_payment %}
                                     <template #column-paymentStateId="{ item }">
                                         {% if item.paymentStateMachineState is not null %}
-                                            <sw-label :variant="getVariantState('order_transaction', item.paymentStateMachineState)" appearance="badged">
+                                            <sw-label :variant="getVariantState('order_transaction', item.paymentStateMachineState)" appearance="badged" v-if="item.paymentStateMachineState.name !== ''">
                                                 {{ item.paymentStateMachineState.name }}
                                             </sw-label>
                                         {% endif %}
@@ -76,7 +79,7 @@
                                 {% block twint_transaction_log_list_content_order %}
                                     <template #column-orderStateId="{ item }">
                                         {% if item.orderStateMachineState is not null %}
-                                            <sw-label :variant="getVariantState('order', item.orderStateMachineState)" appearance="badged">
+                                            <sw-label :variant="getVariantState('order', item.orderStateMachineState)" appearance="badged" v-if="item.paymentStateMachineState.name !== ''">
                                                 {{ item.orderStateMachineState.name }}
                                             </sw-label>
                                         {% endif %}
@@ -111,7 +114,7 @@
                                                 <div class="sw-data-grid">
                                                     <table class="sw-data-grid__table">
                                                         <tbody class="sw-data-grid__body">
-                                                            <tr class="sw-data-grid__row">
+                                                            <tr class="sw-data-grid__row" v-if="item.order.orderNumber !== ''">
                                                                 <td class="sw-data-grid__cell">
                                                                     <div class="sw-data-grid__cell-content">
                                                                         <b>{{ $tc('twint.order.transactionLog.list.columns.orderID') }}:</b>
@@ -127,7 +130,7 @@
                                                                     </div>
                                                                 </td>
                                                             </tr>
-                                                            <tr class="sw-data-grid__row">
+                                                            <tr class="sw-data-grid__row" v-if="item.apiMethod !== null">
                                                                 <td class="sw-data-grid__cell">
                                                                     <div class="sw-data-grid__cell-content">
                                                                         <b>{{ $tc('twint.order.transactionLog.list.columns.apiMethod') }}:</b>
@@ -137,7 +140,7 @@
                                                                     <div class="sw-data-grid__cell-content"> {{ item.apiMethod }}</div>
                                                                 </td>
                                                             </tr>
-                                                            <tr class="sw-data-grid__row">
+                                                            <tr class="sw-data-grid__row" v-if="item.transactionId !== null">
                                                                 <td class="sw-data-grid__cell">
                                                                     <div class="sw-data-grid__cell-content">
                                                                         <b>{{ $tc('twint.order.transactionLog.list.columns.transaction') }}:</b>
@@ -147,7 +150,7 @@
                                                                     <div class="sw-data-grid__cell-content"> {{ item.transactionId }}</div>
                                                                 </td>
                                                             </tr>
-                                                            <tr class="sw-data-grid__row">
+                                                            <tr class="sw-data-grid__row" v-if="item.paymentStateMachineState.name !== ''">
                                                                 <td class="sw-data-grid__cell">
                                                                     <div class="sw-data-grid__cell-content">
                                                                         <b>{{ $tc('twint.order.transactionLog.list.columns.payment') }}:</b>
@@ -156,7 +159,7 @@
                                                                 <td class="sw-data-grid__cell">
                                                                     <div class="sw-data-grid__cell-content">
                                                                         {% if item.paymentStateMachineState is not null %}
-                                                                            <sw-label :variant="getVariantState('order_transaction', item.paymentStateMachineState)" appearance="badged">
+                                                                            <sw-label :variant="getVariantState('order_transaction', item.paymentStateMachineState)" appearance="badged" v-if="item.paymentStateMachineState.name !== ''">
                                                                                 {{ item.paymentStateMachineState.name }}
                                                                             </sw-label>
                                                                         {% else %}
@@ -165,7 +168,7 @@
                                                                     </div>
                                                                 </td>
                                                             </tr>
-                                                            <tr class="sw-data-grid__row">
+                                                            <tr class="sw-data-grid__row" v-if="item.orderStateMachineState.name !== ''">
                                                                 <td class="sw-data-grid__cell">
                                                                     <div class="sw-data-grid__cell-content">
                                                                         <b>{{ $tc('twint.order.transactionLog.list.columns.order') }}:</b>
@@ -174,7 +177,7 @@
                                                                 <td class="sw-data-grid__cell">
                                                                     <div class="sw-data-grid__cell-content">
                                                                         {% if item.orderStateMachineState is not null %}
-                                                                            <sw-label :variant="getVariantState('order', item.orderStateMachineState)" appearance="badged">
+                                                                            <sw-label :variant="getVariantState('order', item.orderStateMachineState)" appearance="badged"  v-if="item.orderStateMachineState.name !== ''">
                                                                                 {{ item.orderStateMachineState.name }}
                                                                             </sw-label>
                                                                         {% else %}
