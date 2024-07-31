@@ -49,7 +49,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
     {
         $channel = $event->getSalesChannelId();
         $key = $event->getKey();
-        if (in_array($key, [Settings::CERTIFICATE, Settings::MERCHANT_ID, Settings::TEST_MODE], true)) {
+        if (in_array($key, [Settings::CERTIFICATE, Settings::STORE_UUID, Settings::TEST_MODE], true)) {
             // Need to read the config values from the database and validate the credentials
             // While user is updating any of the Twint settings
             $this->settingService->validateCredentials($channel);
@@ -76,7 +76,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
 
         // Filter the config array to only include the keys that are defined TwintPayment plugin
         $keys = array_keys($event->getConfig());
-        $credentialKeys = [Settings::CERTIFICATE, Settings::MERCHANT_ID, Settings::TEST_MODE];
+        $credentialKeys = [Settings::CERTIFICATE, Settings::STORE_UUID, Settings::TEST_MODE];
 
         if (array_intersect($keys, $credentialKeys) !== []) {
             // Need to read the config values from the database and validate the credentials

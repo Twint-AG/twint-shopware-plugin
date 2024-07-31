@@ -11,7 +11,7 @@ class TwintSettingStruct extends Struct
     /**
      * @var string
      */
-    protected $merchantId;
+    protected $storeUuid;
 
     /**
      * @var bool
@@ -30,14 +30,14 @@ class TwintSettingStruct extends Struct
 
     protected bool $validated = false;
 
-    public function getMerchantId(): string
+    public function getStoreUuid(): string
     {
-        return (string) $this->merchantId;
+        return (string) $this->storeUuid;
     }
 
-    public function setMerchantId(string $merchantId): self
+    public function setStoreUuid(string $value): self
     {
-        $this->merchantId = $merchantId;
+        $this->storeUuid = $value;
         return $this;
     }
 
@@ -70,7 +70,7 @@ class TwintSettingStruct extends Struct
 
     public function getScreens(): array
     {
-        return $this->screens;
+        return $this->screens ?? [];
     }
 
     public function setScreens(array $screens): self

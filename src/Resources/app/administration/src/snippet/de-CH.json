@@ -20,7 +20,7 @@
           "message": "Ungültige Zugangsdaten. Bitte überprüfen: UUID Ihres Stores, Zertifikat und Umfeld (Modus)"
         }
       },
-      "merchantId": {
+      "storeUuid": {
         "label": "UUID Ihres Stores",
         "placeholder": "UUID Ihres Stores eingeben",
         "helpText": "Die UUID Ihres Stores wird von TWINT bereitgestellt",

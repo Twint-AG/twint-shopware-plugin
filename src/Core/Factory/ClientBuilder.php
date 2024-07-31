@@ -19,8 +19,8 @@ use Twint\Sdk\InvocationRecorder\Soap\MessageRecorder;
 use Twint\Sdk\InvocationRecorder\Soap\RecordingTransport;
 use Twint\Sdk\Io\InMemoryStream;
 use Twint\Sdk\Value\Environment;
-use Twint\Sdk\Value\MerchantId;
 use Twint\Sdk\Value\PrefixedCashRegisterId;
+use Twint\Sdk\Value\StoreUuid;
 use Twint\Sdk\Value\Version;
 
 class ClientBuilder
@@ -48,11 +48,11 @@ class ClientBuilder
             throw new InvalidConfigException(InvalidConfigException::ERROR_NOT_VALIDATED);
         }
 
-        $merchantId = $setting->getMerchantId();
+        $storeUuid = $setting->getStoreUuid();
         $certificate = $setting->getCertificate();
         $environment = $setting->isTestMode() ? Environment::TESTING() : Environment::PRODUCTION();
-        if ($merchantId === '') {
-            throw new InvalidConfigException(InvalidConfigException::ERROR_INVALID_MERCHANT_ID);
+        if ($storeUuid === '') {
+            throw new InvalidConfigException(InvalidConfigException::ERROR_INVALID_STORE_UUID);
         }
 
         if ($certificate === []) {
@@ -71,7 +71,7 @@ class ClientBuilder
             $client = new InvocationRecordingClient(
                 new Client(
                     CertificateContainer::fromPkcs12(new Pkcs12Certificate(new InMemoryStream($cert), $passphrase)),
-                    new PrefixedCashRegisterId(MerchantId::fromString($merchantId), Settings::PLATFORM),
+                    new PrefixedCashRegisterId(StoreUuid::fromString($storeUuid), Settings::PLATFORM),
                     // @phpstan-ignore-next-line
                     new Version($version),
                     $environment,

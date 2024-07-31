@@ -32,7 +32,7 @@
         <title lang="it-CH">Credenziali</title>
 
         <input-field>
-            <name>merchantId</name>
+            <name>storeUuid</name>
             <label>Store UUID</label>
             <label lang="de-CH">UUID Ihres Stores</label>
             <label lang="fr-CH">UUID de votre commerce</label>

@@ -125,10 +125,10 @@ class TwintController extends AbstractController
     public function validate(Request $request, Context $context): Response
     {
         $certificate = $request->get('cert') ?? [];
-        $merchantId = $request->get('merchantId') ?? '';
+        $storeUuid = $request->get('storeUuid') ?? '';
         $testMode = $request->get('testMode') ?? false;
 
-        $valid = $this->validator->validate($certificate, $merchantId, $testMode);
+        $valid = $this->validator->validate($certificate, $storeUuid, $testMode);
 
         return $this->json([
             'success' => $valid,
