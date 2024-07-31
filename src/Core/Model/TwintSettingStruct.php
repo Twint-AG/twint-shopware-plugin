@@ -23,10 +23,7 @@ class TwintSettingStruct extends Struct
      */
     protected $certificate;
 
-    /**
-     * @var array
-     */
-    protected $screens;
+    protected ?array $screens;
 
     protected bool $validated = false;
 
