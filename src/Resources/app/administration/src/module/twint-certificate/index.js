@@ -7,7 +7,7 @@ const {ShopwareError} = Shopware.Classes;
 
 
 Component.register('twint-certificate', {
-  template: Shopware.Feature.isActive('v6.6.0.0') ? template : template65,
+  template: template,
 
   mixins: [
     Mixin.getByName('notification'),
