@@ -89,13 +89,13 @@ export default {
 
         checkRequiredFields() {
             let isValid = true;
-            const storeUuid = this.getConfigValue('merchantId');
+            const storeUuid = this.getConfigValue('storeUuid');
             const certificate = this.getConfigValue('certificate');
 
             if (!storeUuid || storeUuid.trim() === '') {
                 this.createNotificationError({
-                    title: this.$tc('twint.settings.merchantId.error.title'),
-                    message: this.$tc('twint.settings.merchantId.error.required')
+                    title: this.$tc('twint.settings.storeUuid.error.title'),
+                    message: this.$tc('twint.settings.storeUuid.error.required')
                 });
 
                 isValid = false;
@@ -103,8 +103,8 @@ export default {
 
             if (isValid && !this.isValidUUIDv4(storeUuid)) {
                 this.createNotificationError({
-                    title: this.$tc('twint.settings.merchantId.error.title'),
-                    message: this.$tc('twint.settings.merchantId.error.invalidFormat')
+                    title: this.$tc('twint.settings.storeUuid.error.title'),
+                    message: this.$tc('twint.settings.storeUuid.error.invalidFormat')
                 });
 
                 isValid = false;
@@ -139,7 +139,7 @@ export default {
             this.$refs.systemConfig.config.forEach((cards) => {
                 credential = {
                     cert: this.getConfigValue('certificate'),
-                    merchantId: this.getConfigValue('merchantId'),
+                    storeUuid: this.getConfigValue('storeUuid'),
                     testMode: this.getConfigValue('testMode'),
                 };
             });

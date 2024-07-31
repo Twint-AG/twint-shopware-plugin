@@ -20,7 +20,7 @@ class Settings
 
     public const TEST_MODE = self::PREFIX_REGULAR . 'testMode';
 
-    public const MERCHANT_ID = self::PREFIX_REGULAR . 'merchantId';
+    public const STORE_UUID = self::PREFIX_REGULAR . 'storeUuid';
 
     public const CERTIFICATE = self::PREFIX_REGULAR . 'certificate';
 
@@ -49,7 +49,7 @@ class Settings
 
     public const DEFAULT_VALUES = [
         self::TEST_MODE => self::ENVIRONMENT_PROD,
-        self::MERCHANT_ID => '',
+        self::STORE_UUID => '',
         self::CERTIFICATE => '',
         self::SCREENS => [
             self::SCREENS_OPTIONS_PDP,

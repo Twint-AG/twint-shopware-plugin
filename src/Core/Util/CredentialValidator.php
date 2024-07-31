@@ -10,7 +10,7 @@ use Twint\Sdk\Certificate\Pkcs12Certificate;
 use Twint\Sdk\Client;
 use Twint\Sdk\Io\InMemoryStream;
 use Twint\Sdk\Value\Environment;
-use Twint\Sdk\Value\MerchantId;
+use Twint\Sdk\Value\StoreUuid;
 use Twint\Sdk\Value\Version;
 
 class CredentialValidator implements CredentialValidatorInterface
@@ -19,7 +19,7 @@ class CredentialValidator implements CredentialValidatorInterface
     {
     }
 
-    public function validate(array $certificate, string $merchantId, bool $testMode): bool
+    public function validate(array $certificate, string $storeUuid, bool $testMode): bool
     {
         try {
             $cert = $this->crypto->decrypt($certificate['certificate']);
@@ -31,7 +31,7 @@ class CredentialValidator implements CredentialValidatorInterface
 
             $client = new Client(
                 CertificateContainer::fromPkcs12(new Pkcs12Certificate(new InMemoryStream($cert), $passphrase)),
-                MerchantId::fromString($merchantId),
+                StoreUuid::fromString($storeUuid),
                 Version::latest(),
                 $testMode ? Environment::TESTING() : Environment::PRODUCTION(),
             );

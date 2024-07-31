@@ -20,7 +20,7 @@ Component.register('twint-certificate', {
       currentCertFile: null,
       passwordError: null,
       validatePassword: '',
-      merchantId: null,
+      storeUuid: null,
       certificate: null,
       validated: null,
       buttonSelector: '.sw-file-input__dropzone .sw-file-input__button'
@@ -141,7 +141,7 @@ Component.register('twint-certificate', {
 
       const settings = await this.systemConfigApiService.getValues('TwintPayment.settings');
       if (Object.keys(settings).length > 0) {
-        this.merchantId = settings['TwintPayment.settings.merchantId'];
+        this.storeUuid = settings['TwintPayment.settings.storeUuid'];
         this.certificate = settings['TwintPayment.settings.certificate'];
         this.validated = settings['TwintPayment.settings.validated'];
 

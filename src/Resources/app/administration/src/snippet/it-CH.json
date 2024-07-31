@@ -20,7 +20,7 @@
           "message": "Credenziali non valide. Ti preghiamo di ricontrollare: UUID del suo negozio, certificato e ambiente (modalità)"
         }
       },
-      "merchantId": {
+      "storeUuid": {
         "label": "UUID del suo negozio",
         "placeholder": "Inserisci l’UUID del suo negozio",
         "helpText": "L’UUID del suo negozio è fornito da TWINT.",

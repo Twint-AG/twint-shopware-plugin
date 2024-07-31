@@ -1,6 +1,6 @@
 const {Component, Mixin} = Shopware;
 
-Component.extend('twint-merchant-id', 'sw-text-field', {
+Component.extend('twint-store-uuid', 'sw-text-field', {
     mixins: [
         Mixin.getByName('notification'),
     ],
@@ -11,8 +11,8 @@ Component.extend('twint-merchant-id', 'sw-text-field', {
 
             if (!this.isValidUUIDv4(event.target.value)) {
                 this.createNotificationError({
-                    title: this.$tc('twint.settings.merchantId.error.title'),
-                    message: this.$tc('twint.settings.merchantId.error.invalidFormat')
+                    title: this.$tc('twint.settings.storeUuid.error.title'),
+                    message: this.$tc('twint.settings.storeUuid.error.invalidFormat')
                 });
             }
         },

@@ -52,7 +52,7 @@ class SettingService implements SettingServiceInterface
         $config = $this->configService->getDomain(self::SYSTEM_CONFIG_DOMAIN, $saleChannel, true);
         $valid = $this->validator->validate(
             $config[Settings::CERTIFICATE],
-            $config[Settings::MERCHANT_ID],
+            $config[Settings::STORE_UUID],
             $config[Settings::TEST_MODE]
         );
 

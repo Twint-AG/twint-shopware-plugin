@@ -20,7 +20,7 @@
           "message": "Identifiants invalides. Veuillez vérifier à nouveau: UUID de votre commerce, certificat et environnement (mode)"
         }
       },
-      "merchantId": {
+      "storeUuid": {
         "label": "UUID de votre commerce",
         "placeholder": "Saisissez l’UUID de votre commerce",
         "helpText": "L’UUID de votre commerce est fourni par TWINT",

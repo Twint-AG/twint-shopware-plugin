@@ -20,7 +20,7 @@
           "message": "Invalid credentials. Please check again: Store UUID, certificate and environment (mode)"
         }
       },
-      "merchantId": {
+      "storeUuid": {
         "label": "Store UUID",
         "placeholder": "Enter your Store UUID",
         "helpText": "The Store UUID is provided by TWINT",
