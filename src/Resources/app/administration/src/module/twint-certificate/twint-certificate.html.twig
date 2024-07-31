@@ -6,6 +6,7 @@
                 :maxFileSize="8*1024*1024"
                 @change="onFileChange"
                 required
+                :disabled="isDisabled"
         >
             <template #caption-label v-if="certificate == null || certificate == ''">
                 {{ $tc('twint.settings.certificate.placeholder') }}
@@ -27,6 +28,7 @@
                 @blur="updatePassword"
                 autocomplete="off"
                 required
+                :disabled="isDisabled"
         >
             <template #suffix>
                 {% block twint_certificate_password_suffix_block %}

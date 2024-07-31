@@ -13,6 +13,13 @@ Component.register('twint-certificate', {
   ],
   inject: ['feature', 'systemConfigApiService'],
 
+  props: {
+    disabled: {
+      type: Boolean,
+      default: false
+    }
+  },
+
   data() {
     return {
       currentPassword: null,
@@ -25,6 +32,12 @@ Component.register('twint-certificate', {
       buttonSelector: '.sw-file-input__dropzone .sw-file-input__button'
     };
   },
+
+  computed:{
+    isDisabled() {
+      return this.disabled;
+    }
+  },
   created() {
     this.loadSettings();
     this.registerValidator();
@@ -33,7 +46,8 @@ Component.register('twint-certificate', {
     registerValidator() {
       const event = new CustomEvent('twint-add-validators', {
         detail: {
-          validator: this.validate.bind(this)
+          method: this.validate,
+          self: this
         }
       });
 
@@ -41,22 +55,22 @@ Component.register('twint-certificate', {
       document.dispatchEvent(event);
     },
 
-    validate() {
+    validate(self) {
       let valid = true;
-      if (!this.certificate && (!this.currentPassword || this.currentPassword.length === 0)) {
-        this.createNotificationError({
-          title: this.$tc('twint.settings.certificate.error.title'),
-          message: this.$tc('twint.settings.certificate.password.error'),
+      if (!self.certificate && (!self.currentPassword || self.currentPassword.length === 0)) {
+        self.createNotificationError({
+          title: self.$tc('twint.settings.certificate.error.title'),
+          message: self.$tc('twint.settings.certificate.password.error'),
           growl: true
         });
 
         valid = false;
       }
 
-      if (!this.certificate && this.currentCertFile == null) {
-        this.createNotificationError({
-          title: this.$tc('twint.settings.certificate.error.title'),
-          message: this.$tc('twint.settings.certificate.error.required')
+      if (!self.certificate && self.currentCertFile == null) {
+        self.createNotificationError({
+          title: self.$tc('twint.settings.certificate.error.title'),
+          message: self.$tc('twint.settings.certificate.error.required')
         });
 
         valid = false;
@@ -66,8 +80,8 @@ Component.register('twint-certificate', {
     },
 
     onFileChange(file) {
-      this.certificate = null;
-      this.updateCertificate(null);
+      this.certificate = '';
+      this.updateCertificate();
 
       this.currentCertFile = file;
       if (this.currentCertFile && (!this.currentPassword || this.currentPassword.length === 0)) {
@@ -86,10 +100,6 @@ Component.register('twint-certificate', {
     },
 
     updatePassword(event) {
-      this.certificate = null;
-      this.updateCertificate(null);
-
-
       if (this.currentCertFile && (!this.currentPassword || this.currentPassword.length === 0)) {
         this.passwordError = new ShopwareError({
           code: 'c1051bb4-d103-4f74-8988-acbcafc7fdc3',
@@ -108,8 +118,9 @@ Component.register('twint-certificate', {
       }
       const inputElement = this.$refs.myInput;
       service.uploadFile(this.currentCertFile, this.currentPassword ?? '').then((res) => {
-        this.updateCertificate(res.data.data);
         this.certificate = res.data.data;
+        this.updateCertificate();
+
         this.changeButtonText();
         this.createNotification({
           title: this.$tc('twint.settings.certificate.success.title'),
@@ -120,7 +131,7 @@ Component.register('twint-certificate', {
         });
 
       }).catch((err) => {
-        this.certificate = null;
+        this.certificate = '';
         this.changeButtonText();
         //specific error handling
         if (err.response.status === 400) {
@@ -142,13 +153,13 @@ Component.register('twint-certificate', {
       })
     },
 
-    updateCertificate(value) {
+    updateCertificate() {
       if (this.feature.isActive('v6.6.0.0')) {
-        this.$emit('update:value', value);
+        this.$emit('update:value', this.certificate);
         return;
       }
 
-      this.$emit('input', value);
+      this.$emit('input', this.certificate);
       this.changeButtonText();
     },
 
