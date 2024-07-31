@@ -81,7 +81,7 @@ export default {
 
         isValidUUIDv4(uuid) {
             // Regular expression to match UUID v4 format
-            var uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
             // Check if the string matches the UUID v4 format
             return uuidRegex.test(uuid);
@@ -110,18 +110,21 @@ export default {
                 isValid = false;
             }
 
-            if (!certificate) {
+            let certificateValid = true;
+            for(let i = 0; i < this.validators.length; ++i){
+                let valid = (this.validators[i])();
+                certificateValid = certificateValid && valid;
+            }
+
+            isValid = isValid && certificateValid;
+
+            if (!certificate && certificateValid) {
                 this.createNotificationError({
                     title: this.$tc('twint.settings.certificate.error.title'),
-                    message: this.$tc('twint.settings.certificate.error.required')
+                    message: this.$tc('twint.settings.certificate.error.invalid')
                 });
 
                 isValid = false;
-            }
-
-            for(let i = 0; i < this.validators.length; ++i){
-                let valid = (this.validators[i])();
-                isValid = isValid && valid;
             }
 
             return isValid;

@@ -37,6 +37,7 @@
           "message": "Fehler beim Lesen des Zertifikats. Bitte erneut versuchen",
           "general": "Fehler beim Lesen des Zertifikats. Bitte erneut versuchen",
           "required": "Zertifikatsdatei erforderlich",
+          "invalid": "Zertifikat ist ungültig",
           "ERROR_INVALID_INPUT": "Zertifikatsdatei und Passwort erforderlich",
           "ERROR_INVALID_UNKNOWN": "Zertifikat kann nicht validiert werden. Bitte erneut versuchen",
           "ERROR_INVALID_CERTIFICATE_FORMAT": "Zertifikatsformat ungültig",

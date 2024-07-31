@@ -53,10 +53,8 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
             ->all();
 
         $useCart = $payload['useCart'] ?? false;
-        if ($useCart) {
-            $cart = $this->cloneCart($context);
-        } else {
-            $cart = $this->cloneCart($context);
+        $cart = $this->cloneCart($context);
+        if (!$useCart) {
             $cart = $this->cartService->add($cart, $this->getLineItems($payload['lineItems'], $context), $context);
         }
 
