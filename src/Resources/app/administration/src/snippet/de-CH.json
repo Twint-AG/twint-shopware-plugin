@@ -138,7 +138,10 @@
       "fullRefundNotice": "No refundable amount left for this order"
     },
     "error": {
-      "title" : "Fehler bei der Rückerstattung"
+      "title" : "Fehler bei der Rückerstattung",
+      "negativeAmount": "Der zu erstattende Betrag sollte grösser als 0 sein",
+      "invalidMoneyFormat": "Ungültige Menge",
+      "exceedAmount": "Der Gesamtbetrag sollte den erstattungsfähigen Höchstbetrag nicht überschreiten"
     }
   },
   "sw-order": {
