@@ -64,7 +64,7 @@ class PaymentService
         $client = $this->clientBuilder->build($order->getSalesChannelId());
         try {
             /** @var non-empty-string $orderId * */
-            $orderId = $order->getId() === '' || $order->getId() === '0' ? ShopwareUuid::randomHex() : $order->getId();
+            $orderId = $order->getOrderNumber() ?? $order->getId();
             /** @var Order * */
             return $client->startOrder(
                 new UnfiledMerchantTransactionReference($orderId),

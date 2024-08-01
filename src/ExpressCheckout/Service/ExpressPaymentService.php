@@ -89,10 +89,10 @@ class ExpressPaymentService
 
     public function startFastCheckoutOrder(OrderEntity $order, PairingEntity $pairing): ApiResponse
     {
-        $client = $this->clientBuilder->build($order->getSalesChannelId());
+        $client = $this->clientBuilder->build($order->getSalesChannelId(), Version::NEXT);
 
         /** @var non-empty-string $orderId */
-        $orderId = $order->getId();
+        $orderId = $order->getOrderNumber();
 
         return $this->api->call($client, 'startFastCheckoutOrder', [
             PairingUuid::fromString($pairing->getId()),
