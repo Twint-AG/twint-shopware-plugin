@@ -34,8 +34,5 @@ export default class CopyToken extends Plugin {
         this.input.disabled = true
     }
 
-    onError(e){
-        console.error('Action:', e.action);
-        console.error('Trigger:', e.trigger);
-    }
+    onError(e){}
 }
