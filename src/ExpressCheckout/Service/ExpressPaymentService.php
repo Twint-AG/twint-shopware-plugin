@@ -18,9 +18,11 @@ use Twint\Sdk\Value\CustomerDataScopes;
 use Twint\Sdk\Value\FastCheckoutCheckIn;
 use Twint\Sdk\Value\InteractiveFastCheckoutCheckIn;
 use Twint\Sdk\Value\Money;
+use Twint\Sdk\Value\OrderId;
 use Twint\Sdk\Value\PairingUuid;
 use Twint\Sdk\Value\ShippingMethods;
 use Twint\Sdk\Value\UnfiledMerchantTransactionReference;
+use Twint\Sdk\Value\Uuid;
 use Twint\Sdk\Value\Version;
 
 class ExpressPaymentService
@@ -97,6 +99,18 @@ class ExpressPaymentService
             new UnfiledMerchantTransactionReference($orderId),
             new Money($order->getCurrency()?->getIsoCode() ?? Settings::ALLOWED_CURRENCY, $order->getAmountTotal()),
         ], true);
+    }
+
+    public function monitoringOrder(string $pairingUuid, string $channelId): ApiResponse
+    {
+        $client = $this->clientBuilder->build($channelId);
+
+        return $this->api->call(
+            $client,
+            'monitorOrder',
+            [new OrderId(new Uuid($pairingUuid))],
+            false
+        );
     }
 
     protected function getLogCallback(): Closure

@@ -70,6 +70,7 @@ class PairingEntity extends Entity
     public function getCartToken(bool $original = false): string
     {
         $parts = explode(':', $this->cartToken);
+
         return $original ? $parts[0] : $parts[1];
     }
 

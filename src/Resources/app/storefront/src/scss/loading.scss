@@ -10,7 +10,7 @@
   z-index: 9999;
   display: none;
   overflow: hidden;
-  opacity: 0.97;
+  opacity: 0.95;
 
   &.active {
     display: flex;
@@ -23,7 +23,7 @@
   polygon {
     fill: white;
     stroke: #9E9E9E;
-    stroke-width: 1px;
+    stroke-width: 0.3px;
     stroke-dasharray: 0, 0, 0, 200;
     stroke-dashoffset: 0;
     animation: hexagonLoader 4s linear infinite;
@@ -38,7 +38,6 @@
     stroke-dasharray: 0, 15, 20, 40;
   }
   50% {
-    stroke: #262626;
     stroke-dasharray: 0, 30, 40, 0;
   }
   75% {
