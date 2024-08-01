@@ -4,6 +4,7 @@ import './twint-payment-actions.scss';
 const { Component, Mixin } = Shopware;
 const { mapState } = Shopware.Component.getComponentHelper();
 const { Criteria } = Shopware.Data;
+const {ShopwareError} = Shopware.Classes;
 
 Component.register('twint-payment-actions', {
     template,
@@ -42,7 +43,7 @@ Component.register('twint-payment-actions', {
         return {
             reversalId: '',
             reversalHistory: [],
-            refundAmount: 0,
+            refundAmount: null,
             totalOrderAmount: 0,
             refundedAmount: 0,
             reason: '',
@@ -54,7 +55,8 @@ Component.register('twint-payment-actions', {
             naturalSorting: true,
             stateType: 'order_transaction',
             transaction: null,
-            currentActionName: null
+            currentActionName: null,
+            amountError: null,
         };
     },
     created() {
@@ -103,7 +105,10 @@ Component.register('twint-payment-actions', {
         dynamicStep() {
             if(this.decimalPrecision < 0) return 0.01;
             return Math.pow(10, -this.decimalPrecision);
-        }
+        },
+        amountError() {
+            return this.amountError ? this.amountError : null;
+        },
     },
     methods: {
         createdComponent() {
@@ -120,8 +125,10 @@ Component.register('twint-payment-actions', {
             if(twintResponse?.amount){
                 this.totalOrderAmount = twintResponse.amount.amount;
             }
+
         },
         showModal() {
+            this.resetRefundForm();
             this.showRefundModal = true;
         },
 
@@ -178,7 +185,8 @@ Component.register('twint-payment-actions', {
             });
         },
         resetRefundForm(){
-            this.refundAmount = 0;
+            this.refundAmount = null;
+            this.amountError = null;
             this.reason = '';
         },
         roundingFloat(num, digits = 2) {
@@ -211,6 +219,36 @@ Component.register('twint-payment-actions', {
                     });
                 }
             }
-        }
+        },
+        amountInputChanged(value) {
+            this.refundAmount = value;
+            if (this.refundAmount === null || isNaN(this.refundAmount) || this.refundAmount <= 0) {
+                this.amountError = new ShopwareError({
+                    'code': 'zero',
+                    'detail': this.$tc('twint.refund.error.negativeAmount')
+                });
+            } else {
+                const parts = this.refundAmount.toString().split('.');
+                if(parts.length == 2) {
+                    const wholeNumberLength = parts[0].replace('-', '').length;
+                    const decimalLength = parts[1] ? parts[1].length : 0;
+                    if (wholeNumberLength + decimalLength > 19 || decimalLength > 2) {
+                        this.amountError = new ShopwareError({
+                            'code': 'wrongFormat',
+                            'detail': this.$tc('twint.refund.error.invalidMoneyFormat')
+                        });
+                    }
+                }
+                if(value > this.refundableAmount){
+                    this.amountError = new ShopwareError({
+                        'code': 'exceedAmount',
+                        'detail': this.$tc('twint.refund.error.exceedAmount')
+                    });
+                }
+                else{
+                    this.amountError = null;
+                }
+            }
+        },
     },
 });
