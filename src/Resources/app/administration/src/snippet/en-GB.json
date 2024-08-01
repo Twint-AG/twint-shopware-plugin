@@ -137,7 +137,10 @@
         "fullRefundNotice": "No refundable amount left for this order"
       },
       "error": {
-        "title" : "Refund error"
+        "title" : "Refund error",
+        "negativeAmount": "Amount to refund should be greater than 0",
+        "invalidMoneyFormat": "Invalid amount",
+        "exceedAmount": "Total amount should not exceed the maximum refundable amount"
       }
     }
   },

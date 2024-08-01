@@ -23,19 +23,25 @@
                             {% block twint_modal_refund %}
                                 <sw-modal variant="small"
                                           :title="$tc(`twint.refund.modal.title`)" v-if="showRefundModal" @modal-close="onCloseModal">
-                                    <sw-alert class="twint-refundable-amount__notice-message" v-if="refundableAmount==refundAmount" variant="warning">
-                                        <span>{{ $tc('twint.refund.refundable.notice') }}</span>
-                                    </sw-alert>
-
                                     {% block twint_refund_amount %}
                                         <sw-number-field
-                                                v-model:value="refundAmount"
-                                                :max="refundableAmount"
-                                                :min="0"
+                                                {% if VUE3 %}
+                                                    v-model:value="refundAmount"
+                                                {% else %}
+                                                    v-model="refundAmount"
+                                                {% endif %}
                                                 numberType="float"
+                                                ref="refundAmountField"
                                                 :step="dynamicStep"
                                                 :label="$tc('twint.order.refundAction.refundAmount.label')"
-                                                :helpText="$tc('twint.order.refundAction.refundAmount.helpText')">
+                                                :helpText="$tc('twint.order.refundAction.refundAmount.helpText')"
+                                                :error="amountError"
+                                                {% if VUE3 %}
+                                                    @update:value="amountInputChanged"
+                                                {% else %}
+                                                    @change="amountInputChanged"
+                                                {% endif %}
+                                        >
                                             <template #suffix>
                                                 {{ currency }}
                                             </template>
@@ -53,7 +59,7 @@
 
                                     {% block twint_refund_confirm_button %}
                                         <template #modal-footer>
-                                            <sw-button variant="primary"
+                                            <sw-button variant="primary" :disabled="amountError || refundAmount<=0"
                                                        @click="refund">
                                                 {{ $tc('twint.order.refundAction.confirmButton.text') }}
                                             </sw-button>
