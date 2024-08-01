@@ -137,7 +137,10 @@
         "fullRefundNotice": "No refundable amount left for this order"
       },
       "error": {
-        "title" : "Errore rimborso"
+        "title" : "Errore rimborso",
+        "negativeAmount": "L'importo da rimborsare deve essere maggiore di 0",
+        "invalidMoneyFormat": "Importo non valido",
+        "exceedAmount": "L'importo totale non deve superare l'importo massimo rimborsabile"
       }
     }
   },
