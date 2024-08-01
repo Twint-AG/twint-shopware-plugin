@@ -105,12 +105,7 @@ class ExpressPaymentService
     {
         $client = $this->clientBuilder->build($channelId);
 
-        return $this->api->call(
-            $client,
-            'monitorOrder',
-            [new OrderId(new Uuid($pairingUuid))],
-            false
-        );
+        return $this->api->call($client, 'monitorOrder', [new OrderId(new Uuid($pairingUuid))], false);
     }
 
     protected function getLogCallback(): Closure

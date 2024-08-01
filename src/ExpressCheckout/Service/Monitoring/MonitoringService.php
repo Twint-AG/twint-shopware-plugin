@@ -44,22 +44,15 @@ class MonitoringService
 
     public function monitorOne(PairingEntity $pairing): PairingEntity
     {
-        try {
-            $res = $this->paymentService->monitoring($pairing->getId(), $pairing->getSalesChannelId());
-            $state = $res->getReturn();
-
-            $this->pairingService->fetchCart($pairing, $this->context->getContext($pairing->getSalesChannelId()));
-
-            if ($this->isChanged($pairing, $state)) {
-                $this->api->saveLog($res->getLog());
-                $this->pairingService->update($pairing, $state);
-                $this->handle($pairing, $state);
-            }
-
-            return $pairing;
-        } catch (Throwable $e) {
-            throw $e;
+        $res = $this->paymentService->monitoring($pairing->getId(), $pairing->getSalesChannelId());
+        $state = $res->getReturn();
+        $this->pairingService->fetchCart($pairing, $this->context->getContext($pairing->getSalesChannelId()));
+        if ($this->isChanged($pairing, $state)) {
+            $this->api->saveLog($res->getLog());
+            $this->pairingService->update($pairing, $state);
+            $this->handle($pairing, $state);
         }
+        return $pairing;
     }
 
     protected function isChanged(PairingEntity $entity, FastCheckoutCheckIn $state): bool
