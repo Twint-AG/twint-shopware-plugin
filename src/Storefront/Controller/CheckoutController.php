@@ -83,7 +83,7 @@ class CheckoutController extends StorefrontController
         if (in_array($paring->getStatus(), [PairingService::STATUS_DONE, PairingService::STATUS_CANCELED], true)) {
             return $this->json([
                 'completed' => true,
-                'orderId' => $paring->getOrderId(),
+                'orderId' => $paring->getStatus() == PairingService::STATUS_CANCELED ? null : $paring->getOrderId(),
             ]);
         }
 

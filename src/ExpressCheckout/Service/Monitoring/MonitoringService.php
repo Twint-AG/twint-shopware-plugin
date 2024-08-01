@@ -58,7 +58,6 @@ class MonitoringService
 
             return $pairing;
         } catch (Throwable $e) {
-            echo $e->getMessage();
             throw $e;
         }
     }

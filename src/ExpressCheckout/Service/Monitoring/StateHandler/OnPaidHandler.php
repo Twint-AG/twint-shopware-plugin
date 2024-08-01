@@ -23,6 +23,7 @@ use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\Core\DataAbstractionLayer\Entity\TransactionLog\TwintTransactionLogDefinition;
 use Twint\Core\Service\CurrencyService;
 use Twint\Core\Service\OrderService;
+use Twint\ExpressCheckout\Model\ApiResponse;
 use Twint\ExpressCheckout\Service\ExpressPaymentService;
 use Twint\ExpressCheckout\Service\Monitoring\ContextFactory as TwintContext;
 use Twint\ExpressCheckout\Service\Monitoring\CustomerRegisterService;
@@ -73,16 +74,16 @@ class OnPaidHandler implements StateHandlerInterface
         //Start TWINT order
         $res = $this->paymentService->startFastCheckoutOrder($order, $entity);
 
+        // Append fields to transaction log
+        $this->appendLogFields($order, $res->getLog());
+
         $twint = $res->getReturn();
 
         //Update custom field
         $this->updateCustomFields($order, $twint);
+        $order = $this->reloadOrder($order->getId());
 
-        // Change payment status
-        $this->markTransactionAsPaid($order, $entity);
-
-        // Append fields to transaction log
-        $this->appendLogFields($order, $res->getLog());
+        $success = $this->refreshTwintTransactionStatusUntilDone($entity, $order, $res);
 
         $this->massUpdateLogs($order, $entity->getId());
 
@@ -90,11 +91,45 @@ class OnPaidHandler implements StateHandlerInterface
         $entity->setOrderId($order->getId());
         $this->pairingService->persistOrderId($entity, $order->getId());
 
-        // Delete cart
-        $this->cleanUpCurrentCart($entity);
+        if($success) {
+            // Delete cart
+            $this->cleanUpCurrentCart($entity);
 
-        //Flag as done
-        $this->pairingService->markAsDone($entity);
+            //Flag as done
+            $this->pairingService->markAsDone($entity);
+        }else {
+            $this->pairingService->markAsCancelled($entity);
+        }
+    }
+
+    protected function refreshTwintTransactionStatusUntilDone(PairingEntity $entity, OrderEntity $order, ApiResponse $res): bool
+    {
+        $tOrder = $res->getReturn();
+
+        if($tOrder->isSuccessful()){
+            // Change payment status
+            $this->markTransactionAsPaid($order, $entity);
+
+            // Append fields to transaction log
+            $this->appendLogFields($order, $res->getLog());
+
+            return true;
+        }
+
+        if($tOrder->isFailure()){
+            // Change payment status
+            $this->markTransactionAsCancelled($order, $entity);
+
+            // Append fields to transaction log
+            $this->appendLogFields($order, $res->getLog());
+
+            return false;
+        }
+
+        sleep(2);
+        $res = $this->paymentService->monitoringOrder($tOrder->id()->__toString(), $order->getSalesChannelId());
+
+        return $this->refreshTwintTransactionStatusUntilDone($entity, $order, $res);
     }
 
     protected function cleanUpCurrentCart(PairingEntity $entity): void
@@ -190,6 +225,7 @@ class OnPaidHandler implements StateHandlerInterface
     {
         $criteria = new Criteria([$orderId]);
         $criteria->addAssociation('transactions');
+        $criteria->addAssociation('currency');
 
         // @phpstan-ignore-next-line: Always has record here
         return $this->orderRepository->search($criteria, Context::createDefaultContext())
@@ -201,8 +237,13 @@ class OnPaidHandler implements StateHandlerInterface
         return $this->customerService->register($entity, $this->context->getContext($entity->getSalesChannelId()));
     }
 
+    /**
+     * @throws Exception
+     */
     protected function markTransactionAsPaid(OrderEntity $order, PairingEntity $entity): void
     {
+        $order = $this->reloadOrder($order->getId());
+
         $transaction = $order->getTransactions()
             ?->first();
 
@@ -212,5 +253,20 @@ class OnPaidHandler implements StateHandlerInterface
 
         $context = $this->context->getContext($entity->getSalesChannelId());
         $this->transactionStateHandler->paid($transaction->getId(), $context->getContext());
+    }
+
+    protected function markTransactionAsCancelled(OrderEntity $order, PairingEntity $entity): void
+    {
+        $order = $this->reloadOrder($order->getId());
+
+        $transaction = $order->getTransactions()
+            ?->first();
+
+        if ($transaction === null) {
+            throw new Exception('Transaction not found');
+        }
+
+        $context = $this->context->getContext($entity->getSalesChannelId());
+        $this->transactionStateHandler->cancel($transaction->getId(), $context->getContext());
     }
 }
