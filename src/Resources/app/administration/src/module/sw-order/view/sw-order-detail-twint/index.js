@@ -91,9 +91,6 @@ Shopware.Component.register('sw-order-detail-twint', {
             if(state){
                 return this.stateStyleDataProviderService.getStyle(`${entity}.state`, state.technicalName).variant;
             }
-            else{
-                console.log(state);
-            }
         }
     },
     destroyed() {
