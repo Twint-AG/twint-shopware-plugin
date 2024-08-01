@@ -91,22 +91,25 @@ class OnPaidHandler implements StateHandlerInterface
         $entity->setOrderId($order->getId());
         $this->pairingService->persistOrderId($entity, $order->getId());
 
-        if($success) {
+        if ($success) {
             // Delete cart
             $this->cleanUpCurrentCart($entity);
 
             //Flag as done
             $this->pairingService->markAsDone($entity);
-        }else {
+        } else {
             $this->pairingService->markAsCancelled($entity);
         }
     }
 
-    protected function refreshTwintTransactionStatusUntilDone(PairingEntity $entity, OrderEntity $order, ApiResponse $res): bool
-    {
+    protected function refreshTwintTransactionStatusUntilDone(
+        PairingEntity $entity,
+        OrderEntity $order,
+        ApiResponse $res
+    ): bool {
         $tOrder = $res->getReturn();
 
-        if($tOrder->isSuccessful()){
+        if ($tOrder->isSuccessful()) {
             // Change payment status
             $this->markTransactionAsPaid($order, $entity);
 
@@ -116,7 +119,7 @@ class OnPaidHandler implements StateHandlerInterface
             return true;
         }
 
-        if($tOrder->isFailure()){
+        if ($tOrder->isFailure()) {
             // Change payment status
             $this->markTransactionAsCancelled($order, $entity);
 
