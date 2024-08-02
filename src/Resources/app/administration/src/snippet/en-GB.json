@@ -93,8 +93,7 @@
           },
           "modal": {
             "title": "Log details",
-            "close": "Close",
-            "soapMethod": "Soap method"
+            "close": "Close"
           }
         }
       },
@@ -134,7 +133,7 @@
       "refundable": {
         "title": "Total refundable amount left",
         "notice": "Total amount automatically adjusted to the maximum refund amount.",
-        "fullRefundNotice": "No refundable amount left for this order"
+        "fullRefundNotice": "Total refundable amount left: 0"
       },
       "error": {
         "title" : "Refund error",

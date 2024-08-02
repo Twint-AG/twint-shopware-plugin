@@ -78,7 +78,7 @@
             "createdAt": "Créée à",
             "orderID": "ID de la commande",
             "apiMethod": "Méthode API",
-            "soapAction": "SOAP action",
+            "soapAction": "Action du SOAP",
             "order": "Statut de la commande",
             "transaction": "ID de la transaction de la commande",
             "request": "Demande",
@@ -93,8 +93,7 @@
           },
           "modal": {
             "title": "Détails du journal",
-            "close": "Fermer",
-            "soapMethod": "Méthode SOAP"
+            "close": "Fermer"
           }
         }
       },
@@ -134,7 +133,7 @@
       "refundable": {
         "title": "Montant total restant à rembourser",
         "notice": "Montant total automatiquement ajusté au montant maximal du montant du remboursement.",
-        "fullRefundNotice": "No refundable amount left for this order "
+        "fullRefundNotice": "Montant total restant à rembourser: 0"
       },
       "error": {
         "title" : "Erreur de remboursement",
