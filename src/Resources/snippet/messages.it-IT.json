@@ -14,7 +14,7 @@
             "scanQR": "Scansiona questo codice QR con l’app TWINT per completare il check-out.",
             "selectAddress": "Seleziona un indirizzo di consegna e completa l’acquisto nell’app.",
             "inputCode": "Inserisci questo codice nella tua app TWINT:",
-            "oppure": "oppure"
+            "or": "oppure"
         },
         "button": {
             "copyCode": "Copia il codice"
@@ -33,8 +33,8 @@
         },
         "administration": {
             "name": {
-                "twint_express_checkout": "TWINT Express Checkout | Pagamento TWINT",
-                "twint_checkout": "TWINT Checkout | Pagamento TWINT"
+                "twint_express_checkout": "TWINT Express Checkout | TWINT",
+                "twint_checkout": "TWINT Checkout | TWINT"
             },
             "extractPem": {
                 "success": {

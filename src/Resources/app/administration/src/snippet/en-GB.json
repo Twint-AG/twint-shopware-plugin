@@ -50,7 +50,7 @@
         },
         "success": {
           "title": "Certificate validation successful",
-          "message": "Your certificate is successfully validated"
+          "message": "Your certificate was successfully validated"
         },
         "password": {
           "label": "Certificate password",

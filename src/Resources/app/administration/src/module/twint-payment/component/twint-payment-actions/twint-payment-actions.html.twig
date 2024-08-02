@@ -33,7 +33,7 @@
                                                 numberType="float"
                                                 ref="refundAmountField"
                                                 :step="dynamicStep"
-                                                :digits="19"
+                                                :digits="22"
                                                 :label="$tc('twint.order.refundAction.refundAmount.label')"
                                                 :helpText="$tc('twint.order.refundAction.refundAmount.helpText')"
                                                 :error="amountError"
@@ -43,7 +43,7 @@
                                                 {% else %}
                                                     @change="amountInputChanged"
                                                 {% endif %}
-                                        >
+                                                required>
                                             <template #suffix>
                                                 {{ currency }}
                                             </template>
