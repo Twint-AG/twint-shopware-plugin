@@ -1,1 +1,58 @@
-src/Resources/snippet/messages.fr-FR.json
+{
+    "twintPayment": {
+        "error": {
+            "orderNotFound": "Cette commande est introuvable",
+            "pairingNotFound": "Invalid transaction"
+        },
+        "notice": {
+            "hasProductInCart": "Votre panier contient déjà des produits. Veuillez vérifier votre panier avant de continuer."
+        },
+        "message": {
+            "successPayment": "Votre paiement a été effectué avec succès"
+        },
+        "instruction" : {
+            "scanQR": "Scannez ce code QR avec votre app TWINT pour terminer le paiement.",
+            "selectAddress": "Sélectionnez une adresse de livraison et terminez l’achat dans l’app.",
+            "inputCode": "Entrez ce code dans votre app TWINT:",
+            "or": "ou"
+        },
+        "button": {
+            "copyCode": "Copiez le code"
+        },
+        "appSelector": {
+            "title": "Choisissez votre app TWINT",
+            "otherBankOption": "Autres banques",
+            "switchLinkLabel": "Passez à l’app TWINT maintenant"
+        },
+        "modal": {
+            "cancelCheckout": "Annuler le check-out",
+            "finish": "Poursuivre les achats"
+        },
+        "express": {
+            "checkingOut": "TWINT Express Checkout en cours"
+        },
+        "administration": {
+            "name": {
+                "twint_express_checkout": "TWINT Express Checkout | TWINT",
+                "twint_checkout": "TWINT Checkout | TWINT"
+            },
+            "extractPem": {
+                "success": {
+                    "message": "Validation du certificat réussie"
+                },
+                "error": {
+                    "invalidFile": "Fichier de certificat invalide",
+                    "emptyFile": "Veuillez télécharger un fichier de certificat valide"
+                }
+            },
+            "refund": {
+                "error": {
+                    "negativeAmount": "The refund amount cannot be negative",
+                    "exceededAmount": "Le montant du remboursement ne peut excéder le montant de la commande %amount% %currency%",
+                    "fail": "Le remboursement ne peut pas être traité pour cette commande, veuillez réessayer.",
+                    "missingResponse": "Missing TWINT response for this order"
+                }
+            }
+        }
+    }
+}
