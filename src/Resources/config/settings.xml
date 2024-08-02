@@ -54,6 +54,13 @@
             <label lang="it-CH">UUID del suo negozio</label>
             <required>true</required>
             <placeholder>xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx</placeholder>
+            <helpText>The Store UUID is provided by TWINT</helpText>
+            <helpText lang="de-DE">Die UUID Ihres Stores wird von TWINT bereitgestellt</helpText>
+            <helpText lang="de-CH">Die UUID Ihres Stores wird von TWINT bereitgestellt</helpText>
+            <helpText lang="fr-FR">L’UUID de votre commerce est fourni par TWINT</helpText>
+            <helpText lang="fr-CH">L’UUID de votre commerce est fourni par TWINT</helpText>
+            <helpText lang="it-IT">L’UUID del suo negozio è fornito da TWINT.</helpText>
+            <helpText lang="it-CH">L’UUID del suo negozio è fornito da TWINT.</helpText>
         </input-field>
 
         <component name="twint-certificate">
