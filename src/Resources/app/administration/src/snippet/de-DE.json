@@ -77,7 +77,7 @@
           "columns": {
             "createdAt": "Erstellt am",
             "apiMethod": "API-Methode",
-            "soapAction": "SOAP action",
+            "soapAction": "SOAP-Aktion",
             "orderID": "Order ID",
             "order": "Bestellstatus",
             "transaction": "Transaktions-Nummer",
@@ -93,8 +93,7 @@
           },
           "modal": {
             "title": "Verlaufsdetails",
-            "close": "Schliessen",
-            "soapMethod": "Soap-Methode"
+            "close": "Schliessen"
           }
         }
       },
@@ -135,7 +134,7 @@
     "refundable": {
       "title": "Total Restbetrag Rückerstattung",
       "notice": "Automatische Anpassung des Totalbetrags an den Höchstbetrag der Rückerstattung",
-      "fullRefundNotice": "No refundable amount left for this order"
+      "fullRefundNotice": "Total Restbetrag Rückerstattung: 0"
     },
     "error": {
       "title" : "Fehler bei der Rückerstattung",

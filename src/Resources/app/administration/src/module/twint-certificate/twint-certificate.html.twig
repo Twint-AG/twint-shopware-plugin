@@ -8,12 +8,13 @@
                 required
                 :disabled="isDisabled"
         >
-            <template #caption-label v-if="certificate == null || certificate == ''">
-                {{ $tc('twint.settings.certificate.placeholder') }}
-            </template>
-
-            <template #caption-label v-if="certificate != null && certificate != ''">
-                {{ $tc('twint.settings.certificate.notice.label') }}
+            <template #caption-label>
+                <span v-if="certificate == null || certificate == ''">
+                    {{ $tc('twint.settings.certificate.placeholder') }}
+                </span>
+                <span v-else>
+                    {{ $tc('twint.settings.certificate.notice.label') }}
+                </span>
             </template>
         </sw-file-input>
 

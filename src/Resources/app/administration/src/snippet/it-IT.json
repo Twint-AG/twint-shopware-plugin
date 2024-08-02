@@ -78,7 +78,7 @@
             "createdAt": "Creato a",
             "orderID": "ID ordine",
             "apiMethod": "Metodo API",
-            "soapAction": "SOAP action",
+            "soapAction": "Azione SOAP",
             "order": "Stato dell’ordine",
             "transaction": "ID transazione ordine",
             "request": "Richiesta",
@@ -93,8 +93,7 @@
           },
           "modal": {
             "title": "Dettagli del log",
-            "close": "Chiudi",
-            "soapMethod": "Metodo Soap"
+            "close": "Chiudi"
           }
         }
       },
@@ -134,7 +133,7 @@
       "refundable": {
         "title": "Importo totale rimborsabile rimanente",
         "notice": "Importo totale automaticamente adattato all’importo massimo del rimborso.",
-        "fullRefundNotice": "No refundable amount left for this order"
+        "fullRefundNotice": "Importo totale rimborsabile rimanente: 0"
       },
       "error": {
         "title" : "Errore rimborso",
