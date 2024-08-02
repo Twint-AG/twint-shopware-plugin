@@ -19,7 +19,7 @@
             "scanQR": "Diesen QR-Code mit der TWINT App  scannen, um den Bestellvorgang abzuschliessen.",
             "selectAddress": "Lieferadresse auswählen und Kauf in der App abschliessen",
             "inputCode": "Diesen Code in der TWINT App eingeben:",
-            "oder": "oder"
+            "or": "oder"
         },
         "button": {
             "copyCode": "Code kopieren"
