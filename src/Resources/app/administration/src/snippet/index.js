@@ -1,10 +1,23 @@
-import de from './de-CH.json';
+import de from './de-DE.json';
 import en from './en-GB.json';
-import fr from './fr-CH.json';
-import it from './it-CH.json';
+import fr from './fr-FR.json';
+import it from './it-IT.json';
 
-Shopware.Locale.extend('en-GB', en);
-Shopware.Locale.extend('de-CH', de);
-Shopware.Locale.extend('fr-CH', fr);
-Shopware.Locale.extend('it-CH', it);
+let map = {
+  'en-GB': en,
+  'de-DE': de,
+  'de-CH': de,
+  'fr-FR': fr,
+  'fr-CH': fr,
+  'it-IT': it,
+  'it-CH': it,
+};
+
+for (let locale in map) {
+  if(Shopware.Locale.getLocaleRegistry().has(locale)){
+    Shopware.Locale.extend(locale, map[locale]);
+  }else {
+    Shopware.Locale.register(locale, map[locale]);
+  }
+}
 

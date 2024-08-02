@@ -5,48 +5,69 @@
     <card>
         <title>Display options</title>
         <title lang="de-CH">Optionen anzeigen</title>
-        <title lang="fr-CH">Options d’affichage</title>
+        <title lang="de-DE">Optionen anzeigen</title>
+        <title lang="fr-CH">Options d'affichage</title>
+        <title lang="fr-FR">Options d'affichage</title>
         <title lang="it-CH">Opzioni di visualizzazione</title>
+        <title lang="it-IT">Opzioni di visualizzazione</title>
 
         <input-field type="multi-select">
             <name>screens</name>
             <label>Display screens</label>
             <label lang="de-CH">Screens anzeigen</label>
-            <label lang="fr-CH">Écrans d’affichage</label>
+            <label lang="de-DE">Screens anzeigen</label>
+            <label lang="fr-CH">Écrans d'affichage</label>
+            <label lang="fr-FR">Écrans d'affichage</label>
             <label lang="it-CH">Schermate di visualizzazione</label>
+            <label lang="it-IT">Schermate di visualizzazione</label>
 
             <helpText>Where users see the TWINT Express Checkout button</helpText>
             <helpText lang="de-CH">Hier sehen die Nutzerinnen und Nutzer die Schaltfläche TWINT Express Checkout</helpText>
+            <helpText lang="de-DE">Hier sehen die Nutzerinnen und Nutzer die Schaltfläche TWINT Express Checkout</helpText>
             <helpText lang="fr-CH">Où les utilisateurs voient le bouton TWINT Express Checkout</helpText>
+            <helpText lang="fr-FR">Où les utilisateurs voient le bouton TWINT Express Checkout</helpText>
             <helpText lang="it-CH">Dove gli utenti visualizzano il pulsante per TWINT Express Checkout</helpText>
+            <helpText lang="it-IT">Dove gli utenti visualizzano il pulsante per TWINT Express Checkout</helpText>
             <options>
                 <option>
                     <id>PDP</id>
                     <name>Product details page</name>
                     <name lang="de-CH">Zur Produktdetailseite</name>
+                    <name lang="de-DE">Zur Produktdetailseite</name>
                     <name lang="fr-CH">Page de détail des produits</name>
+                    <name lang="fr-FR">Page de détail des produits</name>
                     <name lang="it-CH">Pagina dettagli prodotto</name>
+                    <name lang="it-IT">Pagina dettagli prodotto</name>
                 </option>
                 <option>
                     <id>PLP</id>
                     <name>Product listing page</name>
                     <name lang="de-CH">Zur Produktliste</name>
+                    <name lang="de-DE">Zur Produktliste</name>
                     <name lang="fr-CH">Page de liste des produits</name>
+                    <name lang="fr-FR">Page de liste des produits</name>
                     <name lang="it-CH">Pagina elenco prodotti</name>
+                    <name lang="it-IT">Pagina elenco prodotti</name>
                 </option>
                 <option>
                     <id>CART</id>
                     <name>Cart page</name>
                     <name lang="de-CH">Warenkorb</name>
+                    <name lang="de-DE">Warenkorb</name>
                     <name lang="fr-CH">Page du panier</name>
+                    <name lang="fr-FR">Page du panier</name>
                     <name lang="it-CH">Pagina carrello</name>
+                    <name lang="it-IT">Pagina carrello</name>
                 </option>
                 <option>
                     <id>CART_FLYOUT</id>
                     <name>Cart flyout</name>
                     <name lang="de-CH">Warenkorb-Flyout</name>
+                    <name lang="de-DE">Warenkorb-Flyout</name>
                     <name lang="fr-CH">Affichage du panier</name>
+                    <name lang="fr-FR">Affichage du panier</name>
                     <name lang="it-CH">Carrello a comparsa</name>
+                    <name lang="it-IT">Carrello a comparsa</name>
                 </option>
             </options>
             <defaultValue>["PDP", "PLP", "CART", "CART_FLYOUT"]</defaultValue>

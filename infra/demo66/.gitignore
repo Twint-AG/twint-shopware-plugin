@@ -20,7 +20,7 @@ public/asset-manifest.json
 ###< shopware/core ###
 
 .env.test
-custom/plugins/SwagPayPal/
+custom/plugins
 
 ###> phpunit/phpunit ###
 /phpunit.xml
