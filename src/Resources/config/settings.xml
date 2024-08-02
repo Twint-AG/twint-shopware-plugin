@@ -5,20 +5,29 @@
 
     <card>
         <title>Environment</title>
+        <title lang="de-DE">Umgebung</title>
         <title lang="de-CH">Umgebung</title>
+        <title lang="fr-FR">Environnement</title>
         <title lang="fr-CH">Environnement</title>
+        <title lang="it-IT">Ambiente</title>
         <title lang="it-CH">Ambiente</title>
 
         <input-field type="bool">
             <name>testMode</name>
             <label>Switch to test mode</label>
+            <label lang="de-DE">Zum Testmodus wechseln</label>
             <label lang="de-CH">Zum Testmodus wechseln</label>
+            <label lang="fr-FR">Passer en mode test</label>
             <label lang="fr-CH">Passer en mode test</label>
+            <label lang="it-IT">Passa alla modalità di prova</label>
             <label lang="it-CH">Passa alla modalità di prova</label>
 
             <helpText>Turning on test mode will use the TWINT PAT environment. PAT stands for Production Acceptance Test and allows you to test your TWINT integration on an environment closeley resembling the production environment without actually charging a TWINT account</helpText>
+            <helpText lang="de-DE">Der Testmodus nutzt die TWINT PAT Umgebung. PAT bedeutet Production Acceptance Test: So lässt sich die Integration von TWINT in einer Umgebung testen, die sich weitgehend mit der Produktionsumgebung deckt, ohne jedoch ein TWINT Konto zu belasten.</helpText>
             <helpText lang="de-CH">Der Testmodus nutzt die TWINT PAT Umgebung. PAT bedeutet Production Acceptance Test: So lässt sich die Integration von TWINT in einer Umgebung testen, die sich weitgehend mit der Produktionsumgebung deckt, ohne jedoch ein TWINT Konto zu belasten.</helpText>
+            <helpText lang="fr-FR">L’activation du mode test entraîne l’utilisation de l’environnement TWINT PAT. PAT signifie «Production Acceptance Test» et vous permet de tester votre intégration TWINT dans un environnement proche de l’environnement de production sans avoir à payer avec un compte TWINT.</helpText>
             <helpText lang="fr-CH">L’activation du mode test entraîne l’utilisation de l’environnement TWINT PAT. PAT signifie «Production Acceptance Test» et vous permet de tester votre intégration TWINT dans un environnement proche de l’environnement de production sans avoir à payer avec un compte TWINT.</helpText>
+            <helpText lang="it-IT">Passando alla modalità di prova sarà utilizzato l’ambiente TWINT PAT. PAT è l’acronimo di «Production Acceptance Test» e consente di testare l’integrazione di TWINT in un ambiente simile all’ambiente di produzione senza dover effettivamente caricare un account TWINT.</helpText>
             <helpText lang="it-CH">Passando alla modalità di prova sarà utilizzato l’ambiente TWINT PAT. PAT è l’acronimo di «Production Acceptance Test» e consente di testare l’integrazione di TWINT in un ambiente simile all’ambiente di produzione senza dover effettivamente caricare un account TWINT.</helpText>
 
             <defaultValue>false</defaultValue>
@@ -27,15 +36,21 @@
 
     <card>
         <title>Credentials</title>
+        <title lang="de-DE">Zugangsdaten</title>
         <title lang="de-CH">Zugangsdaten</title>
+        <title lang="fr-FR">Identifiants</title>
         <title lang="fr-CH">Identifiants</title>
+        <title lang="it-IT">Credenziali</title>
         <title lang="it-CH">Credenziali</title>
 
         <input-field>
             <name>storeUuid</name>
             <label>Store UUID</label>
+            <label lang="de-DE">UUID Ihres Stores</label>
             <label lang="de-CH">UUID Ihres Stores</label>
+            <label lang="fr-FR">UUID de votre commerce</label>
             <label lang="fr-CH">UUID de votre commerce</label>
+            <label lang="it-IT">UUID del suo negozio</label>
             <label lang="it-CH">UUID del suo negozio</label>
             <required>true</required>
             <placeholder>xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx</placeholder>
@@ -44,8 +59,11 @@
         <component name="twint-certificate">
             <name>certificate</name>
             <label>Certificate file</label>
+            <label lang="de-DE">Zertifikatsdatei</label>
             <label lang="de-CH">Zertifikatsdatei</label>
+            <label lang="fr-FR">Fichier de certificat</label>
             <label lang="fr-CH">Fichier de certificat</label>
+            <label lang="it-IT">File del certificato</label>
             <label lang="it-CH">File del certificato</label>
             <required>true</required>
         </component>
