@@ -126,6 +126,7 @@ release:
         - tags
     stage: release
     image: alpine:3
+    extends: .base
     script:
       - apk add --no-cache git openssh
       - ./bin/sync.sh
