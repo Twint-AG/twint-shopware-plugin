@@ -128,5 +128,5 @@ release:
     image: alpine:3
     extends: .base
     script:
-      - apk add --no-cache git openssh
+      - apk add --no-cache git openssh bash
       - ./bin/sync.sh
