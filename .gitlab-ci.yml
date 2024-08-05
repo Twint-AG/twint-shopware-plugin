@@ -7,6 +7,7 @@ variables:
 
 stages:
   - check
+  - release
 
 .base:
   before_script:
@@ -119,3 +120,12 @@ end-2-end:
     paths:
       - cypress/cypress/screenshots/
       - cypress/cypress/videos/
+
+release:
+    only:
+        - tags
+    stage: release
+    image: alpine:3
+    script:
+      - apk add --no-cache make git openssh
+      - ./bin/sync.sh
