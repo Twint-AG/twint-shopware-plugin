@@ -12,7 +12,7 @@
         "shopware6"
     ],
     "type": "shopware-platform-plugin",
-    "version": "9.9.9-dev",
+    "version": "1.0.0-RC6",
     "license": "MIT",
     "authors": [
         {
