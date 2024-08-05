@@ -22,3 +22,10 @@ Fixing coding standards
 ```
 vendor/bin/ecs --fix
 ```
+
+### Release management
+Tag a new release, let’s say version 1.2.3:
+```
+bin/release.sh 1.2.3
+```
+CI will then sync with the public GitHub repository.
