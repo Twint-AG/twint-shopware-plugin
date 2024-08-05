@@ -16,6 +16,8 @@ services:
       - ".:/var/www/html"
       - "./../..:/var/www/plugin:rw"
       - "sw65_volume:/var/lib/mysql:rw"
+      # prevent recursive binding volumes
+      - "/var/www/plugin/infra"
     networks:
       - web
     environment:
