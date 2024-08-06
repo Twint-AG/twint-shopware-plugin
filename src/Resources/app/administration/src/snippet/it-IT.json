@@ -55,7 +55,7 @@
         "password": {
           "label": "Password del certificato",
           "helpText": "Si prega di inserire la password del certificato",
-          "error": "Password del certificato è necessario"
+          "error": "La password del certificato è necessaria"
         },
         "notice": {
           "label": "Certificato crittografato e archiviato"

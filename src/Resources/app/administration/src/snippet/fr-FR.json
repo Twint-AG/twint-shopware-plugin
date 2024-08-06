@@ -55,7 +55,7 @@
         "password": {
           "label": "Mot de passe du certificat",
           "helpText": "Saisissez le mot de passe du certificat",
-          "error": "Mot de passe du certificat est requis"
+          "error": "Le mot de passe du certificat est requis"
         },
         "notice": {
           "label": "Certificat crypté et enregistré"
