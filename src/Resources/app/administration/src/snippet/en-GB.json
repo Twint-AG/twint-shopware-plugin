@@ -117,29 +117,29 @@
           "helpText": "The refund amount cannot exceed the total order amount"
         },
         "confirmButton": {
-          "text": "Execute"
-        }
-      }
-    },
-    "refund": {
-      "modal": {
-        "title": "Create new refund"
-      },
-      "buttons": {
-        "refund": {
-          "label": "Refund"
+          "text": "Refund"
         }
       },
-      "refundable": {
-        "title": "Total refundable amount left",
-        "notice": "Total amount automatically adjusted to the maximum refund amount.",
-        "fullRefundNotice": "Total refundable amount left: 0"
-      },
-      "error": {
-        "title" : "Refund error",
-        "negativeAmount": "Amount to refund should be greater than 0",
-        "invalidMoneyFormat": "Invalid amount",
-        "exceedAmount": "Total amount should not exceed the maximum refundable amount"
+      "refund": {
+        "modal": {
+          "title": "Create new refund"
+        },
+        "buttons": {
+          "refund": {
+            "label": "Refund"
+          }
+        },
+        "refundable": {
+          "title": "Total refundable amount left",
+          "notice": "Total amount automatically adjusted to the maximum refund amount.",
+          "fullRefundNotice": "Total refundable amount left: 0"
+        },
+        "error": {
+          "title" : "Refund error",
+          "negativeAmount": "Amount to refund should be greater than 0",
+          "invalidMoneyFormat": "Invalid amount",
+          "exceedAmount": "Total amount should not exceed the maximum refundable amount"
+        }
       }
     }
   },

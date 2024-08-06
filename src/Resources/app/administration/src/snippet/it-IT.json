@@ -117,29 +117,29 @@
           "helpText": "L’importo del rimborso non può superare l’importo totale dell’ordine."
         },
         "confirmButton": {
-          "text": "Esegui"
-        }
-      }
-    },
-    "refund": {
-      "modal": {
-        "title": "Crea nuovo rimborso"
-      },
-      "buttons": {
-        "refund": {
-          "label": "Rimborso"
+          "text": "Rimborso"
         }
       },
-      "refundable": {
-        "title": "Importo totale rimborsabile rimanente",
-        "notice": "Importo totale automaticamente adattato all’importo massimo del rimborso.",
-        "fullRefundNotice": "Importo totale rimborsabile rimanente: 0"
-      },
-      "error": {
-        "title" : "Errore rimborso",
-        "negativeAmount": "L'importo da rimborsare deve essere maggiore di 0",
-        "invalidMoneyFormat": "Importo non valido",
-        "exceedAmount": "L'importo totale non deve superare l'importo massimo rimborsabile"
+      "refund": {
+        "modal": {
+          "title": "Crea nuovo rimborso"
+        },
+        "buttons": {
+          "refund": {
+            "label": "Rimborso"
+          }
+        },
+        "refundable": {
+          "title": "Importo totale rimborsabile rimanente",
+          "notice": "Importo totale automaticamente adattato all’importo massimo del rimborso.",
+          "fullRefundNotice": "Importo totale rimborsabile rimanente: 0"
+        },
+        "error": {
+          "title" : "Errore rimborso",
+          "negativeAmount": "L'importo da rimborsare deve essere maggiore di 0",
+          "invalidMoneyFormat": "Importo non valido",
+          "exceedAmount": "L'importo totale non deve superare l'importo massimo rimborsabile"
+        }
       }
     }
   },

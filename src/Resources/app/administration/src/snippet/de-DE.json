@@ -117,32 +117,33 @@
           "helpText": "Der Rückerstattungsbetrag darf den Totalbetrag der Bestellung nicht überschreiten"
         },
         "confirmButton": {
-          "text": "Ausführen"
+          "text": "Rückerstattung"
+        }
+      },
+      "refund": {
+        "modal": {
+          "title": "Neue Rückerstattung erstellen"
+        },
+        "buttons": {
+          "refund": {
+            "label": "Rückerstattung"
+          }
+        },
+        "refundable": {
+          "title": "Total Restbetrag Rückerstattung",
+          "notice": "Automatische Anpassung des Totalbetrags an den Höchstbetrag der Rückerstattung",
+          "fullRefundNotice": "Total Restbetrag Rückerstattung: 0"
+        },
+        "error": {
+          "title" : "Fehler bei der Rückerstattung",
+          "negativeAmount": "Der zu erstattende Betrag sollte grösser als 0 sein",
+          "invalidMoneyFormat": "Ungültige Menge",
+          "exceedAmount": "Der Gesamtbetrag sollte den erstattungsfähigen Höchstbetrag nicht überschreiten"
         }
       }
     }
   },
-  "refund": {
-    "modal": {
-      "title": "Neue Rückerstattung erstellen"
-    },
-    "buttons": {
-      "refund": {
-        "label": "Rückerstattung"
-      }
-    },
-    "refundable": {
-      "title": "Total Restbetrag Rückerstattung",
-      "notice": "Automatische Anpassung des Totalbetrags an den Höchstbetrag der Rückerstattung",
-      "fullRefundNotice": "Total Restbetrag Rückerstattung: 0"
-    },
-    "error": {
-      "title" : "Fehler bei der Rückerstattung",
-      "negativeAmount": "Der zu erstattende Betrag sollte grösser als 0 sein",
-      "invalidMoneyFormat": "Ungültige Menge",
-      "exceedAmount": "Der Gesamtbetrag sollte den erstattungsfähigen Höchstbetrag nicht überschreiten"
-    }
-  },
+
   "sw-order": {
     "detail": {
       "twint": "TWINT"
