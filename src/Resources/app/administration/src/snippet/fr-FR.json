@@ -127,7 +127,7 @@
       },
       "buttons": {
         "refund": {
-          "label": "Refund"
+          "label": "Remboursement"
         }
       },
       "refundable": {
