@@ -117,29 +117,29 @@
           "helpText": "Le montant du remboursement ne peut excéder le montant total de la commande"
         },
         "confirmButton": {
-          "text": "Exécuter"
-        }
-      }
-    },
-    "refund": {
-      "modal": {
-        "title": "Créer nouveau remboursement"
-      },
-      "buttons": {
-        "refund": {
-          "label": "Remboursement"
+          "text": "Remboursement"
         }
       },
-      "refundable": {
-        "title": "Montant total restant à rembourser",
-        "notice": "Montant total automatiquement ajusté au montant maximal du montant du remboursement.",
-        "fullRefundNotice": "Montant total restant à rembourser: 0"
-      },
-      "error": {
-        "title" : "Erreur de remboursement",
-        "negativeAmount": "Le montant à rembourser doit être supérieur à 0",
-        "invalidMoneyFormat": "Montant invalide",
-        "exceedAmount": "Le montant total ne doit pas dépasser le montant maximal remboursable"
+      "refund": {
+        "modal": {
+          "title": "Créer nouveau remboursement"
+        },
+        "buttons": {
+          "refund": {
+            "label": "Remboursement"
+          }
+        },
+        "refundable": {
+          "title": "Montant total restant à rembourser",
+          "notice": "Montant total automatiquement ajusté au montant maximal du montant du remboursement.",
+          "fullRefundNotice": "Montant total restant à rembourser: 0"
+        },
+        "error": {
+          "title" : "Erreur de remboursement",
+          "negativeAmount": "Le montant à rembourser doit être supérieur à 0",
+          "invalidMoneyFormat": "Montant invalide",
+          "exceedAmount": "Le montant total ne doit pas dépasser le montant maximal remboursable"
+        }
       }
     }
   },

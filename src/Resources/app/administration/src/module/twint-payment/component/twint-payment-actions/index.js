@@ -175,7 +175,7 @@ Component.register('twint-payment-actions', {
                 } else {
                     this.isLoading = false;
                     this.createNotificationError({
-                        title: this.$tc('twint.refund.error.title'),
+                        title: this.$tc('twint.order.refund.error.title'),
                         message: response.error
                     });
                 }
@@ -211,7 +211,7 @@ Component.register('twint-payment-actions', {
                         });
                     }).catch((error) => {
                         this.createNotificationError({
-                            title: this.$tc('twint.refund.error.title'),
+                            title: this.$tc('twint.order.refund.error.title'),
                             message: error
                         });
                     }).finally(() => {
@@ -225,7 +225,7 @@ Component.register('twint-payment-actions', {
             if (this.refundAmount === null || isNaN(this.refundAmount) || this.refundAmount <= 0) {
                 this.amountError = new ShopwareError({
                     'code': 'zero',
-                    'detail': this.$tc('twint.refund.error.negativeAmount')
+                    'detail': this.$tc('twint.order.refund.error.negativeAmount')
                 });
             } else {
                 const parts = this.refundAmount.toString().split('.');
@@ -235,14 +235,14 @@ Component.register('twint-payment-actions', {
                     if (wholeNumberLength + decimalLength > 19 || decimalLength > 2) {
                         this.amountError = new ShopwareError({
                             'code': 'wrongFormat',
-                            'detail': this.$tc('twint.refund.error.invalidMoneyFormat')
+                            'detail': this.$tc('twint.order.refund.error.invalidMoneyFormat')
                         });
                     }
                 }
                 if(value > this.refundableAmount){
                     this.amountError = new ShopwareError({
                         'code': 'exceedAmount',
-                        'detail': this.$tc('twint.refund.error.exceedAmount')
+                        'detail': this.$tc('twint.order.refund.error.exceedAmount')
                     });
                 }
                 else{
