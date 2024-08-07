@@ -8,9 +8,9 @@ import {getPriceString} from "../../support/commands";
 
 const userData = require("../../fixtures/testAccount")
 
-describe("ser perform Twint Regular Checkout", () => {
+describe("User perform Twint Regular Checkout", () => {
   beforeEach("Open the front store", () => {
-    // Visite the store front
+    // Visit the store front
     // To do: manage this by env variable
 
     cy.visit('/');
@@ -24,7 +24,7 @@ describe("ser perform Twint Regular Checkout", () => {
   })
 
   it('User should be able to pay for a product with Twint Regular Checkout', () => {    
-    // User ogin
+    // User login
     cy.login(userData.testAccount.username, userData.testAccount.password)
     
     // Search for testing products
@@ -111,7 +111,7 @@ describe("ser perform Twint Regular Checkout", () => {
     })
   })
 
-  it('Guess user should be able to pay for a product with Twint Regular Checkout', () => {
+  it('Guest user should be able to pay for a product with Twint Regular Checkout', () => {
     // Search for testing products
     cy.searchProduct("Test")
 
