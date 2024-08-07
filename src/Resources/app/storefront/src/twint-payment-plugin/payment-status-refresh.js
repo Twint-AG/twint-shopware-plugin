@@ -3,6 +3,7 @@ import HttpClient from "src/service/http-client.service";
 import DomAccess from 'src/helper/dom-access.helper';
 import ExpressCheckoutButton from './express-checkout-button';
 import AjaxOffCanvas from 'src/plugin/offcanvas/ajax-offcanvas.plugin';
+import Iterator from 'src/helper/iterator.helper';
 
 export default class PaymentStatusRefresh extends Plugin {
 
@@ -61,6 +62,9 @@ export default class PaymentStatusRefresh extends Plugin {
             this.checking = false;
             if (data.completed) {
                 if(data.orderId){
+                    const CartWidgetPluginInstances = window.PluginManager.getPluginInstances('CartWidget');
+                    Iterator.iterate(CartWidgetPluginInstances, instance => instance.fetch());
+                    this.$emitter.publish('fetchCartWidgets');
                     AjaxOffCanvas.close();
                     this.loadThankYouPage();
                 }
