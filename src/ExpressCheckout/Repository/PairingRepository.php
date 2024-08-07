@@ -14,6 +14,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\ExpressCheckout\Exception\PairingException;
@@ -87,6 +88,7 @@ class PairingRepository
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsAnyFilter('status', [PairingStatus::PAIRING_IN_PROGRESS]));
+        $criteria->addSorting(new FieldSorting('createdAt', FieldSorting::ASCENDING));
         $criteria->addAssociation('shippingMethod');
         $criteria->addAssociation('customer.addresses');
 
