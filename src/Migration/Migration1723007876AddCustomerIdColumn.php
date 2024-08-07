@@ -32,4 +32,9 @@ class Migration1723007876AddCustomerIdColumn extends MigrationStep
                 ON UPDATE CASCADE;';
         $connection->executeStatement($sql);
     }
+
+    public function updateDestructive(Connection $connection): void
+    {
+        // implement update destructive
+    }
 }
