@@ -6,6 +6,7 @@ import AjaxOffCanvas from 'src/plugin/offcanvas/ajax-offcanvas.plugin';
 import Iterator from 'src/helper/iterator.helper';
 
 export default class PaymentStatusRefresh extends Plugin {
+    static POLL_LIMIT = 500;
 
     static options = {
         containerSelector: '.twint-qr-container',
@@ -40,7 +41,7 @@ export default class PaymentStatusRefresh extends Plugin {
     }
 
     reachLimit() {
-        if (this.checking || this.count > 10) {
+        if (this.checking || this.count > PaymentStatusRefresh.POLL_LIMIT) {
             return true;
         }
 
