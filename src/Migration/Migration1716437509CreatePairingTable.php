@@ -22,6 +22,7 @@ class Migration1716437509CreatePairingTable extends MigrationStep
         $sql = 'CREATE TABLE IF NOT EXISTS `twint_pairing` (
             `id` VARCHAR(255) NOT NULL,
             `cart_token` VARCHAR(255) NOT NULL,
+            `customer_id` VARCHAR(255) NOT NULL,
             `status` VARCHAR(255) NOT NULL,
             `token` VARCHAR(255) NOT NULL,
             `sales_channel_id` BINARY(16) NULL,

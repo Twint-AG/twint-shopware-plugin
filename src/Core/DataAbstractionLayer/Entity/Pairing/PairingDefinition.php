@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Twint\Core\DataAbstractionLayer\Entity\Pairing;
 
+use Shopware\Core\Checkout\Customer\CustomerDefinition;
 use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Checkout\Shipping\ShippingMethodDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
@@ -42,6 +43,8 @@ class PairingDefinition extends EntityDefinition
         return new FieldCollection([
             (new StringField('id', 'id'))->setFlags(new PrimaryKey(), new Required()),
             (new StringField('cart_token', 'cartToken'))->setFlags(new Required()),
+            (new FkField('customer_id', 'customerId', CustomerDefinition::class)),
+            new ManyToOneAssociationField('customer', 'customer_id', CustomerDefinition::class, 'id', false),
             (new StringField('status', 'status'))->setFlags(new Required()),
             (new StringField('token', 'token'))->setFlags(new Required()),
 

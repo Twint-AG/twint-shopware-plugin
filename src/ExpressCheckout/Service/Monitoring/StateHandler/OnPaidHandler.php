@@ -61,10 +61,10 @@ class OnPaidHandler implements StateHandlerInterface
         }
 
         //Register customer
-        list($customerEntity, $customerData) = $this->registerCustomer($entity);
+        list($customerEntity, $addressId) = $this->registerCustomer($entity);
 
         //Create context
-        $this->createContext($entity, $state, $customerEntity, $customerData);
+        $this->createContext($entity, $state, $customerEntity, $addressId);
 
         // Place order
         $order = $this->placeOrder($entity);
@@ -195,15 +195,16 @@ class OnPaidHandler implements StateHandlerInterface
         PairingEntity $entity,
         FastCheckoutCheckIn $state,
         CustomerEntity $customerEntity,
-        array $customerData
+        string $addressId
     ): void {
         //Create new context for the customer
         $this->context->createContext($entity->getSalesChannelId(), [
             'customerId' => $customerEntity->getId(),
             'shippingMethodId' => (string) $state->shippingMethodId(),
-            'shippingAddressId' => $customerData['defaultShippingAddressId'],
             'paymentMethodId' => $this->paymentMethodUtil->getExpressCheckoutMethodId(),
             'currencyId' => $this->currencyService->getCurrencyId(),
+            'billingAddressId' => $addressId,
+            'shippingAddressId' => $addressId,
         ]);
     }
 

@@ -34,6 +34,8 @@ class PairingRepository
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('id', $pairingId));
         $criteria->addAssociation('shippingMethod');
+        $criteria->addAssociation('customer');
+        $criteria->addAssociation('customer.addresses');
 
         $pairing = $this->pairingRepository->search($criteria, $context->getContext())
             ->first();
@@ -86,6 +88,7 @@ class PairingRepository
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsAnyFilter('status', [PairingStatus::PAIRING_IN_PROGRESS]));
         $criteria->addAssociation('shippingMethod');
+        $criteria->addAssociation('customer.addresses');
 
         return $this->pairingRepository->search($criteria, Context::createDefaultContext());
     }
