@@ -7,9 +7,10 @@
     "shopware/core": "v6.6.1.0",
     "shopware/elasticsearch": "*",
     "shopware/storefront": "*",
+    "swag/language-pack": "^4.7",
     "swag/swag-extension-store": "^3.0",
     "symfony/flex": "~2",
-    "twint-ag/twint-shopware-plugin": "^1.0.0"
+    "twint-ag/twint-shopware-plugin": "dev-master"
   },
   "repositories": [
     {
@@ -31,17 +32,6 @@
       "url": "custom/static-plugins/*",
       "options": {
         "symlink": true
-      }
-    },
-    {
-      "name": "twint-ag/twint-shopware-plugin",
-      "type": "path",
-      "url": "/var/www/plugin",
-      "options": {
-        "symlink": true,
-        "versions": {
-          "twint-ag/twint-shopware-plugin": "1.0.0"
-        }
       }
     }
   ],
