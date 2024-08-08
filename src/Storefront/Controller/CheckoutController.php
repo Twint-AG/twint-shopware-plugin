@@ -15,6 +15,7 @@ use Shopware\Storefront\Page\Checkout\Finish\CheckoutFinishPage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Throwable;
 use Twint\Core\Service\PaymentService;
 use Twint\Core\Util\CryptoHandler;
 use Twint\ExpressCheckout\Exception\PairingException;
@@ -73,7 +74,7 @@ class CheckoutController extends StorefrontController
         try {
             $pairingUUid = $this->cryptoService->unHash($pairingHash);
             $paring = $this->paringLoader->load($pairingUUid, $context);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $this->addFlash(self::DANGER, $this->trans('twintPayment.error.pairingNotFound'));
             return $this->redirectToRoute('frontend.account.order.page');
         }
