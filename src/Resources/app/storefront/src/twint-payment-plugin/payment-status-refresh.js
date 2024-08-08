@@ -58,9 +58,15 @@ export default class PaymentStatusRefresh extends Plugin {
         let url = window.router['frontend.twint.monitoring'];
         url = url.replace('--hash--', this.options.pairingHash);
 
-        this.client.get(url, (response) => {
-            const data = JSON.parse(response);
+        this.client.get(url, (response, request) => {
             this.checking = false;
+
+            if(request.status !== 200){
+                return this.onError(request);
+            }
+
+            const data = JSON.parse(response);
+
             if (data.completed) {
                 if(data.orderId){
                     const CartWidgetPluginInstances = window.PluginManager.getPluginInstances('CartWidget');
@@ -110,5 +116,11 @@ export default class PaymentStatusRefresh extends Plugin {
             } catch (e) {
             }
         }, 'application/json', true);
+    }
+
+    onError(request){
+        ExpressCheckoutButton.modal.updateContent(request.responseText);
+        let titleEl = DomAccess.querySelector(document, '.js-pseudo-modal .twint-modal .modal-title');
+        titleEl.innerHTML = titleEl.getAttribute('data-finish');
     }
 }

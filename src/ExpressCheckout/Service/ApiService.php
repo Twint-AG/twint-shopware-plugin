@@ -24,6 +24,7 @@ class ApiService
 
     /**
      * @param callable|null $buildLogCallback A callback function to build the log. It should accept two parameters.
+     * @throws Throwable
      */
     public function call(
         InvocationRecordingClient $client,
@@ -36,6 +37,7 @@ class ApiService
             $returnValue = $client->{$method}(...$args);
         } catch (Throwable $e) {
             $this->logger->error('TWINT API error: ' . $e->getMessage());
+            throw $e;
         } finally {
             $invocations = $client->flushInvocations();
 
@@ -76,7 +78,7 @@ class ApiService
                 $log = $callback($log, $returnValue);
             }
 
-            if (!$save) {
+            if ($returnValue && !$save) {
                 return $log;
             }
 

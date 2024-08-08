@@ -128,8 +128,7 @@ class OnPaidHandler implements StateHandlerInterface
 
             return false;
         }
-
-        sleep(2);
+        // Request until get success/fail. Assume TWINT API will finish within a few seconds
         $res = $this->paymentService->monitoringOrder($tOrder->id()->__toString(), $order->getSalesChannelId());
 
         return $this->refreshTwintTransactionStatusUntilDone($entity, $order, $res);
