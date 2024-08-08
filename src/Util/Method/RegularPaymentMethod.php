@@ -15,11 +15,11 @@ class RegularPaymentMethod extends AbstractMethod
         return [
             'de-CH' => [
                 'description' => '',
-                'name' => 'TWINT Checkout',
+                'name' => 'TWINT',
             ],
             'en-GB' => [
                 'description' => '',
-                'name' => 'TWINT Checkout',
+                'name' => 'TWINT',
             ],
         ];
     }
