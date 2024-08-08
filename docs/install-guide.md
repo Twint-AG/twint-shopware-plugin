@@ -68,8 +68,8 @@ Under the `Display options` section -> Choose the placement for displaying the `
 #### 4. Go to `Settings -> Payment methods`
 
 - Ensure that the below payment methods are enabled:
-    - TWINT - Express Checkout
-    - TWINT - Regular Checkout
+    - TWINT 
+    - TWINT Express Checkout
 - The payment method can be customized (e.g. add logo) by clicking the "Edit details" link next to each payment method.
 
 <img src="./screenshots/twint-payment-methods.png" alt="Active TWINT payment methods" width="900" height="auto">
