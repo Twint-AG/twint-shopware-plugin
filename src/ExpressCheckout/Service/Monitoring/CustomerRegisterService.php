@@ -6,6 +6,8 @@ namespace Twint\ExpressCheckout\Service\Monitoring;
 
 use DateTimeImmutable;
 use Doctrine\DBAL\Exception;
+use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -22,19 +24,85 @@ class CustomerRegisterService
     public function __construct(
         private readonly NumberRangeValueGenerator $numberRangeValueGenerator,
         private readonly EntityRepository $customerRepository,
+        private readonly EntityRepository $addressRepository,
         private readonly PaymentMethodUtil $paymentMethodUtil,
         private readonly EntityRepository $salutationRepository,
         private readonly EntityRepository $countryRepository
     ) {
     }
 
+    /**
+     * @throws Exception
+     */
     public function register(PairingEntity $pairing, SalesChannelContext $context): array
     {
         $customerData = $this->generateCustomerData($pairing, $context);
+
+        $customer = $pairing->getCustomer();
+
+        if ($customer instanceof CustomerEntity) {
+            $address = $this->getMatchedAddress($customerData, $customer);
+
+            if ($address instanceof CustomerAddressEntity) {
+                return [$customer, $address->getId()];
+            }
+
+            $addressId = $this->createAddress($customer, $customerData['addresses'][0], $context);
+            return [$customer, $addressId];
+        }
+
+        return $this->createNew($customerData, $context);
+    }
+
+    private function createAddress(CustomerEntity $customer, array $addressData, SalesChannelContext $context): string
+    {
+        $addressData['customerId'] = $customer->getId();
+        $addressData['salutationId'] = $customer->getSalutationId();
+
+        $this->addressRepository->create([$addressData], $context->getContext());
+
+        return $addressData['id'];
+    }
+
+    private function getMatchedAddress(array $customerData, CustomerEntity $customer): ?CustomerAddressEntity
+    {
+        $tAddress = $customerData['addresses'][0];
+        $tCombined = implode(
+            '|',
+            [$tAddress['street'],
+                $tAddress['city'],
+                $tAddress['zipcode'],
+                $tAddress['countryId'],
+                $tAddress['firstName'],
+                $tAddress['lastName'],
+            ]
+        );
+
+        /** @var CustomerAddressEntity $address */
+        foreach ($customer->getAddresses() ?? [] as $address) {
+            $combined = implode('|', [
+                $address->getStreet(),
+                $address->getCity(),
+                $address->getZipcode(),
+                $address->getCountryId(),
+                $address->getFirstName(),
+                $address->getLastName(),
+            ]);
+
+            if ($tCombined === $combined) {
+                return $address;
+            }
+        }
+
+        return null;
+    }
+
+    private function createNew(array $customerData, SalesChannelContext $context): array
+    {
         $this->customerRepository->create([$customerData], $context->getContext());
 
         return [$this->customerRepository->search(new Criteria([$customerData['id']]), $context->getContext())
-            ->first(), $customerData];
+            ->first(), $customerData['defaultShippingAddressId']];
     }
 
     /**
@@ -56,7 +124,7 @@ class CustomerRegisterService
             'street' => $address->street(),
             'city' => $address->city(),
             'zipcode' => $address->zip(),
-            'countryId' => (string) $this->getCountryId($context, $address->country() ->__toString()),
+            'countryId' => (string) $this->getCountryId($context, $address->country()->__toString()),
             'countryStateId' => null,
             'firstName' => $address->firstName(),
             'lastName' => $address->lastName(),
@@ -81,12 +149,25 @@ class CustomerRegisterService
             'email' => (string) $customerData->email(),
             'active' => false,
             'firstLogin' => new DateTimeImmutable(),
-            'password' => '12345678',
+            'password' => $this->generateRandomPassword(),
             'id' => Uuid::randomHex(),
             'addresses' => [$swAddress],
             'defaultBillingAddressId' => $addressId,
             'defaultShippingAddressId' => $addressId,
         ];
+    }
+
+    protected function generateRandomPassword(int $length = 15): string
+    {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()';
+        $charactersLength = strlen($characters);
+        $randomPassword = '';
+
+        for ($i = 0; $i < $length; $i++) {
+            $randomPassword .= $characters[rand(0, $charactersLength - 1)];
+        }
+
+        return $randomPassword;
     }
 
     private function getSalutationId(SalesChannelContext $context): ?string
