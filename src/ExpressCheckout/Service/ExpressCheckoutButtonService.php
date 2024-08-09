@@ -106,7 +106,7 @@ class ExpressCheckoutButtonService
             return self::$buttons;
         }
 
-        self::$buttons = $settings->getScreens();
+        self::$buttons = $context->getCurrentCustomerGroup()->getDisplayGross() ? $settings->getScreens() : [];
 
         return self::$buttons;
     }
