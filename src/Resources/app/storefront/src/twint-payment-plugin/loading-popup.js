@@ -3,12 +3,13 @@ import DomAccess from 'src/helper/dom-access.helper';
 import items from './points';
 
 export default class LoadingPopup extends Plugin {
-
+  static animation = null;
+  static index = 0;
   active = false;
 
   init() {
     this.checking = false;
-    this.index = 0;
+    LoadingPopup.index = 0;
 
     this.el = DomAccess.querySelector(document, '#twint-loading-popup');
   }
@@ -16,24 +17,28 @@ export default class LoadingPopup extends Plugin {
   show() {
     this.active = true;
     this.el.classList.add('active');
-    this.animation = setInterval(this.changePoints.bind(this), 20);
+
+    if(!LoadingPopup.animation){
+      LoadingPopup.animation = setInterval(this.changePoints.bind(this), 20);
+    }
   }
 
   hide() {
     this.active = false;
     this.el.classList.remove('active');
-    if (this.animation) {
-      clearInterval(this.animation);
+    if (LoadingPopup.animation) {
+      clearInterval(LoadingPopup.animation);
+      LoadingPopup.animation = null;
     }
   }
 
   changePoints() {
     const pointElement = document.getElementById('twintAnimation');
-    pointElement.setAttribute('d', String(items[this.index]));
+    pointElement.setAttribute('d', String(items[LoadingPopup.index]));
 
-    this.index++;
-    if (this.index >= items.length) {
-      this.index = 0;
+    LoadingPopup.index++;
+    if (LoadingPopup.index >= items.length) {
+      LoadingPopup.index = 0;
     }
   }
 }
