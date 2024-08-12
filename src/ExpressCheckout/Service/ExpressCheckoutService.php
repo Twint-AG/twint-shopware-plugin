@@ -7,11 +7,13 @@ namespace Twint\ExpressCheckout\Service;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\CartPersister;
 use Shopware\Core\Checkout\Cart\Delivery\DeliveryBuilder;
+use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\LineItemFactoryRegistry;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Shipping\SalesChannel\AbstractShippingMethodRoute;
 use Shopware\Core\Checkout\Shipping\ShippingMethodCollection;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
+use Shopware\Core\Content\Product\State;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -58,7 +60,7 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
             $cart = $this->cartService->add($cart, $this->getLineItems($payload['lineItems'], $context), $context);
         }
 
-        $methods = $this->getShippingMethods($context, $request);
+        $methods = $this->getShippingMethods($cart, $context, $request);
 
         $options = $this->buildShippingOptions($cart, $methods, $context);
 
@@ -94,6 +96,7 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
             if ($context->getShippingMethod()->getId() !== $method->getId()) {
                 $session = [
                     'shippingMethodId' => $method->getId(),
+                    'customerId' => $context->getCustomerId(),
                     'currencyId' => $this->currencyService->getCurrencyId(),
                 ];
 
@@ -121,8 +124,25 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
         return new ShippingMethods(...$options);
     }
 
-    private function getShippingMethods(SalesChannelContext $context, Request $request): ShippingMethodCollection
-    {
+    private function getShippingMethods(
+        Cart $cart,
+        SalesChannelContext $context,
+        Request $request
+    ): ShippingMethodCollection {
+        $hasPhysical = false;
+
+        /** @var LineItem $lineItem */
+        foreach ($cart->getLineItems() as $lineItem) {
+            if (in_array(State::IS_PHYSICAL, $lineItem->getStates(), true)) {
+                $hasPhysical = true;
+                break;
+            }
+        }
+
+        if (!$hasPhysical) {
+            return new ShippingMethodCollection();
+        }
+
         $criteria = new Criteria();
         $criteria->setTitle('generic-page::shipping-methods');
 
