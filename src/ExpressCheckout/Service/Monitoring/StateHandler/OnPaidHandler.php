@@ -9,6 +9,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\CartPersister;
+use Shopware\Core\Checkout\Cart\Event\CheckoutOrderPlacedEvent;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
@@ -19,6 +20,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
+use Shopware\Core\Profiling\Profiler;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\Core\DataAbstractionLayer\Entity\TransactionLog\TwintTransactionLogDefinition;
 use Twint\Core\Service\CurrencyService;
@@ -47,7 +50,8 @@ class OnPaidHandler implements StateHandlerInterface
         private readonly ExpressPaymentService $paymentService,
         private readonly OrderService $orderService,
         private readonly Connection $connection,
-        private readonly CartPersister $cartPersister
+        private readonly CartPersister $cartPersister,
+        private readonly EventDispatcherInterface $eventDispatcher
     ) {
     }
 
@@ -56,7 +60,7 @@ class OnPaidHandler implements StateHandlerInterface
      */
     public function handle(PairingEntity $entity, FastCheckoutCheckIn $state): void
     {
-        if (empty($entity->getCustomerData()) || ($entity->getShippingMethodId() === '' || $entity->getShippingMethodId() === '0')) {
+        if (empty($entity->getCustomerData())) {
             return;
         }
 
@@ -94,6 +98,14 @@ class OnPaidHandler implements StateHandlerInterface
         if ($success) {
             // Delete cart
             $this->cleanUpCurrentCart($entity);
+
+            // Send Event
+            $context = $this->context->getContext($entity->getSalesChannelId());
+            $event = new CheckoutOrderPlacedEvent($context->getContext(), $order, $entity->getSalesChannelId());
+
+            Profiler::trace('checkout-order::event-listeners', function () use ($event): void {
+                $this->eventDispatcher->dispatch($event);
+            });
 
             //Flag as done
             $this->pairingService->markAsDone($entity);
