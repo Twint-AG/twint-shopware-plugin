@@ -4,10 +4,17 @@ import ExpressCheckoutButton from './twint-payment-plugin/express-checkout-butto
 import PaymentStatusRefresh from './twint-payment-plugin/payment-status-refresh';
 import LoadingPopup from './twint-payment-plugin/loading-popup';
 import CopyToken from './twint-payment-plugin/copy-token';
+import Feature from 'src/helper/feature.helper';
+import CartWidgetPlugin from './header/cart-widget';
 
 // Register your plugin via the existing PluginManager
 const PluginManager = window.PluginManager;
-PluginManager.override('CartWidget', () => import('./header/cart-widget'), '[data-cart-widget]');
+
+if (Feature.isActive('v6.6.0.0')) {
+  PluginManager.override('CartWidget', () => import('./header/cart-widget'), '[data-cart-widget]');
+}else {
+  PluginManager.override('CartWidget', CartWidgetPlugin, '[data-cart-widget]');
+}
 PluginManager.register('TwintAppSwitchHandler', AppSwitchHandler, '[data-app-selector]');
 PluginManager.register('TwintExpressCheckoutButton', ExpressCheckoutButton, '[data-twint-express-checkout-button]');
 PluginManager.register('TwintPaymentStatusRefresh', PaymentStatusRefresh, '[data-twint-payment-status-refresh]');
