@@ -18,11 +18,5 @@
 
   svg {
     width: 50px;
-
-    @media (min-width: 768px) {
-      & {
-        width: 70px;
-      }
-    }
   }
 }
