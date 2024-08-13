@@ -1,6 +1,6 @@
 import Plugin from 'src/plugin-system/plugin.class';
 import HttpClient from "src/service/http-client.service";
-import TwintModal from './modal';
+import PseudoModalUtil from 'src/utility/modal-extension/pseudo-modal.util';
 import Iterator from 'src/helper/iterator.helper';
 
 export default class ExpressCheckoutButton extends Plugin {
@@ -21,7 +21,7 @@ export default class ExpressCheckoutButton extends Plugin {
         }
 
         if(!ExpressCheckoutButton.modal) {
-            ExpressCheckoutButton.modal = new TwintModal(
+            ExpressCheckoutButton.modal = new PseudoModalUtil(
                 '',
                 true,
                 '.js-twint-modal-template',
