@@ -147,13 +147,14 @@ class CustomerRegisterService
             'firstName' => $address->firstName(),
             'lastName' => $address->lastName(),
             'email' => (string) $customerData->email(),
-            'active' => false,
+            'active' => true,
             'firstLogin' => new DateTimeImmutable(),
             'password' => $this->generateRandomPassword(),
             'id' => Uuid::randomHex(),
             'addresses' => [$swAddress],
             'defaultBillingAddressId' => $addressId,
             'defaultShippingAddressId' => $addressId,
+            'guest' => true,
         ];
     }
 
