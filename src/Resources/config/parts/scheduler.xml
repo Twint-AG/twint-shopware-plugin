@@ -15,19 +15,5 @@
             </call>
             <tag name="messenger.message_handler"/>
         </service>
-
-        <service id="Twint\ScheduledTask\OrderMonitorTask">
-            <tag name="shopware.scheduled.task"/>
-        </service>
-
-        <service id="Twint\ScheduledTask\OrderMonitorTaskHandler">
-            <argument type="service" id="scheduled_task.repository"/>
-            <argument type="service" id="logger"/>
-            <call method="setMonitoringService">
-                <argument type="service" id="Twint\Core\Service\OrderMonitoringService"/>
-            </call>
-            <tag name="messenger.message_handler"/>
-        </service>
-
     </services>
 </container>

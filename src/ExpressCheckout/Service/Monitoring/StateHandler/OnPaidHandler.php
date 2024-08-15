@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Twint\ExpressCheckout\Service\Monitoring\StateHandler;
 
 use Defuse\Crypto\Encoding;
+use Defuse\Crypto\Exception\BadFormatException;
+use Defuse\Crypto\Exception\EnvironmentIsBrokenException;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Shopware\Core\Checkout\Cart\Cart;
@@ -24,17 +26,15 @@ use Shopware\Core\Profiling\Profiler;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\Core\DataAbstractionLayer\Entity\TransactionLog\TwintTransactionLogDefinition;
+use Twint\Core\Model\ApiResponse;
 use Twint\Core\Service\CurrencyService;
-use Twint\Core\Service\OrderService;
-use Twint\ExpressCheckout\Model\ApiResponse;
+use Twint\Core\Service\PairingService as RegularPairingService;
 use Twint\ExpressCheckout\Service\ExpressPaymentService;
 use Twint\ExpressCheckout\Service\Monitoring\ContextFactory as TwintContext;
 use Twint\ExpressCheckout\Service\Monitoring\CustomerRegisterService;
 use Twint\ExpressCheckout\Service\PairingService;
 use Twint\ExpressCheckout\Util\PaymentMethodUtil;
 use Twint\Sdk\Value\FastCheckoutCheckIn;
-use Twint\Sdk\Value\Order;
-use Twint\Util\OrderCustomFieldInstaller;
 
 class OnPaidHandler implements StateHandlerInterface
 {
@@ -47,8 +47,8 @@ class OnPaidHandler implements StateHandlerInterface
         private readonly OrderTransactionStateHandler $transactionStateHandler,
         private readonly CurrencyService $currencyService,
         private readonly PairingService $pairingService,
+        private readonly RegularPairingService $regularPairingService,
         private readonly ExpressPaymentService $paymentService,
-        private readonly OrderService $orderService,
         private readonly Connection $connection,
         private readonly CartPersister $cartPersister,
         private readonly EventDispatcherInterface $eventDispatcher
@@ -81,10 +81,6 @@ class OnPaidHandler implements StateHandlerInterface
         // Append fields to transaction log
         $this->appendLogFields($order, $res->getLog());
 
-        $twint = $res->getReturn();
-
-        //Update custom field
-        $this->updateCustomFields($order, $twint);
         $order = $this->reloadOrder($order->getId());
 
         $success = $this->refreshTwintTransactionStatusUntilDone($entity, $order, $res);
@@ -114,6 +110,9 @@ class OnPaidHandler implements StateHandlerInterface
         }
     }
 
+    /**
+     * @throws Exception
+     */
     protected function refreshTwintTransactionStatusUntilDone(
         PairingEntity $entity,
         OrderEntity $order,
@@ -121,12 +120,16 @@ class OnPaidHandler implements StateHandlerInterface
     ): bool {
         $tOrder = $res->getReturn();
 
+        $context = $this->context->getContext($entity->getSalesChannelId());
+
         if ($tOrder->isSuccessful()) {
             // Change payment status
             $this->markTransactionAsPaid($order, $entity);
 
             // Append fields to transaction log
             $this->appendLogFields($order, $res->getLog());
+
+            $this->regularPairingService->create($res, $order, $context);
 
             return true;
         }
@@ -138,8 +141,11 @@ class OnPaidHandler implements StateHandlerInterface
             // Append fields to transaction log
             $this->appendLogFields($order, $res->getLog());
 
+            $this->regularPairingService->create($res, $order, $context);
+
             return false;
         }
+
         // Request until get success/fail. Assume TWINT API will finish within a few seconds
         $res = $this->paymentService->monitoringOrder($tOrder->id()->__toString(), $order->getSalesChannelId());
 
@@ -155,6 +161,8 @@ class OnPaidHandler implements StateHandlerInterface
 
     /**
      * @throws Exception
+     * @throws BadFormatException
+     * @throws EnvironmentIsBrokenException
      */
     public function massUpdateLogs(OrderEntity $order, string $pairingId): void
     {
@@ -194,15 +202,6 @@ class OnPaidHandler implements StateHandlerInterface
         return $this->paymentService->api->saveLog($log);
     }
 
-    protected function updateCustomFields(OrderEntity $order, ?Order $twint): void
-    {
-        $customFields = $order->getCustomFields();
-        $response = json_encode($twint);
-
-        $customFields[OrderCustomFieldInstaller::TWINT_API_RESPONSE_CUSTOM_FIELD] = $response;
-        $this->orderService->updateOrderCustomField($order->getId(), $customFields);
-    }
-
     protected function createContext(
         PairingEntity $entity,
         FastCheckoutCheckIn $state,
@@ -220,6 +219,9 @@ class OnPaidHandler implements StateHandlerInterface
         ]);
     }
 
+    /**
+     * @throws Exception
+     */
     protected function placeOrder(PairingEntity $entity): OrderEntity
     {
         if (!$entity->getCart() instanceof Cart) {
@@ -242,9 +244,11 @@ class OnPaidHandler implements StateHandlerInterface
         $criteria->addAssociation('transactions');
         $criteria->addAssociation('currency');
 
-        // @phpstan-ignore-next-line: Always has record here
-        return $this->orderRepository->search($criteria, Context::createDefaultContext())
+        /** @var OrderEntity $order */
+        $order = $this->orderRepository->search($criteria, Context::createDefaultContext())
             ->first();
+
+        return $order;
     }
 
     protected function registerCustomer(PairingEntity $entity): array
@@ -270,6 +274,9 @@ class OnPaidHandler implements StateHandlerInterface
         $this->transactionStateHandler->paid($transaction->getId(), $context->getContext());
     }
 
+    /**
+     * @throws Exception
+     */
     protected function markTransactionAsCancelled(OrderEntity $order, PairingEntity $entity): void
     {
         $order = $this->reloadOrder($order->getId());

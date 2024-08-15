@@ -18,9 +18,6 @@ use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\UninstallContext;
 use Shopware\Core\Framework\Plugin\Context\UpdateContext;
 use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
-use Shopware\Core\System\CustomField\Aggregate\CustomFieldSet\CustomFieldSetDefinition;
-use Shopware\Core\System\CustomField\CustomFieldDefinition;
-use Shopware\Core\System\Snippet\SnippetDefinition;
 use Shopware\Core\System\SystemConfig\SystemConfigDefinition;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Component\Config\FileLocator;
@@ -35,7 +32,6 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Twint\Util\ConfigInstaller;
 use Twint\Util\Installer;
 use Twint\Util\MediaInstaller;
-use Twint\Util\OrderCustomFieldInstaller;
 use Twint\Util\PaymentMethodInstaller;
 use Twint\Util\PaymentMethodRegistry;
 use function rtrim;
@@ -122,14 +118,6 @@ class TwintPayment extends Plugin
                 $this->getRepository($this->container, SystemConfigDefinition::ENTITY_NAME),
                 // @phpstan-ignore-next-line
                 $this->container->get(SystemConfigService::class)
-            ),
-            new OrderCustomFieldInstaller(
-                // @phpstan-ignore-next-line
-                $this->getRepository($this->container, CustomFieldSetDefinition::ENTITY_NAME),
-                // @phpstan-ignore-next-line
-                $this->getRepository($this->container, CustomFieldDefinition::ENTITY_NAME),
-                // @phpstan-ignore-next-line
-                $this->getRepository($this->container, SnippetDefinition::ENTITY_NAME),
             )
         );
     }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Twint\ExpressCheckout\Model;
+namespace Twint\Core\Model;
 
 class ApiResponse
 {

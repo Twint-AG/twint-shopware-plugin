@@ -25,7 +25,7 @@ export default class PaymentStatusRefresh extends Plugin {
       this.checkExpressCheckoutStatus();
     } else {
       this.$container = DomAccess.querySelector(document, this.options.containerSelector);
-      this.orderNumber = this.$container.getAttribute('data-order-number');
+      this.pairingId = this.$container.getAttribute('data-pairing-id');
 
       this.checkRegularCheckoutStatus();
     }
@@ -131,8 +131,8 @@ export default class PaymentStatusRefresh extends Plugin {
     if (this.reachLimit())
       return;
 
-    let url = window.router['frontend.twint.order'];
-    url = url.replace('--number--', this.orderNumber);
+        let url = window.router['frontend.twint.status'];
+        url = url.replace('--hash--', this.pairingId);
 
     this.client.get(url, (response) => {
       this.checking = false;

@@ -14,7 +14,7 @@ Use `sw65` if you are using the demo65 environment.
 
 Install dependencies for the plugin:
 ```
-cd /var/www/plugin
+cd /var/www/html/custom/plugins/TwintPayment
 composer install
 ```
 

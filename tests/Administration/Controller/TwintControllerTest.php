@@ -155,49 +155,4 @@ class TwintControllerTest extends TestCase
         static::assertSame('Invalid certificate file', $data['message']);
         static::assertSame('ERROR_INVALID_PASSPHRASE', $data['errorCode']);
     }
-
-    public function testRefundWithValidOrder(): void
-    {
-        $orderId = Uuid::randomHex();
-        $order = new OrderEntity();
-        $order->setId($orderId);
-        $twintOrder = new Order(
-            OrderId::fromString(self::ORDER_ID),
-            new FiledMerchantTransactionReference(Uuid::randomHex()),
-            OrderStatus::SUCCESS(),
-            TransactionStatus::ORDER_OK(),
-            Money::CHF(10),
-            PairingStatus::NO_PAIRING(),
-            new NumericPairingToken(uint()->assert(self::PAIRING_TOKEN)),
-            null
-        );
-        $orderService = $this->createMock(OrderService::class);
-        $orderService->method('getOrder')->willReturn($order);
-        $orderService->method('getTwintOrder')->willReturn($twintOrder);
-
-        $paymentService = $this->createMock(PaymentService::class);
-        $paymentService->method('getTotalReversal')->willReturn(0.0);
-        $paymentService->method('reverseOrder')->willReturn($twintOrder);
-
-
-        $rounding = $this->createMock(CashRounding::class);
-        $rounding->method('mathRound')->willReturn(20.00);
-
-        $translatorMock = $this->createMock(TranslatorInterface::class);
-        $translatorMock->method('trans')->willReturn('Certificate validation successful');
-
-        $this->controller->setOrderService($orderService);
-        $this->controller->setPaymentService($paymentService);
-        $this->controller->setCashRounding($rounding);
-        $this->controller->setTranslator($translatorMock);
-
-        // Prepare a mock Request
-        $request = $this->createRequest('api.action.twint.refund', ['orderId' => $orderId, 'reason' => 'test', 'amount' => 5]);
-        // Call the method
-        $response = $this->controller->refund($request, $this->context);
-        // Assertions
-        $this->assertInstanceOf(Response::class, $response);
-        $data = json_decode($response->getContent(), true);
-        $this->assertTrue($data['success']);
-    }
 }
