@@ -7,7 +7,8 @@ namespace Twint\ExpressCheckout\Service\Monitoring;
 use Doctrine\DBAL\Exception;
 use Throwable;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
-use Twint\ExpressCheckout\Service\ApiService;
+use Twint\Core\Service\ApiService;
+use Twint\Core\Service\PairingService as RegularPairingService;
 use Twint\ExpressCheckout\Service\ExpressPaymentService;
 use Twint\ExpressCheckout\Service\Monitoring\ContextFactory as TwintContext;
 use Twint\ExpressCheckout\Service\Monitoring\StateHandler\OnPaidHandler;
@@ -24,6 +25,7 @@ class MonitoringService
         private TwintContext $context,
         private readonly OnPaidHandler $onPaidHandler,
         private readonly PairingService $pairingService,
+        private readonly RegularPairingService $regular,
         private readonly ApiService $api
     ) {
     }
@@ -36,9 +38,10 @@ class MonitoringService
     public function monitor(): void
     {
         $pairings = $this->pairingService->loadInProcessPairings();
+
         /** @var PairingEntity $pairing */
         foreach ($pairings as $pairing) {
-            $this->monitorOne($pairing);
+            $pairing->getIsExpress() ? $this->monitorOne($pairing) : $this->regular->monitor($pairing);
         }
     }
 

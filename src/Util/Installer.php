@@ -12,8 +12,7 @@ class Installer
 {
     public function __construct(
         private readonly PaymentMethodInstaller $paymentMethodInstaller,
-        private readonly ConfigInstaller $configInstaller,
-        private readonly OrderCustomFieldInstaller $orderCustomFieldInstaller
+        private readonly ConfigInstaller $configInstaller
     ) {
     }
 
@@ -21,14 +20,12 @@ class Installer
     {
         $this->paymentMethodInstaller->installAll($context);
         $this->configInstaller->addDefaultConfiguration();
-        $this->orderCustomFieldInstaller->install($context);
     }
 
     public function uninstall(Context $context): void
     {
         $this->paymentMethodInstaller->setAllPaymentStatus(false, $context);
         $this->configInstaller->removeConfiguration($context);
-        $this->orderCustomFieldInstaller->uninstall($context);
     }
 
     public function activate(Context $context): void

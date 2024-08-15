@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Twint\Tests\Storefront\Controller;
 
 use PHPUnit\Framework\TestCase;
+use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
@@ -14,19 +15,18 @@ use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\Test\TestDefaults;
+use Shopware\Storefront\Test\Controller\StorefrontControllerTestBehaviour;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
+use Twint\Core\Repository\PairingRepository;
 use Twint\Core\Service\PaymentService;
-use Twint\ExpressCheckout\Repository\PairingRepository;
+use Twint\Core\Util\CryptoHandler;
 use Twint\ExpressCheckout\Service\ExpressCheckoutServiceInterface;
-use Shopware\Core\Checkout\Cart\Cart;
+use Twint\ExpressCheckout\Service\Monitoring\MonitoringService;
 use Twint\Sdk\Value\PairingStatus;
 use Twint\Sdk\Value\PairingUuid;
 use Twint\Storefront\Controller\CheckoutController;
 use Twint\Tests\Helper\ServicesTrait;
-use Twint\Core\Util\CryptoHandler;
-use Shopware\Storefront\Test\Controller\StorefrontControllerTestBehaviour;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Twint\ExpressCheckout\Service\Monitoring\MonitoringService;
 
 /**
  * @internal

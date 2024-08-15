@@ -11,6 +11,7 @@ use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
+use Twint\Sdk\Value\OrderStatus;
 
 class PairingEntity extends Entity
 {
@@ -21,6 +22,12 @@ class PairingEntity extends Entity
     protected string $cartToken;
 
     protected string $status;
+
+    protected ?string $pairingStatus = '';
+
+    protected string $transactionStatus;
+
+    protected bool $isExpress;
 
     protected string $token;
 
@@ -39,6 +46,8 @@ class PairingEntity extends Entity
     protected ?object $customerData = null;
 
     protected ?string $orderId = null;
+
+    protected float $amount;
 
     protected ?OrderEntity $order = null;
 
@@ -99,6 +108,16 @@ class PairingEntity extends Entity
         return $this->status;
     }
 
+    public function getPairingStatus(): ?string
+    {
+        return $this->pairingStatus;
+    }
+
+    public function getTransactionStatus(): string
+    {
+        return $this->transactionStatus;
+    }
+
     public function setStatus(string $value): void
     {
         $this->status = $value;
@@ -157,5 +176,30 @@ class PairingEntity extends Entity
     public function setOrderId(?string $id = null): void
     {
         $this->orderId = $id;
+    }
+
+    public function getAmount(): float
+    {
+        return $this->amount;
+    }
+
+    public function isFinished(): bool
+    {
+        return $this->status === OrderStatus::SUCCESS || $this->status === OrderStatus::FAILURE;
+    }
+
+    public function isSuccess(): bool
+    {
+        return $this->status === OrderStatus::SUCCESS;
+    }
+
+    public function isFailed(): bool
+    {
+        return $this->status === OrderStatus::FAILURE;
+    }
+
+    public function getIsExpress(): bool
+    {
+        return $this->isExpress;
     }
 }

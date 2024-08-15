@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Twint\ExpressCheckout\Repository;
+namespace Twint\Core\Repository;
 
 use Shopware\Core\Checkout\Cart\CartPersister;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
@@ -18,12 +18,13 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\ExpressCheckout\Exception\PairingException;
+use Twint\Sdk\Value\OrderStatus;
 use Twint\Sdk\Value\PairingStatus;
 
 class PairingRepository
 {
     public function __construct(
-        private EntityRepository $pairingRepository,
+        private EntityRepository $repository,
         private CartPersister $cartPersister,
         private EntityRepository $orderRepository,
         private CartService $cartService
@@ -38,7 +39,7 @@ class PairingRepository
         $criteria->addAssociation('customer');
         $criteria->addAssociation('customer.addresses');
 
-        $pairing = $this->pairingRepository->search($criteria, $context->getContext())
+        $pairing = $this->repository->search($criteria, $context->getContext())
             ->first();
 
         if (($pairing instanceof PairingEntity) === false) {
@@ -87,16 +88,37 @@ class PairingRepository
     public function loadInProcessPairings(): EntitySearchResult
     {
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsAnyFilter('status', [PairingStatus::PAIRING_IN_PROGRESS]));
+        $criteria->addFilter(
+            new EqualsAnyFilter('status', [PairingStatus::PAIRING_IN_PROGRESS, OrderStatus::IN_PROGRESS])
+        );
         $criteria->addSorting(new FieldSorting('createdAt', FieldSorting::ASCENDING));
         $criteria->addAssociation('shippingMethod');
         $criteria->addAssociation('customer.addresses');
+        $criteria->addAssociation('order');
+        $criteria->addAssociation('order.transactions');
 
-        return $this->pairingRepository->search($criteria, Context::createDefaultContext());
+        return $this->repository->search($criteria, Context::createDefaultContext());
     }
 
     public function update(array $data): EntityWrittenContainerEvent
     {
-        return $this->pairingRepository->update($data, Context::createDefaultContext());
+        return $this->repository->update($data, Context::createDefaultContext());
+    }
+
+    public function findByOrderId(string $orderId, array $associations = []): ?PairingEntity
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('orderId', $orderId));
+        $criteria->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING));
+        foreach ($associations as $association) {
+            $criteria->addAssociation($association);
+        }
+
+
+        /** @var PairingEntity $entity */
+        $entity = $this->repository->search($criteria, Context::createDefaultContext())
+            ->first();
+
+        return $entity;
     }
 }
