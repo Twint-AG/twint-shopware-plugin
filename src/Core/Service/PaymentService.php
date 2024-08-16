@@ -22,15 +22,16 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
+use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\Core\Factory\ClientBuilder;
 use Twint\Core\Handler\TransactionLog\TransactionLogWriterInterface;
+use Twint\Core\Model\ApiResponse;
 use Twint\Sdk\Value\Money;
 use Twint\Sdk\Value\Order;
 use Twint\Sdk\Value\OrderId;
 use Twint\Sdk\Value\OrderStatus;
 use Twint\Sdk\Value\UnfiledMerchantTransactionReference;
 use Twint\Sdk\Value\Uuid;
-use Twint\Util\OrderCustomFieldInstaller;
 use function Psl\Type\string;
 
 class PaymentService
@@ -43,12 +44,13 @@ class PaymentService
         private readonly ClientBuilder $clientBuilder,
         private readonly TransactionLogWriterInterface $transactionLogWriter,
         private readonly CashRounding $rounding,
-        private readonly OrderService $orderService
+        private readonly OrderService $orderService,
+        private readonly ApiService $apiService,
     ) {
         $this->context = new Context(new SystemSource());
     }
 
-    public function createOrder(AsyncPaymentTransactionStruct $transaction): Order
+    public function createOrder(AsyncPaymentTransactionStruct $transaction): ApiResponse
     {
         $order = $transaction->getOrder();
         if (!$order->getCurrency() instanceof CurrencyEntity) {
@@ -60,78 +62,32 @@ class PaymentService
         }
         $currency = $order->getCurrency()
             ->getIsoCode();
+
         $client = $this->clientBuilder->build($order->getSalesChannelId());
         try {
-            /** @var non-empty-string $orderId * */
+            /** @var non-empty-string $orderId */
             $orderId = $order->getOrderNumber() ?? $order->getId();
-            /** @var Order * */
-            return $client->startOrder(
-                new UnfiledMerchantTransactionReference($orderId),
-                new Money($currency, $order->getAmountTotal())
-            );
-        } catch (Exception $e) {
-            throw PaymentException::asyncProcessInterrupted(
-                $transaction->getOrderTransaction()
-                    ->getId(),
-                'An error occurred during the communication with API gateway' . PHP_EOL . $e->getMessage()
-            );
-        } finally {
-            $this->transactionLogWriter->writeObjectLog(
-                $order->getId(),
-                $order->getVersionId(),
-                $transaction->getOrderTransaction()
-                    ->getStateId(),
-                $transaction->getOrder()
-                    ->getStateId(),
-                $transaction->getOrderTransaction()
-                    ->getId(),
-                $client->flushInvocations(),
-                $this->context
-            );
-        }
-    }
 
-    public function checkOrderStatus(OrderEntity $order): ?Order
-    {
-        try {
-            if ($this->orderService->isTwintOrder($order)) {
-                $twintApiResponse = json_decode(
-                    $order->getCustomFields()[OrderCustomFieldInstaller::TWINT_API_RESPONSE_CUSTOM_FIELD] ?? '{}',
-                    true
-                );
-                $client = $this->clientBuilder->build($order->getSalesChannelId());
-                /** @var Order * */
-                $twintOrder = $client->monitorOrder(new OrderId(new Uuid($twintApiResponse['id'])));
-                $transactionId = $order->getTransactions()?->first()?->getId() ?? null;
-                if ($transactionId === null) {
-                    throw new Exception('Missing transaction ID for this order:' . $order->getId() . PHP_EOL);
+            return $this->apiService->call($client, 'startOrder', [
+                new UnfiledMerchantTransactionReference($orderId),
+                new Money($currency, $order->getAmountTotal()),
+            ], true, static function (array $log, mixed $return) use ($order, $transaction) {
+                if ($return instanceof Order) {
+                    $log['pairingId'] = $return->id()->__toString();
+                    $log['orderId'] = $order->getId();
+                    $log['orderVersionId'] = $order->getVersionId();
+                    $log['paymentStateId'] = $transaction->getOrderTransaction()->getStateId();
+                    $log['orderStateId'] = $transaction->getOrder()->getStateId();
+                    $log['transactionId'] = $transaction->getOrderTransaction()->getId();
                 }
-                if ($twintOrder->status()->equals(OrderStatus::SUCCESS())) {
-                    $this->transactionStateHandler->paid($transactionId, $this->context);
-                } elseif ($twintOrder->status()->equals(OrderStatus::FAILURE())) {
-                    $this->transactionStateHandler->cancel($transactionId, $this->context);
-                }
-                return $twintOrder;
-            }
-            return null;
+
+                return $log;
+            });
         } catch (Exception $e) {
             throw PaymentException::asyncProcessInterrupted(
-                $order->getId(),
+                $transaction->getOrderTransaction()
+                    ->getId(),
                 'An error occurred during the communication with API gateway' . PHP_EOL . $e->getMessage()
-            );
-        } finally {
-            $order = $this->orderService->getOrder($order->getId(), $this->context);
-            $innovations = empty($client) ? [] : $client->flushInvocations();
-            $this->transactionLogWriter->writeObjectLog(
-                $order->getId(),
-                $order->getVersionId(),
-                $order->getTransactions()
-                    ?->first()
-                    ?->getStateId() ?? '',
-                $order->getStateId(),
-                $transactionId ?? '',
-                $innovations,
-                $this->context
             );
         }
     }
@@ -139,41 +95,36 @@ class PaymentService
     public function reverseOrder(OrderEntity $order, float $amount = 0): ?Order
     {
         try {
-            if (($twintOrder = $this->orderService->getTwintOrder($order)) instanceof Order) {
-                if ($amount <= 0 || $amount > $twintOrder->amount()->amount()) {
-                    $amount = $twintOrder->amount()
-                        ->amount();
+            if (($pairing = $this->orderService->getPairing($order->getId())) instanceof PairingEntity) {
+                if ($amount <= 0 || $amount > $pairing->getAmount()) {
+                    $amount = $pairing->getAmount();
                 }
                 $orderTransactionId = $order->getTransactions()?->first()?->getId();
                 $currency = $order->getCurrency()?->getIsoCode();
-                if ($orderTransactionId && ($currency !== null && $currency !== '' && $currency !== '0') && $twintOrder->amount()->amount() > 0) {
+                if ($orderTransactionId && ($currency !== null && $currency !== '' && $currency !== '0') && $pairing->getAmount() > 0) {
                     $client = $this->clientBuilder->build($order->getSalesChannelId());
-                    /** @var Order * */
-                    $twintOrder = $client->monitorOrder($twintOrder->id());
+                    $innovations = $client->flushInvocations();
+                    $this->transactionLogWriter->writeReserveOrderLog(
+                        $order->getId(),
+                        $order->getVersionId(),
+                        $order->getTransactions()
+                            ?->first()
+                            ?->getStateId() ?? '',
+                        $order
+                            ->getStateId(),
+                        $order->getTransactions()?->first()?->getId() ?? '',
+                        $innovations,
+                        $this->context
+                    );
+                    $reversalIndex = $this->getReversalIndex($order->getId());
+                    $reversalId = 'R-' . $pairing->getId() . '-' . $reversalIndex;
+                    $twintOrder = $client->reverseOrder(
+                        new UnfiledMerchantTransactionReference($reversalId),
+                        new OrderId(new Uuid($pairing->getId())),
+                        new Money($currency, $amount)
+                    );
                     if ($twintOrder->status()->equals(OrderStatus::SUCCESS())) {
-                        $innovations = $client->flushInvocations();
-                        $this->transactionLogWriter->writeReserveOrderLog(
-                            $order->getId(),
-                            $order->getVersionId(),
-                            $order->getTransactions()
-                                ?->first()
-                                ?->getStateId() ?? '',
-                            $order
-                                ->getStateId(),
-                            $order->getTransactions()?->first()?->getId() ?? '',
-                            $innovations,
-                            $this->context
-                        );
-                        $reversalIndex = $this->getReversalIndex($order->getId());
-                        $reversalId = 'R-' . $twintOrder->id()->__toString() . '-' . $reversalIndex;
-                        $twintOrder = $client->reverseOrder(
-                            new UnfiledMerchantTransactionReference($reversalId),
-                            $twintOrder->id(),
-                            new Money($currency, $amount)
-                        );
-                        if ($twintOrder->status()->equals(OrderStatus::SUCCESS())) {
-                            return $twintOrder;
-                        }
+                        return $twintOrder;
                     }
                 }
             }
@@ -198,22 +149,17 @@ class PaymentService
         }
     }
 
-    public function monitorOrder(OrderEntity $order): ?Order
+    /**
+     * @throws Exception
+     */
+    public function monitorOrder(PairingEntity $pairing): ?Order
     {
+        $order = $this->orderService->getOrder($pairing->getOrderId() ?? '');
+
         try {
-            if ($this->orderService->isTwintOrder($order)) {
-                $twintApiResponse = json_decode(
-                    $order->getCustomFields()[OrderCustomFieldInstaller::TWINT_API_RESPONSE_CUSTOM_FIELD] ?? '{}',
-                    true
-                );
-                $client = $this->clientBuilder->build($order->getSalesChannelId());
-                /** @var Order * */
-                $twintOrder = $client->monitorOrder(new OrderId(new Uuid($twintApiResponse['id'])));
-                if ($twintOrder instanceof Order) {
-                    return $twintOrder;
-                }
-            }
-            return null;
+            $client = $this->clientBuilder->build($pairing->getSalesChannelId());
+
+            return $client->monitorOrder(new OrderId(new Uuid($pairing->getId())));
         } catch (Exception $e) {
             throw PaymentException::asyncProcessInterrupted(
                 $order->getId(),
@@ -234,11 +180,6 @@ class PaymentService
                 $this->context
             );
         }
-    }
-
-    public function updateOrderCustomField(string $orderId, array $customFields): void
-    {
-        $this->orderService->updateOrderCustomField($orderId, $customFields);
     }
 
     public function getPayLinks(string $token, string $salesChannelId): array
@@ -305,12 +246,8 @@ class PaymentService
         if (empty($orderTransactionId)) {
             return;
         }
-        if (($twintOrder = $this->orderService->getTwintOrder($order)) instanceof Order) {
-            $amountMoney = new Money(
-                $order->getCurrency()?->getIsoCode() ?? Money::CHF,
-                $twintOrder->amount()
-                    ->amount()
-            );
+        if (($pairing = $this->orderService->getPairing($order->getId())) instanceof PairingEntity) {
+            $amountMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $pairing->getAmount());
             $totalReversal = $this->rounding->mathRound(
                 $amount + $this->getTotalReversal($order->getId()),
                 $order->getItemRounding() ?? new CashRoundingConfig(2, 0.01, true)
@@ -335,12 +272,9 @@ class PaymentService
         if (empty($orderTransactionId)) {
             return '';
         }
-        if (($twintOrder = $this->orderService->getTwintOrder($order)) instanceof Order) {
-            $amountMoney = new Money(
-                $order->getCurrency()?->getIsoCode() ?? Money::CHF,
-                $twintOrder->amount()
-                    ->amount()
-            );
+
+        if (($pairing = $this->orderService->getPairing($order->getId())) instanceof PairingEntity) {
+            $amountMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $pairing->getAmount());
             $totalReversalMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $this->getTotalReversal(
                 $order->getId()
             ));
@@ -352,6 +286,7 @@ class PaymentService
                 return StateMachineTransitionActions::ACTION_REFUND_PARTIALLY;
             }
         }
+
         return '';
     }
 }

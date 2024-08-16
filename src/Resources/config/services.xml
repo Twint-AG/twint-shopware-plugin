@@ -7,7 +7,6 @@
         <import resource="./parts/controller.xml"/>
         <import resource="./parts/subscriber.xml"/>
         <import resource="./parts/scheduler.xml"/>
-        <import resource="./parts/command.xml"/>
         <import resource="./parts/handler.xml"/>
         <import resource="./parts/dal.xml"/>
         <import resource="./parts/monitoring.xml"/>
@@ -41,18 +40,19 @@
 
         <service id="Twint\Core\Service\PaymentService">
             <argument type="service" id="twint_reversal_history.repository"/>
-            <argument type="service"
-                      id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Twint\Core\Factory\ClientBuilder"/>
             <argument type="service" id="twint_transaction_log_writer"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\Price\CashRounding"/>
             <argument type="service" id="Twint\Core\Service\OrderService"/>
+            <argument type="service" id="Twint\Core\Service\ApiService"/>
         </service>
 
         <service id="Twint\Core\Service\OrderService">
             <argument type="service" id="order.repository"/>
             <argument type="service" id="state_machine.repository"/>
             <argument type="service" id="state_machine_state.repository"/>
+            <argument type="service" id="Twint\Core\Repository\PairingRepository"/>
         </service>
 
         <service id="Twint\Core\Util\CryptoHandler" public="true">
@@ -86,18 +86,29 @@
             <argument type="service" id="logger"/>
         </service>
 
-        <service id="Twint\Core\Service\OrderMonitoringService">
-            <argument type="service" id="Twint\Core\Service\OrderService"/>
-            <argument type="service" id="Twint\Core\Service\PaymentService"/>
-        </service>
-
-        <service id="Twint\ExpressCheckout\Service\ApiService">
+        <service id="Twint\Core\Service\ApiService">
             <argument type="service" id="twint_transaction_log.repository"/>
             <argument type="service" id="logger"/>
         </service>
 
         <service id="Twint\Core\Service\CurrencyService">
             <argument type="service" id="currency.repository"/>
+        </service>
+
+        <service id="Twint\Core\Service\PairingService">
+            <argument type="service" id="twint_pairing.repository"/>
+            <argument type="service" id="Twint\Core\Service\ApiService"/>
+            <argument type="service" id="Twint\Core\Factory\ClientBuilder"/>
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
+            <argument type="service" id="Twint\Core\Service\OrderService"/>
+        </service>
+
+        <service id="Twint\Core\Repository\PairingRepository">
+            <argument type="service" id="twint_pairing.repository"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\CartPersister"/>
+            <argument type="service" id="order.repository"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
+
         </service>
     </services>
 </container>

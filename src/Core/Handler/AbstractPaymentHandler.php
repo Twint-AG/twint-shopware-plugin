@@ -19,33 +19,22 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 use Twint\Core\Service\OrderService;
+use Twint\Core\Service\PairingService;
 use Twint\Core\Service\PaymentService;
 use Twint\Core\Util\CryptoHandler;
 use Twint\Sdk\Value\Order;
-use Twint\Util\OrderCustomFieldInstaller;
 
 abstract class AbstractPaymentHandler implements AsynchronousPaymentHandlerInterface, RefundPaymentHandlerInterface
 {
-    private OrderTransactionStateHandler $transactionStateHandler;
-
-    private PaymentService $paymentService;
-
-    private OrderService $orderService;
-
-    private CryptoHandler $cryptoService;
-
-    private RouterInterface $router;
-
-    private LoggerInterface $logger;
-
-    public function __construct(OrderTransactionStateHandler $transactionStateHandler, PaymentService $paymentService, CryptoHandler $cryptoService, RouterInterface $router, LoggerInterface $logger, OrderService $orderService)
-    {
-        $this->transactionStateHandler = $transactionStateHandler;
-        $this->paymentService = $paymentService;
-        $this->cryptoService = $cryptoService;
-        $this->router = $router;
-        $this->logger = $logger;
-        $this->orderService = $orderService;
+    public function __construct(
+        private readonly OrderTransactionStateHandler $transactionStateHandler,
+        private readonly PaymentService $paymentService,
+        private readonly CryptoHandler $cryptoService,
+        private readonly RouterInterface $router,
+        private readonly LoggerInterface $logger,
+        private readonly OrderService $orderService,
+        private readonly PairingService $pairingService,
+    ) {
     }
 
     public function pay(
@@ -55,23 +44,14 @@ abstract class AbstractPaymentHandler implements AsynchronousPaymentHandlerInter
     ): RedirectResponse {
         // Method that sends the return URL to the external gateway and gets a redirect URL back
         try {
-            $twintOrder = $this->paymentService->createOrder($transaction);
+            $res = $this->paymentService->createOrder($transaction);
             $this->transactionStateHandler->process(
                 $transaction->getOrderTransaction()
                     ->getId(),
                 $salesChannelContext->getContext()
             );
-            //update API response for order
-            $orderCustomFields = $transaction->getOrder()
-                ->getCustomFields();
-            $twintOrderJson = json_encode($twintOrder);
-            if ($twintOrderJson) {
-                $twintApiArray = json_decode($twintOrderJson, true);
-                $orderCustomFields[OrderCustomFieldInstaller::TWINT_API_RESPONSE_CUSTOM_FIELD] = json_encode(
-                    $twintApiArray
-                );
-                $this->paymentService->updateOrderCustomField($transaction->getOrder()->getId(), $orderCustomFields);
-            }
+
+            $pairing = $this->pairingService->create($res, $transaction->getOrder(), $salesChannelContext);
         } catch (Exception $e) {
             throw PaymentException::asyncProcessInterrupted(
                 $transaction->getOrderTransaction()
@@ -79,14 +59,10 @@ abstract class AbstractPaymentHandler implements AsynchronousPaymentHandlerInter
                 'An error occurred during the communication with external payment gateway' . PHP_EOL . $e->getMessage()
             );
         }
-        // Redirect to external gateway
-        if ($transaction->getOrder()->getOrderNumber() !== null && $transaction->getOrder()->getOrderNumber() !== '' && $transaction->getOrder()->getOrderNumber() !== '0') {
-            $hashOrderNumber = $this->cryptoService->hash($transaction->getOrder()->getOrderNumber());
-            return new RedirectResponse($this->router->generate('frontend.twint.waiting', [
-                'orderNumber' => $hashOrderNumber,
-            ]));
-        }
-        return new RedirectResponse('/');
+
+        return new RedirectResponse($this->router->generate('frontend.twint.waiting', [
+            'pairingId' => $this->cryptoService->hash($pairing->getId()),
+        ]));
     }
 
     public function finalize(

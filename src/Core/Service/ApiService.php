@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Twint\ExpressCheckout\Service;
+namespace Twint\Core\Service;
 
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Throwable;
-use Twint\ExpressCheckout\Model\ApiResponse;
+use Twint\Core\Model\ApiResponse;
 use Twint\Sdk\Exception\ApiFailure;
 use Twint\Sdk\InvocationRecorder\InvocationRecordingClient;
 use Twint\Sdk\InvocationRecorder\Value\Invocation;

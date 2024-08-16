@@ -11,8 +11,9 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\Core\Factory\ClientBuilder;
+use Twint\Core\Model\ApiResponse;
+use Twint\Core\Service\ApiService;
 use Twint\Core\Setting\Settings;
-use Twint\ExpressCheckout\Model\ApiResponse;
 use Twint\Sdk\Exception\SdkError;
 use Twint\Sdk\Value\CustomerDataScopes;
 use Twint\Sdk\Value\FastCheckoutCheckIn;
@@ -44,22 +45,23 @@ class ExpressPaymentService
     ): InteractiveFastCheckoutCheckIn {
         $client = $this->clientBuilder->build($context->getSalesChannel()->getId(), Version::NEXT);
 
+        $amount = $cart->getPrice()
+            ->getPositionPrice();
         $res = $this->api->call(
             $client,
             'requestFastCheckOutCheckIn',
-            [
-                Money::CHF($cart->getPrice()->getPositionPrice()),
-                new CustomerDataScopes(...CustomerDataScopes::all()),
-                $methods,
-            ],
+            [Money::CHF($amount), new CustomerDataScopes(...CustomerDataScopes::all()), $methods],
             true,
             $this->getLogCallback()
         );
 
         $pairing = $res->getReturn();
+
         $this->pairingRepository->create([
             [
                 'id' => (string) $pairing->pairingUuid(),
+                'isExpress' => true,
+                'amount' => $amount,
                 'salesChannelId' => $context->getSalesChannel()
                     ->getId(),
                 'cart' => $cart,
@@ -99,7 +101,7 @@ class ExpressPaymentService
             PairingUuid::fromString($pairing->getId()),
             new UnfiledMerchantTransactionReference($orderId),
             new Money($order->getCurrency()?->getIsoCode() ?? Settings::ALLOWED_CURRENCY, $order->getAmountTotal()),
-        ], true);
+        ]);
     }
 
     public function monitoringOrder(string $pairingUuid, string $channelId): ApiResponse

@@ -9,7 +9,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEve
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
-use Twint\ExpressCheckout\Repository\PairingRepository;
+use Twint\Core\Repository\PairingRepository;
 use Twint\Sdk\Value\FastCheckoutCheckIn;
 use Twint\Sdk\Value\FastCheckoutState;
 use Twint\Sdk\Value\ShippingMethodId;
