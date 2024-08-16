@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
+use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\Core\Handler\ReversalHistory\ReversalHistoryWriterInterface;
 use Twint\Core\Service\OrderService;
 use Twint\Core\Service\PaymentService;
@@ -150,11 +151,10 @@ class TwintController extends AbstractController
 
         try {
             $order = $this->orderService->getOrder($orderId, new Context(new SystemSource()));
-            if (($twintOrder = $this->orderService->getTwintOrder($order)) instanceof Order) {
+            if (($pairing = $this->orderService->getPairing($orderId)) instanceof PairingEntity) {
                 $amountMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $amount);
                 $refundableAmount = $this->rounding->mathRound(
-                    $twintOrder->amount()
-                        ->amount() - $this->paymentService->getTotalReversal($order->getId()),
+                    $pairing->getAmount() - $this->paymentService->getTotalReversal($order->getId()),
                     $order->getItemRounding() ?? $context->getRounding()
                 );
                 $refundableAmountMoney = new Money(
@@ -170,6 +170,7 @@ class TwintController extends AbstractController
                         ]),
                     ]);
                 }
+
                 $twintReverseOrder = $this->paymentService->reverseOrder($order, $amount);
                 if ($twintReverseOrder instanceof Order) {
                     $this->reversalHistoryWriter->write(
@@ -209,21 +210,18 @@ class TwintController extends AbstractController
     #[Route(path: '/api/_actions/twint/order/{orderId}/status', name: 'api.action.twint.order.status', methods: [
         'GET',
     ])]
-    public function status(string $orderId, Request $request, Context $context): Response
+    public function status(string $orderId): Response
     {
         try {
-            $order = $this->orderService->getOrder($orderId, new Context(new SystemSource()));
-            $twintStatusOrder = $this->paymentService->monitorOrder($order);
-            if ($twintStatusOrder instanceof Order) {
-                return $this->json([
-                    'success' => true,
-                    'order' => json_encode($twintStatusOrder),
-                ]);
+            $pairing = $this->orderService->getPairing($orderId);
+            if (!$pairing instanceof PairingEntity) {
+                throw new Exception('Record not found');
             }
+
             return $this->json([
-                'success' => false,
+                'success' => $this->paymentService->monitorOrder($pairing),
             ]);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             return $this->json([
                 'success' => false,
                 'error' => $e->getMessage(),

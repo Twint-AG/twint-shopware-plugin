@@ -7,23 +7,21 @@ namespace Twint\Storefront\Controller;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
 use Exception;
-use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Order\OrderException;
-use Shopware\Core\Framework\Context;
+use Http\Client\Common\Exception\HttpClientNotFoundException;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Twint\Core\Service\OrderService;
+use Throwable;
+use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
+use Twint\Core\Service\PairingService;
 use Twint\Core\Service\PaymentService;
 use Twint\Core\Util\CryptoHandler;
-use Twint\Sdk\Value\Order;
-use Twint\Sdk\Value\OrderStatus;
-use Twint\Util\OrderCustomFieldInstaller;
 
 #[Route(defaults: [
     '_routeScope' => ['storefront'],
@@ -31,120 +29,96 @@ use Twint\Util\OrderCustomFieldInstaller;
 class PaymentController extends StorefrontController
 {
     public function __construct(
-        private EntityRepository $orderRepository,
+        private EntityRepository $pairingRepository,
         private CryptoHandler $cryptoService,
         private PaymentService $paymentService,
-        private OrderService $orderService
+        private PairingService $pairingService,
     ) {
     }
 
-    #[Route(path: '/payment/waiting/{orderNumber}', name: 'frontend.twint.waiting', methods: ['GET'])]
-    public function showWaiting(Request $request, Context $context): Response
+    #[Route(path: '/payment/waiting/{pairingId}', name: 'frontend.twint.waiting', methods: ['GET'])]
+    public function showWaiting(Request $request, SalesChannelContext $context): Response
     {
-        $orderNumber = $request->get('orderNumber');
+        $hash = $request->get('pairingId');
         try {
-            $orderNumber = $this->cryptoService->unHash($orderNumber);
-            $criteria = new Criteria();
-            $criteria->addFilter(new EqualsFilter('orderNumber', $orderNumber));
-            $criteria->addAssociation('orderCustomer.customer')
-                ->addAssociation('transactions.paymentMethod')
-                ->addAssociation('transactions.stateMachineState')
-                ->addAssociation('lineItems')
-                ->addAssociation('currency')
-                ->addAssociation('addresses.country')
-                ->addAssociation('customFields');
-            /** @var OrderEntity|null $order */
-            $order = $this->orderRepository->search($criteria, $context)
-                ->first();
-            if (empty($order)) {
-                throw OrderException::orderNotFound($orderNumber);
-            }
+            $pairing = $this->getPairing($hash, $context);
         } catch (Exception $e) {
-            $this->addFlash(self::DANGER, $this->trans('twintPayment.error.orderNotFound'));
             return $this->redirectToRoute('frontend.account.order.page');
         }
-        if ($this->orderService->isOrderPaid($order)) {
+
+        if ($pairing->isSuccess()) {
             $this->addFlash(self::SUCCESS, $this->trans('twintPayment.message.successPayment'));
             return $this->redirectToRoute('frontend.checkout.finish.page', [
-                'orderId' => $order->getId(),
+                'orderId' => $pairing->getOrderId(),
             ]);
-        } elseif ($this->orderService->isCancelPaid($order)) {
+        }
+
+        if ($pairing->isFailed()) {
             return $this->redirectToRoute('frontend.account.edit-order.page', [
-                'orderId' => $order->getId(),
+                'orderId' => $pairing->getOrderId(),
                 'error-code' => 'CHECKOUT__TWINT_PAYMENT_DECLINED',
             ]);
         }
-        $twintApiResponse = json_decode(
-            $order->getCustomFields()[OrderCustomFieldInstaller::TWINT_API_RESPONSE_CUSTOM_FIELD] ?? '{}',
-            true
+
+        $options = new QROptions(
+            [
+                'eccLevel' => QRCode::ECC_L,
+                'outputType' => QRCode::OUTPUT_MARKUP_SVG,
+                'version' => 5,
+            ]
         );
-        $qrcode = '';
-        if ($twintApiResponse) {
-            $options = new QROptions(
-                [
-                    'eccLevel' => QRCode::ECC_L,
-                    'outputType' => QRCode::OUTPUT_MARKUP_SVG,
-                    'version' => 5,
-                ]
-            );
-            $pairingToken = (string) ($twintApiResponse['pairingToken'] ?? '');
-            $qrcode = (new QRCode($options))->render($pairingToken);
-        }
+
         return $this->renderStorefront('@TwintPayment/storefront/page/waiting.html.twig', [
-            'orderNumber' => $orderNumber,
-            'qrCode' => $qrcode,
-            'pairingToken' => $twintApiResponse['pairingToken'] ?? '',
-            'amount' => $order->getPrice()
-                ->getTotalPrice(),
-            'payLinks' => $this->paymentService->getPayLinks($pairingToken ?? '', $order->getSalesChannelId()),
+            'pairing' => $hash,
+            'qrCode' => (new QRCode($options))->render($pairing->getToken()),
+            'pairingToken' => $pairing->getToken(),
+            'amount' => $pairing->getAmount(),
+            'payLinks' => $this->paymentService->getPayLinks($pairing->getToken(), $pairing->getSalesChannelId()),
         ]);
     }
 
-    #[Route(path: '/payment/order/{orderNumber}', name: 'frontend.twint.order', defaults: [
+    #[Route(path: '/payment/status/{pairingId}', name: 'frontend.twint.status', defaults: [
         'XmlHttpRequest' => true,
         'csrf_protected' => false,
     ], methods: ['GET'])]
-    public function order(Request $request, Context $context): JsonResponse
+    public function order(Request $request, SalesChannelContext $context): JsonResponse
     {
-        $orderNumber = $request->get('orderNumber');
-        $result = [
-            'reload' => false,
-        ];
-        try {
-            $criteria = new Criteria();
-            $criteria->addFilter(new EqualsFilter('orderNumber', $orderNumber));
-            $criteria->addAssociation('transactions.stateMachineState');
-            $criteria->addAssociation('currency');
-            /** @var OrderEntity|null $order */
-            $order = $this->orderRepository->search($criteria, $context)
-                ->first();
-            if (!empty($order) && ($this->orderService->isOrderPaid($order) || $this->orderService->isCancelPaid(
-                $order
-            ))) {
-                $result = [
-                    'reload' => true,
-                ];
-            } elseif (!empty($order)) {
-                $twintOrder = $this->paymentService->checkOrderStatus($order);
-                if (!$twintOrder instanceof Order) {
-                    $result = [
-                        'reload' => false,
-                    ];
-                } elseif ($twintOrder instanceof Order && $twintOrder->status()->equals(
-                    OrderStatus::SUCCESS()
-                ) || $twintOrder->status()
-                    ->equals(OrderStatus::FAILURE())) {
-                    $result = [
-                        'reload' => true,
-                    ];
-                }
-            }
-        } catch (Exception $e) {
+        $hash = $request->get('pairingId');
+
+        $json = static function ($reload, $error = '') {
             return new JsonResponse([
-                'reload' => false,
-                'error' => $e->getMessage(),
+                'reload' => $reload,
             ]);
+        };
+
+        try {
+            $pairing = $this->getPairing($hash, $context);
+
+            if ($pairing->isFinished()) {
+                return $json(true);
+            }
+
+            return $json($this->pairingService->monitor($pairing));
+        } catch (Throwable $e) {
+            return $json(false, $e->getMessage());
         }
-        return new JsonResponse($result);
+    }
+
+    private function getPairing(string $hash, SalesChannelContext $context): PairingEntity
+    {
+        $pairingId = $this->cryptoService->unHash($hash);
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('id', $pairingId));
+        $criteria->addAssociation('order.transactions.stateMachineState');
+
+        /** @var PairingEntity $pairing */
+        $pairing = $this->pairingRepository->search($criteria, $context->getContext())
+            ->first();
+
+        if (!$pairing instanceof PairingEntity) {
+            throw new HttpClientNotFoundException($pairingId);
+        }
+
+        return $pairing;
     }
 }
