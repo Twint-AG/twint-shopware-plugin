@@ -119,13 +119,14 @@ Component.register('twint-payment-actions', {
                 }
             }
             this.transaction = this.order.transactions.last();
-            const customFields = this.order?.customFields || {};
-            const twintResponse = JSON.parse(customFields['twint_api_response'] || '{}');
             this.totalOrderAmount = this.totalAmount;
-            if(twintResponse?.amount){
-                this.totalOrderAmount = twintResponse.amount.amount;
-            }
 
+            let self = this;
+            this.TwintPaymentService.getPairing(this.order.id).then((response) => {
+                if(response.pairing){
+                    self.totalOrderAmount = response.pairing.amount;
+                }
+            });
         },
         showModal() {
             this.resetRefundForm();
