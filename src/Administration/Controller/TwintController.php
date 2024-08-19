@@ -228,4 +228,19 @@ class TwintController extends AbstractController
             ]);
         }
     }
+
+    /**
+     * @throws Exception
+     */
+    #[Route(path: '/api/_actions/twint/order/{orderId}/pairing', name: 'api.action.twint.order.pairing', methods: [
+        'GET',
+    ])]
+    public function pairing(string $orderId): Response
+    {
+        $pairing = $this->orderService->getPairing($orderId);
+
+        return $this->json([
+            'pairing' => $pairing
+        ]);
+    }
 }
