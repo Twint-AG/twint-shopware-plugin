@@ -240,7 +240,7 @@ class TwintController extends AbstractController
         $pairing = $this->orderService->getPairing($orderId);
 
         return $this->json([
-            'pairing' => $pairing
+            'pairing' => $pairing,
         ]);
     }
 }
