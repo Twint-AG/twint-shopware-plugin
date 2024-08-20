@@ -12,10 +12,12 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
 use Shopware\Storefront\Page\Checkout\Finish\CheckoutFinishPage;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Throwable;
+use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\Core\Repository\PairingRepository;
 use Twint\Core\Service\PaymentService;
 use Twint\Core\Util\CryptoHandler;
@@ -73,19 +75,25 @@ class CheckoutController extends StorefrontController
         $pairingHash = $request->get('paringHash');
         try {
             $pairingUUid = $this->cryptoService->unHash($pairingHash);
-            $paring = $this->paringLoader->load($pairingUUid, $context);
+            $pairing = $this->paringLoader->load($pairingUUid, $context);
         } catch (Throwable $e) {
             $this->addFlash(self::DANGER, $this->trans('twintPayment.error.pairingNotFound'));
             return $this->redirectToRoute('frontend.account.order.page');
         }
 
-        $this->monitor->monitorOne($paring);
+        $this->monitor->monitorOne($pairing);
 
-        if (in_array($paring->getStatus(), [PairingService::STATUS_DONE, PairingService::STATUS_CANCELED], true)) {
-            return $this->json([
+        if (in_array($pairing->getStatus(), [PairingService::STATUS_DONE, PairingService::STATUS_CANCELED], true)) {
+            $data = [
                 'completed' => true,
-                'orderId' => $paring->getStatus() === PairingService::STATUS_CANCELED ? null : $paring->getOrderId(),
-            ]);
+                'orderId' => $pairing->getStatus() === PairingService::STATUS_CANCELED ? null : $pairing->getOrderId(),
+            ];
+
+            if(!empty($data['orderId'])){
+                $data['thank-you'] = $this->thankYouPage($pairing, $context)->getContent();
+            }
+
+            return $this->json($data);
         }
 
         return $this->json([
@@ -101,26 +109,14 @@ class CheckoutController extends StorefrontController
         $pairingHash = $request->get('paringHash');
         try {
             $pairingUUid = $this->cryptoService->unHash($pairingHash);
-            $paring = $this->paringLoader->load($pairingUUid, $context);
+            $pairing = $this->paringLoader->load($pairingUUid, $context);
         } catch (Exception $e) {
             $this->addFlash(self::DANGER, $this->trans('twintPayment.error.pairingNotFound'));
             return $this->redirectToRoute('frontend.account.order.page');
         }
 
-        if ($paring->getOrderId()) {
-            $page = new CheckoutFinishPage();
-            $this->paringLoader->fetchOrder($paring, $context);
-
-            if (!($paring->getOrder()  instanceof OrderEntity)) {
-                $this->addFlash(self::DANGER, $this->trans('twintPayment.error.orderNotFound'));
-                return $this->redirectToRoute('frontend.account.order.page');
-            }
-
-            $page->setOrder($paring->getOrder());
-
-            return $this->renderStorefront('@TwintPayment/storefront/page/express-finish.html.twig', [
-                'page' => $page,
-            ]);
+        if ($pairing->getOrderId()) {
+            return $this->thankYouPage($pairing, $context);
         }
 
         $options = new QROptions(
@@ -130,17 +126,34 @@ class CheckoutController extends StorefrontController
                 'version' => 5,
             ]
         );
-        $qrcode = (new QRCode($options))->render($paring->getToken());
+        $qrcode = (new QRCode($options))->render($pairing->getToken());
 
         return $this->renderStorefront('@TwintPayment/storefront/page/express-payment.html.twig', [
             'pairingHash' => $pairingHash,
             'orderNumber' => 'CART',
             'qrCode' => $qrcode,
-            'pairingToken' => $paring->getToken(),
-            'amount' => $paring->getCart() // @phpstan-ignore-line
+            'pairingToken' => $pairing->getToken(),
+            'amount' => $pairing->getCart() // @phpstan-ignore-line
                 ->getPrice()
                 ->getPositionPrice(),
             'payLinks' => [],
+        ]);
+    }
+    
+    protected function thankYouPage(PairingEntity $pairing, SalesChannelContext $context): RedirectResponse|Response
+    {
+        $page = new CheckoutFinishPage();
+        $this->paringLoader->fetchOrder($pairing, $context);
+
+        if (!($pairing->getOrder()  instanceof OrderEntity)) {
+            $this->addFlash(self::DANGER, $this->trans('twintPayment.error.orderNotFound'));
+            return $this->redirectToRoute('frontend.account.order.page');
+        }
+
+        $page->setOrder($pairing->getOrder());
+
+        return $this->renderStorefront('@TwintPayment/storefront/page/express-finish.html.twig', [
+            'page' => $page,
         ]);
     }
 
@@ -150,7 +163,7 @@ class CheckoutController extends StorefrontController
     private function getPairingContent(string $pairingHash, SalesChannelContext $context): string
     {
         $pairingUUid = $this->cryptoService->unHash($pairingHash);
-        $paring = $this->paringLoader->load($pairingUUid, $context);
+        $pairing = $this->paringLoader->load($pairingUUid, $context);
 
         $options = new QROptions(
             [
@@ -159,19 +172,19 @@ class CheckoutController extends StorefrontController
                 'version' => 5,
             ]
         );
-        $qrcode = (new QRCode($options))->render($paring->getToken()); // @phpstan-ignore-line
+        $qrcode = (new QRCode($options))->render($pairing->getToken()); // @phpstan-ignore-line
 
         // @phpstan-ignore-next-line
         return $this->renderStorefront('@TwintPayment/storefront/page/express-payment.html.twig', [
             'pairingHash' => $pairingHash,
             'orderNumber' => 'CART',
             'qrCode' => $qrcode,
-            'pairingToken' => $paring->getToken(), // @phpstan-ignore-line
-            'amount' => $paring->getCart() // @phpstan-ignore-line
+            'pairingToken' => $pairing->getToken(), // @phpstan-ignore-line
+            'amount' => $pairing->getCart() // @phpstan-ignore-line
                 ->getPrice()
                 ->getPositionPrice(),
             'payLinks' => $this->paymentService->getPayLinks(
-                $paring->getToken(), // @phpstan-ignore-line
+                $pairing->getToken(), // @phpstan-ignore-line
                 $context->getSalesChannel() // @phpstan-ignore-line
                     ->getId()
             ),
