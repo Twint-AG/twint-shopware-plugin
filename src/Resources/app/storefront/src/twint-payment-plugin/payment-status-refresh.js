@@ -88,7 +88,7 @@ export default class PaymentStatusRefresh extends Plugin {
 
       if (data.completed) {
         if (data.orderId) {
-          this.onExpressPaid();
+          this.onExpressPaid(data);
         } else
           ExpressCheckoutButton.modal.close();
 
@@ -104,7 +104,7 @@ export default class PaymentStatusRefresh extends Plugin {
     return window.location.pathname.includes(cartRoute);
   }
 
-  onExpressPaid() {
+  onExpressPaid(response) {
     this.success = true;
 
     const CartWidgetPluginInstances = window.PluginManager.getPluginInstances('CartWidget');
@@ -112,7 +112,13 @@ export default class PaymentStatusRefresh extends Plugin {
     this.$emitter.publish('fetchCartWidgets');
     AjaxOffCanvas.close();
 
-    this.loadThankYouPage();
+    if(response.orderId && response['thank-you']){
+      this.ThankYouPageLoaded(response['thank-you']);
+
+      return;
+    }
+
+    this.loadThankYouPage(response['thank-you']);
   }
 
   loadThankYouPage() {
