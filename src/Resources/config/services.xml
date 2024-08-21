@@ -110,5 +110,11 @@
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
 
         </service>
+
+        <service id="Twint\Command\TwintPollCommand">
+            <argument type="service" id="Twint\Core\Repository\PairingRepository" />
+            <argument type="service" id="Twint\ExpressCheckout\Service\Monitoring\MonitoringService" />
+            <tag name="console.command"/>
+        </service>
     </services>
 </container>

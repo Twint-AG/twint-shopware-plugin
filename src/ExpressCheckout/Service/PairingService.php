@@ -16,10 +16,6 @@ use Twint\Sdk\Value\ShippingMethodId;
 
 class PairingService
 {
-    public const STATUS_DONE = 'DONE';
-
-    public const STATUS_CANCELED = 'CANCELLED';
-
     public function __construct(
         private readonly PairingRepository $repository,
     ) {
@@ -44,17 +40,17 @@ class PairingService
 
     public function markAsDone(PairingEntity $pairing): EntityWrittenContainerEvent
     {
-        $pairing->setStatus(self::STATUS_DONE);
+        $pairing->setStatus(PairingEntity::STATUS_DONE);
         return $this->persist($pairing, [
-            'status' => self::STATUS_DONE,
+            'status' => PairingEntity::STATUS_DONE,
         ]);
     }
 
     public function markAsCancelled(PairingEntity $pairing): EntityWrittenContainerEvent
     {
-        $pairing->setStatus(self::STATUS_CANCELED);
+        $pairing->setStatus(PairingEntity::STATUS_CANCELED);
         return $this->persist($pairing, [
-            'status' => self::STATUS_CANCELED,
+            'status' => PairingEntity::STATUS_CANCELED,
         ]);
     }
 
@@ -69,6 +65,9 @@ class PairingService
         return $this->repository->update([$data]);
     }
 
+    /**
+     * @throws Exception
+     */
     public function update(PairingEntity $entity, FastCheckoutState $state): EntityWrittenContainerEvent
     {
         if (!($state instanceof FastCheckoutCheckIn)) {
@@ -82,6 +81,7 @@ class PairingService
         //Store the updated data in the database
         $data = [
             'id' => $entity->getUniqueIdentifier(),
+            'version' => $entity->getVersion(),
             'status' => (string) $state->pairingStatus(),
             'customerData' => json_decode((string) json_encode($state->customerData()), true),
         ];

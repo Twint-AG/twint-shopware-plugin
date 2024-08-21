@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Twint\Core\Service;
 
+use Doctrine\DBAL\Exception\DriverException;
 use Exception;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -83,7 +84,15 @@ class PairingService
             $pairing->getTransactionStatus() !== $tOrder->transactionStatus()
                 ->__toString()
         ) {
-            $pairing = $this->update($pairing, $res);
+            try {
+                $pairing = $this->update($pairing, $res);
+            }catch (DriverException $e){
+                if ($e->getSQLState() !== '45000') {
+                    throw $e;
+                }
+
+                return  false;
+            }
         }
 
         if ($tOrder->isPending()) {
@@ -127,6 +136,7 @@ class PairingService
         $this->repository->update([
             [
                 'id' => $pairing->getId(),
+                'version' => $pairing->getVersion(),
                 'status' => $tOrder->status()
                     ->__toString(),
                 'pairingStatus' => $tOrder->pairingStatus()?->__toString(),

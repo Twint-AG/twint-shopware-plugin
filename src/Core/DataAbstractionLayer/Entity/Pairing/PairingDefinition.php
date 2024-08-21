@@ -14,6 +14,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\PrimaryKey;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\FloatField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\IntField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\JsonField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\ManyToOneAssociationField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
@@ -82,6 +83,8 @@ class PairingDefinition extends EntityDefinition
             (new FkField('order_id', 'orderId', OrderDefinition::class)),
             new ManyToOneAssociationField('order', 'order_id', OrderDefinition::class, 'id', false),
             (new JsonField('customer_data', 'customerData')),
+            new IntField('version', 'version'),
+            new IntField('pid', 'pid'),
             new CreatedAtField(),
             new UpdatedAtField(),
         ]);

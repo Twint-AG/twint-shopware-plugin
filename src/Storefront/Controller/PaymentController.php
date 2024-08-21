@@ -77,33 +77,6 @@ class PaymentController extends StorefrontController
         ]);
     }
 
-    #[Route(path: '/payment/status/{pairingId}', name: 'frontend.twint.status', defaults: [
-        'XmlHttpRequest' => true,
-        'csrf_protected' => false,
-    ], methods: ['GET'])]
-    public function order(Request $request, SalesChannelContext $context): JsonResponse
-    {
-        $hash = $request->get('pairingId');
-
-        $json = static function ($reload, $error = '') {
-            return new JsonResponse([
-                'reload' => $reload,
-            ]);
-        };
-
-        try {
-            $pairing = $this->getPairing($hash, $context);
-
-            if ($pairing->isFinished()) {
-                return $json(true);
-            }
-
-            return $json($this->pairingService->monitor($pairing));
-        } catch (Throwable $e) {
-            return $json(false, $e->getMessage());
-        }
-    }
-
     private function getPairing(string $hash, SalesChannelContext $context): PairingEntity
     {
         $pairingId = $this->cryptoService->unHash($hash);
