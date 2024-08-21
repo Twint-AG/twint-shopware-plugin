@@ -21,13 +21,14 @@ use Twint\Sdk\Value\PairingStatus;
 class MonitoringService
 {
     public function __construct(
-        private ExpressPaymentService $paymentService,
-        private TwintContext $context,
-        private readonly OnPaidHandler $onPaidHandler,
-        private readonly PairingService $pairingService,
+        private ExpressPaymentService          $paymentService,
+        private TwintContext                   $context,
+        private readonly OnPaidHandler         $onPaidHandler,
+        private readonly PairingService        $pairingService,
         private readonly RegularPairingService $regular,
-        private readonly ApiService $api
-    ) {
+        private readonly ApiService            $api
+    )
+    {
     }
 
     /**
@@ -41,27 +42,48 @@ class MonitoringService
 
         /** @var PairingEntity $pairing */
         foreach ($pairings as $pairing) {
-            $pairing->getIsExpress() ? $this->monitorOne($pairing) : $this->regular->monitor($pairing);
+            $this->monitorOne($pairing);
         }
     }
 
-    public function monitorOne(PairingEntity $pairing): PairingEntity
+    /**
+     * @throws Throwable
+     */
+    public function monitorOne(PairingEntity $pairing) : mixed{
+        return $pairing->getIsExpress() ? $this->monitorExpress($pairing) : $this->regular->monitor($pairing);
+    }
+
+    /**
+     * @throws Exception\DriverException
+     * @throws Exception
+     */
+    public function monitorExpress(PairingEntity $pairing): PairingEntity
     {
         $res = $this->paymentService->monitoring($pairing->getId(), $pairing->getSalesChannelId());
         $state = $res->getReturn();
         $this->pairingService->fetchCart($pairing, $this->context->getContext($pairing->getSalesChannelId()));
         if ($this->isChanged($pairing, $state)) {
+            try {
+                $this->pairingService->update($pairing, $state);
+            } catch (Exception\DriverException $e) {
+                if ($e->getSQLState() !== '45000') {
+                    throw $e;
+                }
+
+                return $pairing;
+            }
+
             $this->api->saveLog($res->getLog());
-            $this->pairingService->update($pairing, $state);
             $this->handle($pairing, $state);
         }
+
         return $pairing;
     }
 
     protected function isChanged(PairingEntity $entity, FastCheckoutCheckIn $state): bool
     {
         return $entity->getStatus() !== $state->pairingStatus()
-            ->__toString()
+                ->__toString()
             || $entity->getShippingMethodId() !== $state->shippingMethodId()?->__toString()
             || json_encode($entity->getCustomerData()) !== json_encode($state->customerData());
     }

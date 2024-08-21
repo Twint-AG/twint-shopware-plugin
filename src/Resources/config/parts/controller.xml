@@ -17,6 +17,7 @@
         </service>
 
         <service id="Twint\Storefront\Controller\CheckoutController" public="true">
+            <argument type="service" id="kernel" />
             <argument type="service" id="twint.service.express.checkout"/>
             <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
             <argument type="service" id="Twint\Core\Repository\PairingRepository"/>

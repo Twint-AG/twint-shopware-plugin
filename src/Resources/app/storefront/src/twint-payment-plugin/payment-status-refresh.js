@@ -137,15 +137,15 @@ export default class PaymentStatusRefresh extends Plugin {
     if (this.reachLimit())
       return;
 
-        let url = window.router['frontend.twint.status'];
-        url = url.replace('--hash--', this.pairingId);
+    let url = window.router['frontend.twint.monitoring'];
+    url = url.replace('--hash--', this.pairingId);
 
     this.client.get(url, (response) => {
       this.checking = false;
       try {
         const jsonResponse = JSON.parse(response);
-        const reload = (typeof jsonResponse.reload === "boolean") ? jsonResponse.reload : false;
-        if (reload) {
+        const completed = (typeof jsonResponse.completed === "boolean") ? jsonResponse.completed : false;
+        if (completed) {
           location.reload();
         } else {
           setTimeout(this.checkRegularCheckoutStatus.bind(this), this.options.interval);

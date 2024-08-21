@@ -31,7 +31,7 @@ class PairingRepository
     ) {
     }
 
-    public function load(string $pairingId, SalesChannelContext $context): PairingEntity
+    public function load(string $pairingId, Context $context): PairingEntity
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('id', $pairingId));
@@ -39,14 +39,14 @@ class PairingRepository
         $criteria->addAssociation('customer');
         $criteria->addAssociation('customer.addresses');
 
-        $pairing = $this->repository->search($criteria, $context->getContext())
+        $pairing = $this->repository->search($criteria, $context)
             ->first();
 
         if (($pairing instanceof PairingEntity) === false) {
             throw new PairingException("{$pairingId} not found");
         }
 
-        $this->fetchCart($pairing, $context);
+//        $this->fetchCart($pairing, $context);
 
         return $pairing;
     }
@@ -102,6 +102,8 @@ class PairingRepository
 
     public function update(array $data): EntityWrittenContainerEvent
     {
+        //validate $data to make sure always has version
+
         return $this->repository->update($data, Context::createDefaultContext());
     }
 
