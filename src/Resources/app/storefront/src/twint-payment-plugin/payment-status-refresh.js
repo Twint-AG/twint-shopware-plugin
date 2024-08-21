@@ -12,7 +12,13 @@ export default class PaymentStatusRefresh extends Plugin {
     containerSelector: '.twint-qr-container',
     pairingHash: null,
     interval: 1000,
-    expressCheckout: false
+    expressCheckout: false,
+    expressInitialInterval: 2000, // 2s
+    expressSubsequentInterval: 10000, // 10s
+    expressInitialDuration: 5 * 60 * 1000, // 5 minutes
+    regularInitialInterval: 5000, // 5s
+    regularSubsequentInterval: 10000, // 10s
+    regularInitialDuration: 3 * 60 * 1000, // 3 minutes
   };
 
   count = 0;
@@ -22,12 +28,26 @@ export default class PaymentStatusRefresh extends Plugin {
     this.client = new HttpClient();
 
     if (this.options.expressCheckout) {
-      this.checkExpressCheckoutStatus();
+
+      let intervalId = setInterval(this.checkExpressCheckoutStatus.bind(this), this.options.expressInitialInterval);
+
+      setTimeout(() => {
+        clearInterval(intervalId);
+        this.checkExpressCheckoutStatus();
+        intervalId = setInterval(this.checkExpressCheckoutStatus.bind(this), this.options.expressSubsequentInterval);
+      }, this.options.expressInitialDuration);
+
     } else {
       this.$container = DomAccess.querySelector(document, this.options.containerSelector);
       this.pairingId = this.$container.getAttribute('data-pairing-id');
 
-      this.checkRegularCheckoutStatus();
+      let intervalId = setInterval(this.checkRegularCheckoutStatus.bind(this), this.options.regularInitialInterval);
+
+      setTimeout(() => {
+        clearInterval(intervalId);
+        this.checkRegularCheckoutStatus();
+        intervalId = setInterval(this.checkRegularCheckoutStatus.bind(this), this.options.regularSubsequentInterval);
+      }, this.options.regularInitialDuration);
     }
 
     this.modal = null;
@@ -80,10 +100,9 @@ export default class PaymentStatusRefresh extends Plugin {
     this.client.get(url, (response, request) => {
       this.checking = false;
 
-      if (request.status !== 200) {
+      if (request.status !== 200 && request.status !== 0) {
         return this.onError(request);
       }
-
       const data = JSON.parse(response);
 
       if (data.completed) {
@@ -92,12 +111,9 @@ export default class PaymentStatusRefresh extends Plugin {
         } else
           ExpressCheckoutButton.modal.close();
 
-      } else {
-        setTimeout(this.checkExpressCheckoutStatus.bind(this), this.options.interval);
       }
     });
   }
-
   isOnCartPage() {
     let cartRoute = window.router['frontend.checkout.cart.page'];
 
@@ -147,8 +163,6 @@ export default class PaymentStatusRefresh extends Plugin {
         const completed = (typeof jsonResponse.completed === "boolean") ? jsonResponse.completed : false;
         if (completed) {
           location.reload();
-        } else {
-          setTimeout(this.checkRegularCheckoutStatus.bind(this), this.options.interval);
         }
       } catch (e) {
       }
