@@ -55,7 +55,7 @@ class TwintPollCommand extends Command
             $this->repository->updateCheckedAt($pairingId);
 
             $this->monitoringService->monitorOne($pairing);
-            $pairing = $this->repository->load($pairingId, Context::createCLIContext());
+            $pairing = $this->repository->load($pairingId, Context::createDefaultContext());
 
             sleep($this->getInterval($pairing, $startedAt));
             ++$count;
