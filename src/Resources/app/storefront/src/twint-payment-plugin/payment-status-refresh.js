@@ -7,6 +7,8 @@ import Iterator from 'src/helper/iterator.helper';
 
 export default class PaymentStatusRefresh extends Plugin {
   static POLL_LIMIT = 500;
+  
+  static startedAt = null;
 
   static options = {
     containerSelector: '.twint-qr-container',
@@ -33,11 +35,11 @@ export default class PaymentStatusRefresh extends Plugin {
     this.modal = null;
     this.success = false;
 
-    this.startedAt = null;
+    this.timeoutId = null;
   }
 
   begin(){
-    this.startedAt = new Date();
+    PaymentStatusRefresh.startedAt = new Date();
   }
 
   getDomain() {
@@ -69,13 +71,16 @@ export default class PaymentStatusRefresh extends Plugin {
   }
 
   onModalClosed(event) {
+    clearTimeout(this.timeoutId);
+    PaymentStatusRefresh.startedAt = null;
+    
     if (this.isOnCartPage() && this.success) {
       window.location.reload();
     }
   }
 
   checkExpressCheckoutStatus() {
-    if(!this.startedAt){
+    if(!PaymentStatusRefresh.startedAt){
       this.begin();
     }
 
@@ -97,17 +102,19 @@ export default class PaymentStatusRefresh extends Plugin {
       const data = JSON.parse(response);
 
       if (data.completed) {
-        this.startedAt = null;
+        PaymentStatusRefresh.startedAt = null;
 
         if (data.orderId) {
           this.onExpressPaid(data);
-        } else
+        } else {
           ExpressCheckoutButton.modal.close();
+          this.onModalClosed();
+        }
 
       } else {
         let interval = this.getInterval();
         if(interval > 0) {
-          setTimeout(this.checkExpressCheckoutStatus.bind(this), interval);
+          this.timeoutId = setTimeout(this.checkExpressCheckoutStatus.bind(this), interval);
         }
       }
     });
@@ -161,12 +168,12 @@ export default class PaymentStatusRefresh extends Plugin {
         const jsonResponse = JSON.parse(response);
         const completed = (typeof jsonResponse.completed === "boolean") ? jsonResponse.completed : false;
         if (completed) {
-          this.startedAt = null;
+          PaymentStatusRefresh.startedAt = null;
           location.reload();
         } else {
           let interval = this.getInterval();
           if(interval > 0) {
-            setTimeout(this.checkRegularCheckoutStatus.bind(this), interval);
+            this.timeoutId = setTimeout(this.checkRegularCheckoutStatus.bind(this), interval);
           }
         }
       } catch (e) {
@@ -180,16 +187,16 @@ export default class PaymentStatusRefresh extends Plugin {
     titleEl.innerHTML = titleEl.getAttribute('data-finish');
 
     this.success = false;
-    this.startedAt = null;
+    PaymentStatusRefresh.startedAt = null;
   }
 
   getInterval(){
-    if(!this.startedAt){
+    if(!PaymentStatusRefresh.startedAt){
       this.begin();
     }
 
     let now = new Date();
-    const seconds = Math.floor((now - this.startedAt) / 1000);
+    const seconds = Math.floor((now - PaymentStatusRefresh.startedAt) / 1000);
 
     let currentInterval = 2000; // Default to the first interval
 
@@ -216,8 +223,6 @@ export default class PaymentStatusRefresh extends Plugin {
         break;
       }
     }
-
-    console.log("interval", this.startedAt, seconds, currentInterval);
 
     return currentInterval;
   }
