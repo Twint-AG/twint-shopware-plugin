@@ -32,7 +32,6 @@ class PaymentController extends StorefrontController
         private EntityRepository $pairingRepository,
         private CryptoHandler $cryptoService,
         private PaymentService $paymentService,
-        private PairingService $pairingService,
     ) {
     }
 

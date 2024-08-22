@@ -60,7 +60,7 @@ class PairingEntity extends Entity
 
     protected ?int $checkedAgo;
 
-    protected ?DateTimeInterface $checkedAt;
+    protected ?DateTimeInterface $checkedAt = null;
 
     public function getCustomer(): ?CustomerEntity
     {

@@ -96,7 +96,7 @@
         </service>
 
         <service id="Twint\Core\Service\PairingService">
-            <argument type="service" id="twint_pairing_view.repository"/>
+            <argument type="service" id="twint_pairing.repository"/>
             <argument type="service" id="Twint\Core\Service\ApiService"/>
             <argument type="service" id="Twint\Core\Factory\ClientBuilder"/>
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
@@ -114,6 +114,7 @@
         <service id="Twint\Command\TwintPollCommand">
             <argument type="service" id="Twint\Core\Repository\PairingRepository" />
             <argument type="service" id="Twint\ExpressCheckout\Service\Monitoring\MonitoringService" />
+            <argument type="service" id="logger" />
             <tag name="console.command"/>
         </service>
     </services>

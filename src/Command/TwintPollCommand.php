@@ -6,6 +6,7 @@ namespace Twint\Command;
 
 use DateTime;
 use Doctrine\DBAL\Exception\DriverException;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -23,7 +24,8 @@ class TwintPollCommand extends Command
 
     public function __construct(
         private readonly PairingRepository $repository,
-        private readonly MonitoringService $monitoringService
+        private readonly MonitoringService $monitoringService,
+        private readonly LoggerInterface $logger
     )
     {
         parent::__construct();
@@ -49,6 +51,7 @@ class TwintPollCommand extends Command
         $startedAt = new DateTime();
 
         while (!$pairing->isFinished()) {
+            $this->logger->info("TWINT pairing monitor: $pairingId: {$pairing->getVersion()}");
             $this->repository->updateCheckedAt($pairingId);
 
             $this->monitoringService->monitorOne($pairing);

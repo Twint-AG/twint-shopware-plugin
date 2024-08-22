@@ -9,6 +9,7 @@ use Defuse\Crypto\Exception\BadFormatException;
 use Defuse\Crypto\Exception\EnvironmentIsBrokenException;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\CartPersister;
 use Shopware\Core\Checkout\Cart\Event\CheckoutOrderPlacedEvent;
@@ -51,7 +52,8 @@ class OnPaidHandler implements StateHandlerInterface
         private readonly ExpressPaymentService $paymentService,
         private readonly Connection $connection,
         private readonly CartPersister $cartPersister,
-        private readonly EventDispatcherInterface $eventDispatcher
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -60,53 +62,58 @@ class OnPaidHandler implements StateHandlerInterface
      */
     public function handle(PairingEntity $entity, FastCheckoutCheckIn $state): void
     {
-        if (empty($entity->getCustomerData())) {
-            return;
-        }
+        try {
+            if (empty($entity->getCustomerData())) {
+                return;
+            }
 
-        //Register customer
-        list($customerEntity, $addressId) = $this->registerCustomer($entity);
+            //Register customer
+            list($customerEntity, $addressId) = $this->registerCustomer($entity);
 
-        //Create context
-        $this->createContext($entity, $state, $customerEntity, $addressId);
+            //Create context
+            $this->createContext($entity, $state, $customerEntity, $addressId);
 
-        // Place order
-        $order = $this->placeOrder($entity);
+            // Place order
+            $order = $this->placeOrder($entity);
 
-        $entity->setOrder($order);
+            $entity->setOrder($order);
 
-        //Start TWINT order
-        $res = $this->paymentService->startFastCheckoutOrder($order, $entity);
+            //Start TWINT order
+            $res = $this->paymentService->startFastCheckoutOrder($order, $entity);
 
-        // Append fields to transaction log
-        $this->appendLogFields($order, $res->getLog());
+            // Append fields to transaction log
+            $this->appendLogFields($order, $res->getLog());
 
-        $order = $this->reloadOrder($order->getId());
+            $order = $this->reloadOrder($order->getId());
 
-        $success = $this->refreshTwintTransactionStatusUntilDone($entity, $order, $res);
+            $success = $this->refreshTwintTransactionStatusUntilDone($entity, $order, $res);
 
-        $this->massUpdateLogs($order, $entity->getId());
+            $this->massUpdateLogs($order, $entity->getId());
 
-        //Update order_id in Pairing table
-        $entity->setOrderId($order->getId());
-        $this->pairingService->persistOrderId($entity, $order->getId());
+            //Update order_id in Pairing table
+            $entity->setOrderId($order->getId());
+            $this->pairingService->persistOrderId($entity, $order->getId());
 
-        if ($success) {
-            // Delete cart
-            $this->cleanUpCurrentCart($entity);
+            if ($success) {
+                // Delete cart
+                $this->cleanUpCurrentCart($entity);
 
-            // Send Event
-            $context = $this->context->getContext($entity->getSalesChannelId());
-            $event = new CheckoutOrderPlacedEvent($context->getContext(), $order, $entity->getSalesChannelId());
+                // Send Event
+                $context = $this->context->getContext($entity->getSalesChannelId());
+                $event = new CheckoutOrderPlacedEvent($context->getContext(), $order, $entity->getSalesChannelId());
 
-            Profiler::trace('checkout-order::event-listeners', function () use ($event): void {
-                $this->eventDispatcher->dispatch($event);
-            });
+                Profiler::trace('checkout-order::event-listeners', function () use ($event): void {
+                    $this->eventDispatcher->dispatch($event);
+                });
 
-            //Flag as done
-            $this->pairingService->markAsDone($entity);
-        } else {
-            $this->pairingService->markAsCancelled($entity);
+                //Flag as done
+                $this->pairingService->markAsDone($entity);
+            } else {
+                $this->pairingService->markAsCancelled($entity);
+            }
+        }catch ( \Throwable $e){
+            $this->logger->error("TWINT error: " . $e->getMessage());
+            throw $e;
         }
     }
 
@@ -175,6 +182,7 @@ class OnPaidHandler implements StateHandlerInterface
             'order_id' => Encoding::hexToBin($order->getId()),
             'pairing_id' => $pairingId,
         ]);
+
     }
 
     protected function appendLogFields(OrderEntity $order, array $log): EntityWrittenContainerEvent
