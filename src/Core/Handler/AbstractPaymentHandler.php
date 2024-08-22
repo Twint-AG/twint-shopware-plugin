@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Twint\Core\Handler;
 
 use Exception;
-use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\AsynchronousPaymentHandlerInterface;
@@ -17,7 +16,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
-use Twint\Core\Service\OrderService;
 use Twint\Core\Service\PairingService;
 use Twint\Core\Service\PaymentService;
 use Twint\Core\Util\CryptoHandler;
@@ -29,8 +27,6 @@ abstract class AbstractPaymentHandler implements AsynchronousPaymentHandlerInter
         private readonly PaymentService $paymentService,
         private readonly CryptoHandler $cryptoService,
         private readonly RouterInterface $router,
-        private readonly LoggerInterface $logger,
-        private readonly OrderService $orderService,
         private readonly PairingService $pairingService,
     ) {
     }

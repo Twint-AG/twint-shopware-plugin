@@ -131,11 +131,11 @@ class PairingRepository
      */
     public function updateCheckedAt(string $pairingId): int|string
     {
-        return $this->db->executeStatement("
-            UPDATE ".PairingDefinition::ENTITY_NAME."
+        return $this->db->executeStatement('
+            UPDATE ' . PairingDefinition::ENTITY_NAME . '
             SET checked_at = NOW()
-            WHERE id = :id", [
-            'id' => $pairingId
+            WHERE id = :id', [
+            'id' => $pairingId,
         ]);
     }
 }

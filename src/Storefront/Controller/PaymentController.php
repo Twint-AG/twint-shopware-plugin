@@ -13,13 +13,10 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Throwable;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
-use Twint\Core\Service\PairingService;
 use Twint\Core\Service\PaymentService;
 use Twint\Core\Util\CryptoHandler;
 
