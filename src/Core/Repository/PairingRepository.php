@@ -133,7 +133,7 @@ class PairingRepository
     {
         return $this->db->executeStatement("
             UPDATE ".PairingDefinition::ENTITY_NAME."
-            SET checked_at = NOW();
+            SET checked_at = NOW()
             WHERE id = :id", [
             'id' => $pairingId
         ]);
