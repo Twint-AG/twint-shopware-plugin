@@ -16,11 +16,11 @@ use Twint\Sdk\Value\OrderStatus;
 
 class PairingEntity extends Entity
 {
+    use EntityIdTrait;
+
     public const STATUS_DONE = 'DONE';
 
     public const STATUS_CANCELED = 'CANCELLED';
-
-    use EntityIdTrait;
 
     protected ?Cart $cart = null;
 
@@ -196,10 +196,11 @@ class PairingEntity extends Entity
 
     public function isFinished(): bool
     {
-        if ($this->isExpress)
-            return in_array($this->status, [self::STATUS_DONE, self::STATUS_CANCELED]);
+        if ($this->isExpress) {
+            return in_array($this->status, [self::STATUS_DONE, self::STATUS_CANCELED], true);
+        }
 
-        return in_array($this->status, [OrderStatus::SUCCESS, OrderStatus::FAILURE]);
+        return in_array($this->status, [OrderStatus::SUCCESS, OrderStatus::FAILURE], true);
     }
 
     public function isSuccess(): bool
@@ -222,7 +223,8 @@ class PairingEntity extends Entity
         return $this->version;
     }
 
-    public function getCheckedAgo(): ?int{
+    public function getCheckedAgo(): ?int
+    {
         return $this->checkedAgo;
     }
 

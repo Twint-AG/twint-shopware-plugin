@@ -21,14 +21,13 @@ use Twint\Sdk\Value\PairingStatus;
 class MonitoringService
 {
     public function __construct(
-        private ExpressPaymentService          $paymentService,
-        private TwintContext                   $context,
-        private readonly OnPaidHandler         $onPaidHandler,
-        private readonly PairingService        $pairingService,
+        private ExpressPaymentService $paymentService,
+        private TwintContext $context,
+        private readonly OnPaidHandler $onPaidHandler,
+        private readonly PairingService $pairingService,
         private readonly RegularPairingService $regular,
-        private readonly ApiService            $api
-    )
-    {
+        private readonly ApiService $api
+    ) {
     }
 
     /**
@@ -49,7 +48,8 @@ class MonitoringService
     /**
      * @throws Throwable
      */
-    public function monitorOne(PairingEntity $pairing) : mixed{
+    public function monitorOne(PairingEntity $pairing): mixed
+    {
         return $pairing->getIsExpress() ? $this->monitorExpress($pairing) : $this->regular->monitor($pairing);
     }
 
@@ -83,7 +83,7 @@ class MonitoringService
     protected function isChanged(PairingEntity $entity, FastCheckoutCheckIn $state): bool
     {
         return $entity->getStatus() !== $state->pairingStatus()
-                ->__toString()
+            ->__toString()
             || $entity->getShippingMethodId() !== $state->shippingMethodId()?->__toString()
             || json_encode($entity->getCustomerData()) !== json_encode($state->customerData());
     }

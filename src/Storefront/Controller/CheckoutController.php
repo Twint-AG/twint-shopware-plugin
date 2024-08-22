@@ -16,7 +16,6 @@ use Shopware\Storefront\Page\Checkout\Finish\CheckoutFinishPage;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Routing\Annotation\Route;
 use Throwable;
@@ -27,8 +26,6 @@ use Twint\Core\Service\PaymentService;
 use Twint\Core\Util\CryptoHandler;
 use Twint\ExpressCheckout\Exception\PairingException;
 use Twint\ExpressCheckout\Service\ExpressCheckoutServiceInterface;
-use Twint\ExpressCheckout\Service\Monitoring\MonitoringService;
-use Twint\ExpressCheckout\Service\PairingService;
 
 #[Route(defaults: [
     '_routeScope' => ['storefront'],
@@ -45,8 +42,6 @@ class CheckoutController extends StorefrontController
         private PaymentService $paymentService,
         private readonly CartService $cartService,
         private readonly LoggerInterface $logger
-
-
     ) {
     }
 
@@ -89,16 +84,23 @@ class CheckoutController extends StorefrontController
             $pairingUuid = $this->cryptoService->unHash($pairingHash);
             $pairing = $this->paringLoader->load($pairingUuid, $context->getContext());
 
-            if(!$pairing->isFinished() && !$this->isRunning($pairing)) {
-                $this->logger->info("TWINT start process: " .$pairingUuid);
+            if (!$pairing->isFinished() && !$this->isRunning($pairing)) {
+                $this->logger->info('TWINT start process: ' . $pairingUuid);
 
-                $process = new Process(["php", $this->projectDir . "/bin/console", TwintPollCommand::COMMAND, $pairingUuid]);
-                $process->setOptions(['create_new_console' => true]);
+                $process = new Process([
+                    'php',
+                    $this->projectDir . '/bin/console',
+                    TwintPollCommand::COMMAND,
+                    $pairingUuid,
+                ]);
+                $process->setOptions([
+                    'create_new_console' => true,
+                ]);
                 $process->disableOutput();
                 $process->start();
             }
         } catch (Throwable $e) {
-            $this->logger->error("Monitoring error: " .$e->getMessage());
+            $this->logger->error('Monitoring error: ' . $e->getMessage());
             $this->addFlash(self::DANGER, $this->trans('twintPayment.error.pairingNotFound'));
             return $this->redirectToRoute('frontend.account.order.page');
         }
@@ -109,7 +111,7 @@ class CheckoutController extends StorefrontController
                 'orderId' => $pairing->getStatus() === PairingEntity::STATUS_CANCELED ? null : $pairing->getOrderId(),
             ];
 
-            if(!empty($data['orderId'])){
+            if (isset($data['orderId']) && ($data['orderId'] !== '' && $data['orderId'] !== '0')) {
                 $data['thank-you'] = $this->thankYouPage($pairing, $context)->getContent();
             }
 
@@ -137,7 +139,6 @@ class CheckoutController extends StorefrontController
             $pairing = $this->paringLoader->load($pairingUUid, $context->getContext());
             $pairing = $this->paringLoader->fetchCart($pairing, $context);
         } catch (Exception $e) {
-
             $this->addFlash(self::DANGER, $this->trans('twintPayment.error.pairingNotFound'));
             return $this->redirectToRoute('frontend.account.order.page');
         }
@@ -166,7 +167,7 @@ class CheckoutController extends StorefrontController
             'payLinks' => [],
         ]);
     }
-    
+
     protected function thankYouPage(PairingEntity $pairing, SalesChannelContext $context): RedirectResponse|Response
     {
         $page = new CheckoutFinishPage();
