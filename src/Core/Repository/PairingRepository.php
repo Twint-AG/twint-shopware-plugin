@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Twint\Core\Repository;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Shopware\Core\Checkout\Cart\CartPersister;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -16,6 +18,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingDefinition;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\ExpressCheckout\Exception\PairingException;
 use Twint\Sdk\Value\OrderStatus;
@@ -27,7 +30,8 @@ class PairingRepository
         private EntityRepository $repository,
         private CartPersister $cartPersister,
         private EntityRepository $orderRepository,
-        private CartService $cartService
+        private CartService $cartService,
+        private Connection $db
     ) {
     }
 
@@ -45,8 +49,6 @@ class PairingRepository
         if (($pairing instanceof PairingEntity) === false) {
             throw new PairingException("{$pairingId} not found");
         }
-
-//        $this->fetchCart($pairing, $context);
 
         return $pairing;
     }
@@ -122,5 +124,18 @@ class PairingRepository
             ->first();
 
         return $entity;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function updateCheckedAt(string $pairingId): int|string
+    {
+        return $this->db->executeStatement("
+            UPDATE ".PairingDefinition::ENTITY_NAME."
+            SET checked_at = NOW();
+            WHERE id = :id", [
+            'id' => $pairingId
+        ]);
     }
 }

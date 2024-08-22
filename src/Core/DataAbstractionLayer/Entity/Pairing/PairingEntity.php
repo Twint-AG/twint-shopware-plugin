@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Twint\Core\DataAbstractionLayer\Entity\Pairing;
 
+use DateTimeInterface;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -57,7 +58,9 @@ class PairingEntity extends Entity
 
     protected int $version = 1;
 
-    protected ?int $pid;
+    protected ?int $checkedAgo;
+
+    protected ?DateTimeInterface $checkedAt;
 
     public function getCustomer(): ?CustomerEntity
     {
@@ -219,8 +222,12 @@ class PairingEntity extends Entity
         return $this->version;
     }
 
-    public function getPid()
+    public function getCheckedAgo(): ?int{
+        return $this->checkedAgo;
+    }
+
+    public function getCheckedAt(): ?DateTimeInterface
     {
-        return $this->pid;
+        return $this->checkedAt;
     }
 }

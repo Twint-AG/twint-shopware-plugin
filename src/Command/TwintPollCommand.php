@@ -11,8 +11,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
+use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\Core\Repository\PairingRepository;
 use Twint\ExpressCheckout\Exception\PairingException;
 use Twint\ExpressCheckout\Service\Monitoring\MonitoringService;
@@ -20,7 +20,6 @@ use Twint\ExpressCheckout\Service\Monitoring\MonitoringService;
 class TwintPollCommand extends Command
 {
     const COMMAND = 'twint:poll';
-    const LIMIT_POLLING = 180; // 30 mins
 
     public function __construct(
         private readonly PairingRepository $repository,
@@ -43,35 +42,39 @@ class TwintPollCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-
         $pairingId = $input->getArgument('pairing-id');
-
-        $io->info('Starting to load entity');
         $pairing = $this->repository->load($pairingId, Context::createCLIContext());
-        $io->info('Entity loaded');
 
         $count = 0;
-        while (!$pairing->isFinished() && $count < self::LIMIT_POLLING) {
-            $this->log($pairingId, $pairing->getVersion(), "Polling TWINT");
+        $startedAt = new DateTime();
+
+        while (!$pairing->isFinished()) {
+            $this->repository->updateCheckedAt($pairingId);
 
             $this->monitoringService->monitorOne($pairing);
             $pairing = $this->repository->load($pairingId, Context::createCLIContext());
 
-            sleep(1); // Make this more intelligent
+            sleep($this->getInterval($pairing, $startedAt));
             ++$count;
         }
 
         return 0;
     }
 
-    private function log(...$args): void
+    /**
+     * Regular: first 3m every 5s, afterwards 10s
+     * Express: first 10m every 2s, afterwards 10s
+     */
+    private function getInterval(PairingEntity $pairing, DateTime $startedAt): int
     {
-        $message = array_pop($args);
+        $now = new DateTime();
+        $interval = $now->diff($startedAt);
+        $seconds = $interval->s + ($interval->i * 60) + ($interval->h * 3600) + ($interval->d * 86400);
 
-        file_put_contents(
-            '/tmp/polling.log',
-            sprintf("%s: (%d) (%s) %s\n", (new DateTime())->format(DATE_RFC822), getmypid(), join(') (', $args), $message),
-            FILE_APPEND);
+        if ($pairing->getIsExpress()) {
+            return $seconds < 10 * 60 ? 2 : 10;
+        }
+
+        return $seconds < 5 * 60 ? 2 : 10;
     }
 }

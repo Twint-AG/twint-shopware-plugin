@@ -4,7 +4,7 @@
 
     <services>
         <service id="Twint\Storefront\Controller\PaymentController" public="true">
-            <argument type="service" id="twint_pairing.repository"/>
+            <argument type="service" id="twint_pairing_view.repository"/>
             <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
             <argument type="service" id="Twint\Core\Service\PaymentService"/>
             <argument type="service" id="Twint\Core\Service\PairingService"/>
@@ -17,13 +17,13 @@
         </service>
 
         <service id="Twint\Storefront\Controller\CheckoutController" public="true">
-            <argument type="service" id="kernel" />
+            <argument>%kernel.project_dir%</argument>
             <argument type="service" id="twint.service.express.checkout"/>
             <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
             <argument type="service" id="Twint\Core\Repository\PairingRepository"/>
             <argument type="service" id="Twint\Core\Service\PaymentService"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
-            <argument type="service" id="Twint\ExpressCheckout\Service\Monitoring\MonitoringService"/>
+            <argument type="service" id="logger"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
