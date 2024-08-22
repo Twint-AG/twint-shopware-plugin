@@ -87,7 +87,7 @@ class PairingDefinition extends EntityDefinition
             new IntField('version', 'version'),
             new DateTimeField('checked_at', 'checkedAt'),
             new CreatedAtField(),
-            new UpdatedAtField()
+            new UpdatedAtField(),
         ]);
     }
 }

@@ -86,12 +86,12 @@ class PairingService
         ) {
             try {
                 $pairing = $this->update($pairing, $res);
-            }catch (DriverException $e){
+            } catch (DriverException $e) {
                 if ($e->getSQLState() !== '45000') {
                     throw $e;
                 }
 
-                return  false;
+                return false;
             }
         }
 

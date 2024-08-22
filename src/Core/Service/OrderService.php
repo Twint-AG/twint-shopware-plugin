@@ -167,7 +167,7 @@ class OrderService
             'transactions.stateMachineState',
         ];
 
-        $associations = empty($associations) ? $defaults : $associations;
+        $associations = $associations === [] ? $defaults : $associations;
 
 
         $criteria = new Criteria([$orderId]);

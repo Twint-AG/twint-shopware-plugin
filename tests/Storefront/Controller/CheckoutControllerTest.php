@@ -84,7 +84,9 @@ class CheckoutControllerTest extends TestCase
         $this->paymentService = $this->createMock(PaymentService::class);
         $this->cartService = $this->createMock(CartService::class);
         $this->monitor = $this->createMock(MonitoringService::class);
+        $projectDir = $this->getContainer()->getParameter('kernel.project_dir');
         $this->controller = new CheckoutController(
+            $projectDir
             $this->checkoutService,
             $this->cryptoService,
             $this->pairingRepository,
