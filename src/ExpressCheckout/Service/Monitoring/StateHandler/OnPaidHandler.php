@@ -25,6 +25,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\Profiling\Profiler;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Throwable;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\Core\DataAbstractionLayer\Entity\TransactionLog\TwintTransactionLogDefinition;
 use Twint\Core\Model\ApiResponse;
@@ -111,8 +112,8 @@ class OnPaidHandler implements StateHandlerInterface
             } else {
                 $this->pairingService->markAsCancelled($entity);
             }
-        }catch ( \Throwable $e){
-            $this->logger->error("TWINT error: " . $e->getMessage());
+        } catch (Throwable $e) {
+            $this->logger->error('TWINT error: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -182,7 +183,6 @@ class OnPaidHandler implements StateHandlerInterface
             'order_id' => Encoding::hexToBin($order->getId()),
             'pairing_id' => $pairingId,
         ]);
-
     }
 
     protected function appendLogFields(OrderEntity $order, array $log): EntityWrittenContainerEvent

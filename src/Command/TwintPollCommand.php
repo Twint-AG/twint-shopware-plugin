@@ -20,14 +20,13 @@ use Twint\ExpressCheckout\Service\Monitoring\MonitoringService;
 
 class TwintPollCommand extends Command
 {
-    const COMMAND = 'twint:poll';
+    public const COMMAND = 'twint:poll';
 
     public function __construct(
         private readonly PairingRepository $repository,
         private readonly MonitoringService $monitoringService,
         private readonly LoggerInterface $logger
-    )
-    {
+    ) {
         parent::__construct();
     }
 
@@ -45,13 +44,13 @@ class TwintPollCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $pairingId = $input->getArgument('pairing-id');
-        $pairing = $this->repository->load($pairingId, Context::createCLIContext());
+        $pairing = $this->repository->load($pairingId, Context::createDefaultContext());
 
         $count = 0;
         $startedAt = new DateTime();
 
         while (!$pairing->isFinished()) {
-            $this->logger->info("TWINT pairing monitor: $pairingId: {$pairing->getVersion()}");
+            $this->logger->info("TWINT pairing monitor: {$pairingId}: {$pairing->getVersion()}");
             $this->repository->updateCheckedAt($pairingId);
 
             $this->monitoringService->monitorOne($pairing);
