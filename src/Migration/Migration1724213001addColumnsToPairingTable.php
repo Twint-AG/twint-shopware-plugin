@@ -24,10 +24,10 @@ class Migration1724213001addColumnsToPairingTable extends MigrationStep
     public function update(Connection $connection): void
     {
         $sqls = [
-            'ALTER TABLE twint_pairing ADD COLUMN `pid` int NULL;',
+            'ALTER TABLE twint_pairing ADD COLUMN `checked_at` datetime(3) NULL;',
             'ALTER TABLE twint_pairing ADD COLUMN `version` int unsigned NOT NULL DEFAULT 1;',
             "            
-            CREATE TRIGGER before_update_pairing
+            CREATE TRIGGER before_update_twint_pairing
             BEFORE UPDATE ON twint_pairing
             FOR EACH ROW
             BEGIN
@@ -39,12 +39,17 @@ class Migration1724213001addColumnsToPairingTable extends MigrationStep
                
                
                
-               IF OLD.pid = NEW.pid THEN
+               IF OLD.checked_at = NEW.checked_at THEN
                   SET NEW.version = OLD.version + 1;
                END IF;  
                     
             END;            
-           "
+           ",
+            'CREATE VIEW twint_pairing_view AS
+                SELECT
+                  tp.*,
+                  (UNIX_TIMESTAMP() - UNIX_TIMESTAMP(tp.checked_at)) AS checked_ago
+                FROM twint_pairing tp;'
         ];
 
         foreach ($sqls as $sql) {

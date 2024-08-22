@@ -4,8 +4,13 @@
 
     <services>
         <service id="Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingDefinition">
-            <tag name="shopware.entity.definition" entity="twint_transaction_log"/>
+            <tag name="shopware.entity.definition" entity="twint_pairing_entity"/>
         </service>
+
+        <service id="Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingViewDefinition">
+            <tag name="shopware.entity.definition" entity="twint_pairing_view_entity"/>
+        </service>
+
         <service id="Twint\Core\DataAbstractionLayer\Entity\ReversalHistory\TwintReversalHistoryDefinition">
             <tag name="shopware.entity.definition" entity="twint_reversal_history"/>
         </service>

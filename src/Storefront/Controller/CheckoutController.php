@@ -7,6 +7,7 @@ namespace Twint\Storefront\Controller;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
 use Exception;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -34,14 +35,18 @@ use Twint\ExpressCheckout\Service\PairingService;
 ])]
 class CheckoutController extends StorefrontController
 {
+    private const TIME_WINDOW_SECONDS = 10; // 10 seconds
+
     public function __construct(
-        private readonly KernelInterface $kernel,
+        private string $projectDir,
         private readonly ExpressCheckoutServiceInterface $checkoutService,
         private CryptoHandler $cryptoService,
         private readonly PairingRepository $paringLoader,
         private PaymentService $paymentService,
         private readonly CartService $cartService,
-        private readonly MonitoringService $monitor
+        private readonly LoggerInterface $logger
+
+
     ) {
     }
 
@@ -84,16 +89,14 @@ class CheckoutController extends StorefrontController
             $pairingUuid = $this->cryptoService->unHash($pairingHash);
             $pairing = $this->paringLoader->load($pairingUuid, $context->getContext());
 
-            if(!$pairing->isFinished() && !$this->isRunning($pairing->getPid())) {
-                $process = new Process(["php", $this->kernel->getProjectDir() . "/bin/console", TwintPollCommand::COMMAND, $pairingUuid]);
+            if(!$pairing->isFinished() && !$this->isRunning($pairing)) {
+                $process = new Process(["php", $this->projectDir . "/bin/console", TwintPollCommand::COMMAND, $pairingUuid]);
                 $process->setOptions(['create_new_console' => true]);
                 $process->disableOutput();
                 $process->start();
-
-                $this->paringLoader->update([['id' => $pairing->getId(), 'pid' => $process->getPid()]]);
-                $pairing = $this->paringLoader->load($pairingUuid, $context->getContext());
             }
         } catch (Throwable $e) {
+            $this->logger->error("Monitoring error: " .$e->getMessage());
             $this->addFlash(self::DANGER, $this->trans('twintPayment.error.pairingNotFound'));
             return $this->redirectToRoute('frontend.account.order.page');
         }
@@ -116,16 +119,9 @@ class CheckoutController extends StorefrontController
         ]);
     }
 
-    protected function isRunning(int|null $processId): bool
+    protected function isRunning(PairingEntity $pairing): bool
     {
-        if(is_null($processId))
-            return false;
-
-        if(function_exists('posix_getpgid')) {
-            return (bool) posix_getpgid($processId);
-        }
-
-        return true;
+        return $pairing->getCheckedAt() && $pairing->getCheckedAgo() < self::TIME_WINDOW_SECONDS;
     }
 
     #[Route(path: '/payment/express/{paringHash}', name: 'frontend.twint.express', methods: ['GET'], defaults: [
@@ -139,6 +135,7 @@ class CheckoutController extends StorefrontController
             $pairing = $this->paringLoader->load($pairingUUid, $context->getContext());
             $pairing = $this->paringLoader->fetchCart($pairing, $context);
         } catch (Exception $e) {
+
             $this->addFlash(self::DANGER, $this->trans('twintPayment.error.pairingNotFound'));
             return $this->redirectToRoute('frontend.account.order.page');
         }

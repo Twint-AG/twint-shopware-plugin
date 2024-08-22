@@ -96,7 +96,7 @@
         </service>
 
         <service id="Twint\Core\Service\PairingService">
-            <argument type="service" id="twint_pairing.repository"/>
+            <argument type="service" id="twint_pairing_view.repository"/>
             <argument type="service" id="Twint\Core\Service\ApiService"/>
             <argument type="service" id="Twint\Core\Factory\ClientBuilder"/>
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
@@ -104,11 +104,11 @@
         </service>
 
         <service id="Twint\Core\Repository\PairingRepository">
-            <argument type="service" id="twint_pairing.repository"/>
+            <argument type="service" id="twint_pairing_view.repository"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\CartPersister"/>
             <argument type="service" id="order.repository"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
-
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
         </service>
 
         <service id="Twint\Command\TwintPollCommand">
