@@ -204,7 +204,7 @@ export default class PaymentStatusRefresh extends Plugin {
     let stages = {
       0: 2000,
       600: 10000, //10 mins
-      1800: 0 // 30 mins
+      3600: 0 // 1 hour
     }
 
     //regular
@@ -212,7 +212,7 @@ export default class PaymentStatusRefresh extends Plugin {
       stages ={
         0: 2000,
         300: 10000, //5 min
-        1800: 0 // 30 mins
+        3600: 0 // 1 hour
       }
     }
 
