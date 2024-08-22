@@ -32,6 +32,12 @@ export default class PaymentStatusRefresh extends Plugin {
 
     this.modal = null;
     this.success = false;
+
+    this.startedAt = null;
+  }
+
+  begin(){
+    this.startedAt = new Date();
   }
 
   getDomain() {
@@ -69,6 +75,10 @@ export default class PaymentStatusRefresh extends Plugin {
   }
 
   checkExpressCheckoutStatus() {
+    if(!this.startedAt){
+      this.begin();
+    }
+
     this.registerEvents();
 
     if (this.reachLimit())
@@ -87,13 +97,18 @@ export default class PaymentStatusRefresh extends Plugin {
       const data = JSON.parse(response);
 
       if (data.completed) {
+        this.startedAt = null;
+
         if (data.orderId) {
           this.onExpressPaid(data);
         } else
           ExpressCheckoutButton.modal.close();
 
       } else {
-        setTimeout(this.checkExpressCheckoutStatus.bind(this), this.options.interval);
+        let interval = this.getInterval();
+        if(interval > 0) {
+          setTimeout(this.checkExpressCheckoutStatus.bind(this), interval);
+        }
       }
     });
   }
@@ -146,9 +161,13 @@ export default class PaymentStatusRefresh extends Plugin {
         const jsonResponse = JSON.parse(response);
         const completed = (typeof jsonResponse.completed === "boolean") ? jsonResponse.completed : false;
         if (completed) {
+          this.startedAt = null;
           location.reload();
         } else {
-          setTimeout(this.checkRegularCheckoutStatus.bind(this), this.options.interval);
+          let interval = this.getInterval();
+          if(interval > 0) {
+            setTimeout(this.checkRegularCheckoutStatus.bind(this), interval);
+          }
         }
       } catch (e) {
       }
@@ -161,5 +180,45 @@ export default class PaymentStatusRefresh extends Plugin {
     titleEl.innerHTML = titleEl.getAttribute('data-finish');
 
     this.success = false;
+    this.startedAt = null;
+  }
+
+  getInterval(){
+    if(!this.startedAt){
+      this.begin();
+    }
+
+    let now = new Date();
+    const seconds = Math.floor((now - this.startedAt) / 1000);
+
+    let currentInterval = 2000; // Default to the first interval
+
+    // express
+    let stages = {
+      0: 2000,
+      600: 10000, //10 mins
+      1800: 0 // 30 mins
+    }
+
+    //regular
+    if(!this.options.expressCheckout){
+      stages ={
+        0: 2000,
+        300: 10000, //5 min
+        1800: 0 // 30 mins
+      }
+    }
+
+    for (const [second, interval] of Object.entries(stages)) {
+      if (seconds >= parseInt(second)) {
+        currentInterval = interval;
+      } else {
+        break;
+      }
+    }
+
+    console.log("interval", this.startedAt, seconds, currentInterval);
+
+    return currentInterval;
   }
 }
