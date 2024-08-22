@@ -90,6 +90,8 @@ class CheckoutController extends StorefrontController
             $pairing = $this->paringLoader->load($pairingUuid, $context->getContext());
 
             if(!$pairing->isFinished() && !$this->isRunning($pairing)) {
+                $this->logger->info("TWINT start process: " .$pairingUuid);
+
                 $process = new Process(["php", $this->projectDir . "/bin/console", TwintPollCommand::COMMAND, $pairingUuid]);
                 $process->setOptions(['create_new_console' => true]);
                 $process->disableOutput();

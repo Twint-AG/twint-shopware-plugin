@@ -10,6 +10,7 @@ use Shopware\Core\Checkout\Shipping\ShippingMethodDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\BoolField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\CreatedAtField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\DateTimeField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\PrimaryKey;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
@@ -84,6 +85,7 @@ class PairingDefinition extends EntityDefinition
             new ManyToOneAssociationField('order', 'order_id', OrderDefinition::class, 'id', false),
             (new JsonField('customer_data', 'customerData')),
             new IntField('version', 'version'),
+            new DateTimeField('checked_at', 'checkedAt'),
             new CreatedAtField(),
             new UpdatedAtField()
         ]);
