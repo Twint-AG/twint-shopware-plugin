@@ -112,14 +112,18 @@ class CheckoutController extends StorefrontController
 
         // Wait for order placing process
         if ($pairing->isOrderProcessing()) {
-            while (true) {
+            $time = 0;
+            // 100 - Maximum 10s - same as next JS interval
+            while ($time < 100) {
                 $this->logger->info("TWINT usleep(0.5) : $pairingUuid  {$pairing->getStatus()} {$pairing->getVersion()}");
                 $pairing = $this->paringLoader->load($pairingUuid, $context->getContext());
 
                 if ($pairing->isFinished()) {
                     return $this->getFinishedResponse($pairing, $context);
                 }
-                usleep(500000); // Sleep for 500,000 microseconds (0.5 seconds)
+
+                usleep( 3 * 100000); // Sleep for 300,000 microseconds (0.3 seconds)
+                $time += 3;
             }
         }
 
