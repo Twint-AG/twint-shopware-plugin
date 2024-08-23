@@ -58,6 +58,8 @@ class PairingEntity extends Entity
 
     protected int $version = 1;
 
+    protected int $isOrdering;
+
     protected ?int $checkedAgo;
 
     protected ?DateTimeInterface $checkedAt = null;
@@ -231,5 +233,10 @@ class PairingEntity extends Entity
     public function getCheckedAt(): ?DateTimeInterface
     {
         return $this->checkedAt;
+    }
+
+    public function isOrderProcessing(): bool
+    {
+        return (bool)$this->isOrdering;
     }
 }

@@ -13,6 +13,7 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
 use Shopware\Storefront\Page\Checkout\Finish\CheckoutFinishPage;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -100,27 +101,45 @@ class CheckoutController extends StorefrontController
                 $process->start();
             }
         } catch (Throwable $e) {
-            $this->logger->error('Monitoring error: ' . $e->getMessage());
+            $this->logger->error('TWINT start process error: ' . $e->getMessage());
             $this->addFlash(self::DANGER, $this->trans('twintPayment.error.pairingNotFound'));
             return $this->redirectToRoute('frontend.account.order.page');
         }
 
         if ($pairing->isFinished()) {
-            $data = [
-                'completed' => true,
-                'orderId' => $pairing->getStatus() === PairingEntity::STATUS_CANCELED ? null : $pairing->getOrderId(),
-            ];
+            return $this->getFinishedResponse($pairing, $context);
+        }
 
-            if (isset($data['orderId']) && ($data['orderId'] !== '' && $data['orderId'] !== '0')) {
-                $data['thank-you'] = $this->thankYouPage($pairing, $context)->getContent();
+        // Wait for order placing process
+        if ($pairing->isOrderProcessing()) {
+            while (true) {
+                $this->logger->info("TWINT usleep(0.5) : $pairingUuid  {$pairing->getStatus()} {$pairing->getVersion()}");
+                $pairing = $this->paringLoader->load($pairingUuid, $context->getContext());
+
+                if ($pairing->isFinished()) {
+                    return $this->getFinishedResponse($pairing, $context);
+                }
+                usleep(500000); // Sleep for 500,000 microseconds (0.5 seconds)
             }
-
-            return $this->json($data);
         }
 
         return $this->json([
             'completed' => false,
         ]);
+    }
+
+    protected function getFinishedResponse(PairingEntity $pairing, SalesChannelContext $context): JsonResponse
+    {
+        $data = [
+            'completed' => true,
+            'orderId' => $pairing->getStatus() === PairingEntity::STATUS_CANCELED ? null : $pairing->getOrderId(),
+        ];
+
+        if (isset($data['orderId']) && ($data['orderId'] !== '' && $data['orderId'] !== '0')) {
+            $data['thank-you'] = $this->thankYouPage($pairing, $context)->getContent();
+        }
+
+        return $this->json($data);
     }
 
     protected function isRunning(PairingEntity $pairing): bool

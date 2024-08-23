@@ -11,6 +11,7 @@
             <argument type="service" id="Twint\ExpressCheckout\Service\PairingService"/>
             <argument type="service" id="Twint\Core\Service\PairingService"/>
             <argument type="service" id="Twint\Core\Service\ApiService"/>
+            <argument type="service" id="logger"/>
         </service>
 
     </services>

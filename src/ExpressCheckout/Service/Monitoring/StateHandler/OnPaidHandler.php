@@ -29,6 +29,7 @@ use Throwable;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\Core\DataAbstractionLayer\Entity\TransactionLog\TwintTransactionLogDefinition;
 use Twint\Core\Model\ApiResponse;
+use Twint\Core\Repository\PairingRepository;
 use Twint\Core\Service\CurrencyService;
 use Twint\Core\Service\PairingService as RegularPairingService;
 use Twint\ExpressCheckout\Service\ExpressPaymentService;
@@ -54,12 +55,19 @@ class OnPaidHandler implements StateHandlerInterface
         private readonly Connection $connection,
         private readonly CartPersister $cartPersister,
         private readonly EventDispatcherInterface $eventDispatcher,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly PairingRepository $pairingRepository
     ) {
     }
 
     /**
+     * @param PairingEntity $entity
+     * @param FastCheckoutCheckIn $state
+     * @return void
+     * @throws BadFormatException
+     * @throws EnvironmentIsBrokenException
      * @throws Exception
+     * @throws Throwable
      */
     public function handle(PairingEntity $entity, FastCheckoutCheckIn $state): void
     {
@@ -67,6 +75,10 @@ class OnPaidHandler implements StateHandlerInterface
             if (empty($entity->getCustomerData())) {
                 return;
             }
+
+            $this->logger->info("TWINT placing order for {$entity->getId()} {$entity->getToken()}");
+
+            $this->pairingRepository->markAsOrdering($entity->getId());
 
             //Register customer
             list($customerEntity, $addressId) = $this->registerCustomer($entity);

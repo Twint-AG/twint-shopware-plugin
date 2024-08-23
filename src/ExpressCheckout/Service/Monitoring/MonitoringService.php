@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Twint\ExpressCheckout\Service\Monitoring;
 
 use Doctrine\DBAL\Exception;
+use Psr\Log\LoggerInterface;
 use Throwable;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\Core\Service\ApiService;
@@ -26,7 +27,8 @@ class MonitoringService
         private readonly OnPaidHandler $onPaidHandler,
         private readonly PairingService $pairingService,
         private readonly RegularPairingService $regular,
-        private readonly ApiService $api
+        private readonly ApiService $api,
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -70,6 +72,7 @@ class MonitoringService
                     throw $e;
                 }
 
+                $this->logger->info("TWINT update pairing is locked {$pairing->getId()} {$pairing->getVersion()} {$pairing->getStatus()}");
                 return $pairing;
             }
 
