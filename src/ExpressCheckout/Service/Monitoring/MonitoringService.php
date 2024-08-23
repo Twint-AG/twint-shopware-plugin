@@ -43,7 +43,12 @@ class MonitoringService
 
         /** @var PairingEntity $pairing */
         foreach ($pairings as $pairing) {
-            $this->monitorOne($pairing);
+            try {
+                $this->monitorOne($pairing);
+            }catch (Throwable $e){
+                // Silent error to allow process handle next Pairings
+                $this->logger->error("TWINT cli error: {$pairing->getId()} {$pairing->getToken()} {$e->getMessage()}");
+            }
         }
     }
 
