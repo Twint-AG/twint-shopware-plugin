@@ -50,7 +50,7 @@ class TwintPollCommand extends Command
         $startedAt = new DateTime();
 
         while (!$pairing->isFinished()) {
-            $this->logger->info("TWINT pairing monitor: {$pairingId}: {$pairing->getVersion()}");
+            $this->logger->info("TWINT monitor: {$pairingId}: {$pairing->getVersion()}");
             $this->repository->updateCheckedAt($pairingId);
 
             $this->monitoringService->monitorOne($pairing);

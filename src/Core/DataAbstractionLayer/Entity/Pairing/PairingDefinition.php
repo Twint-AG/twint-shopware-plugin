@@ -85,6 +85,7 @@ class PairingDefinition extends EntityDefinition
             new ManyToOneAssociationField('order', 'order_id', OrderDefinition::class, 'id', false),
             (new JsonField('customer_data', 'customerData')),
             new IntField('version', 'version'),
+            new IntField('is_ordering', 'isOrdering'),
             new DateTimeField('checked_at', 'checkedAt'),
             new CreatedAtField(),
             new UpdatedAtField(),

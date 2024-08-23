@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Twint\ExpressCheckout\Service;
 
 use Doctrine\DBAL\Exception;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -18,6 +19,7 @@ class PairingService
 {
     public function __construct(
         private readonly PairingRepository $repository,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -89,6 +91,8 @@ class PairingService
         if ($state->shippingMethodId() instanceof ShippingMethodId) {
             $data['shippingMethodId'] = (string) $state->shippingMethodId();
         }
+
+        $this->logger->info("TWINT update pairing {$entity->getStatus()}");
 
         return $this->repository->update([$data]);
     }

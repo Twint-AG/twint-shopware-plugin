@@ -138,4 +138,14 @@ class PairingRepository
             'id' => $pairingId,
         ]);
     }
+
+    public function markAsOrdering(string $pairingId): int|string
+    {
+        return $this->db->executeStatement('
+            UPDATE ' . PairingDefinition::ENTITY_NAME . '
+            SET is_ordering = 1
+            WHERE id = :id', [
+            'id' => $pairingId
+        ]);
+    }
 }

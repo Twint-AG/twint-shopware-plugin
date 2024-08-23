@@ -6,6 +6,7 @@ namespace Twint\Core\Service;
 
 use Doctrine\DBAL\Exception\DriverException;
 use Exception;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
@@ -29,6 +30,7 @@ class PairingService
         private readonly ClientBuilder $builder,
         private readonly OrderTransactionStateHandler $transactionStateHandler,
         private readonly OrderService $orderService,
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -90,6 +92,8 @@ class PairingService
                 if ($e->getSQLState() !== '45000') {
                     throw $e;
                 }
+
+                $this->logger->info("TWINT update pairing is locked {$pairing->getId()} {$pairing->getVersion()} {$pairing->getStatus()}");
 
                 return false;
             }
