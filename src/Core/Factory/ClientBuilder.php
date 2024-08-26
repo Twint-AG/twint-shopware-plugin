@@ -39,8 +39,8 @@ class ClientBuilder
      */
     public function build(string $salesChannelId, int $version = Version::LATEST): InvocationRecordingClient
     {
-        if (isset(self::$instances[$salesChannelId.$version])) {
-            return self::$instances[$salesChannelId.$version];
+        if (isset(self::$instances[$salesChannelId . $version])) {
+            return self::$instances[$salesChannelId . $version];
         }
 
         $setting = $this->settingService->getSetting($salesChannelId);
@@ -85,7 +85,7 @@ class ClientBuilder
                 $recorder
             );
 
-            self::$instances[$salesChannelId.$version] = $client;
+            self::$instances[$salesChannelId . $version] = $client;
 
             return $client;
         } catch (Throwable $e) {
