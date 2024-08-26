@@ -61,9 +61,6 @@ class OnPaidHandler implements StateHandlerInterface
     }
 
     /**
-     * @param PairingEntity $entity
-     * @param FastCheckoutCheckIn $state
-     * @return void
      * @throws BadFormatException
      * @throws EnvironmentIsBrokenException
      * @throws Exception

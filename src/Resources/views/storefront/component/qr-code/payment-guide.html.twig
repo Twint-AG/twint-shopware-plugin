@@ -1,9 +1,9 @@
 {% block twint_qr_guide %}
-    <div class="container mt-4 qr-code d-none d-md-block">
+    <div class="container mt-4 qr-code d-none {% if not isMobile %}d-md-block{% endif %}">
         <div class="row justify-content-center p-4">
             <div class="col-lg-10 modal-lg-12">
                 <div class="row justify-content-center">
-                    <div class="col-12 {% if expressCheckout %}col-md-6 mb-4{% else %}col-md-12{% endif %}">
+                    <div class="col-12 {% if expressCheckout and not isMobile %}col-md-6 mb-4{% else %}col-md-12{% endif %}">
                         <div class="d-flex flex-column align-items-center" data-test="tutorial-scan">
                             <div class="d-flex justify-content-center">
                                 <img class="guide-icon"
@@ -13,7 +13,7 @@
                         </div>
                     </div>
                     {% if expressCheckout %}
-                    <div class="col-12 col-md-6">
+                    <div class="col-12 {% if not isMobile %}col-md-6{% endif %}">
                         <div class="d-flex flex-column align-items-center" data-test="tutorial-contact">
                             <div class="d-flex justify-content-center">
                                 <img class="guide-icon"

@@ -93,7 +93,9 @@ class PairingService
                     throw $e;
                 }
 
-                $this->logger->info("TWINT update pairing is locked {$pairing->getId()} {$pairing->getVersion()} {$pairing->getStatus()}");
+                $this->logger->info(
+                    "TWINT update pairing is locked {$pairing->getId()} {$pairing->getVersion()} {$pairing->getStatus()}"
+                );
 
                 return false;
             }
