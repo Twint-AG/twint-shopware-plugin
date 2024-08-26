@@ -1,17 +1,25 @@
 {% set basicConfig = config('core.basicInformation') %}
 
 {% block twint_qr_code %}
+    {% set isMobile = isAndroid or isIosDevice %}
+    {% if isMobile %}
+        <style>
+            div.flex-md-row {
+                flex-direction: column-reverse;
+            }
+        </style>
+    {% endif %}
     <div class="container sm-w-100">
         <div class="row justify-content-center pt-md-3">
             <div class="col-12 col-lg-10">
-                <div class="row h-100 flex-column-reverse flex-md-row pl-md-3">
-                    <div class="qr-code col-12 col-md-6 d-flex px-0 justify-content-center bg-white md-rounded pt-4 pt-md-0 pd-md-auto d-md-flex d-none flex d-md-flex">
-                        <div data-twint-copy-token class="d-flex flex-column text-center flex-md-column-reverse">
+                <div class="row h-100 flex-column-reverse flex-md-row {% if not isMobile %}pl-md-3{% endif%}">
+                    <div class="qr-code col-12 {% if not isMobile %}col-md-6 d-md-flex pt-md-0{% endif%} d-flex px-0 justify-content-center bg-white md-rounded pt-4 pd-md-auto d-none flex">
+                        <div data-twint-copy-token class="d-flex flex-column text-center {% if not isMobile %}flex-md-column-reverse{% endif%}">
                             <div class="qr-token text-center mb-3" data-test="qr-code">
                                 <input id="qr-token" class="text-center bg-white" type="text" value="{{ pairingToken }}" disabled>
                             </div>
 
-                            <div class="d-md-none">
+                            <div class="{% if not isMobile %}d-md-none{% endif%}">
                                 <button id="btn-copy-token" data-clipboard-action="copy" data-clipboard-target="#qr-token" class="text-center p-2 px-3 bg-white rounded text-secondary border-secondary border-1 ">{{ "twintPayment.button.copyCode"|trans() }}</button>
                             </div>
 
@@ -22,7 +30,7 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="col-md-6 pl-0 d-flex flex-column">
+                    <div class="{% if not isMobile %}col-md-6{% endif%} pl-0 d-flex flex-column">
                         <div class="row h-100">
                             <div class="col-12 d-flex flex-column row-gap-1 row-gap-md-3 px-0 px-md-3">
                                 <div class="right-element bg-white p-3 h-50 md-rounded d-flex justify-content-center align-items-center" data-test="total-amount">
@@ -39,19 +47,22 @@
                         <div data-app-selector>
                             {% if isIosDevice %}
                                 {{ include('@TwintPayment/storefront/component/qr-code/mobile-ios.html.twig',{
-                                    payLinks: payLinks
+                                    payLinks: payLinks,
+                                    isIosDevice: isIosDevice
                                 }) }}
                             {% endif %}
 
                             {% if isAndroid %}
-                                {{ include('@TwintPayment/storefront/component/qr-code/mobile-android.html.twig') }}
+                                {{ include('@TwintPayment/storefront/component/qr-code/mobile-android.html.twig', {
+                                    isAndroid: isAndroid
+                                }) }}
                             {% endif %}
 
-                            <div class="row qr-code d-none d-md-none">
+                            <div class="row qr-code d-none {% if not isMobile %}d-md-none{% endif%}">
                                 <div class="separator d-flex py-0 text-center my-3">{{ 'twintPayment.instruction.or'|trans() }}</div>
                             </div>
 
-                            <div class="row qr-code d-none flex d-md-none d-flex justify-content-center my-3">
+                            <div class="row qr-code d-none flex {% if not isMobile %}d-md-none"{% endif%} d-flex justify-content-center my-3">
                                 <div class="col-9 text-center">{{ 'twintPayment.instruction.inputCode'|trans() }}</div>
                             </div>
                         </div>

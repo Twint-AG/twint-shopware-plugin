@@ -1,5 +1,5 @@
 {% block twint_qr_ios %}
-    <div class="mb-3 d-md-none">
+    <div class="mb-3 {% if not isIosDevice %}d-md-none{% endif%}">
         <div class="row app-chooser-area" data-test="app">
             <div id="app-chooser-container" class="text-center bg-light">
                 <div class="app-chooser-title my-4">{{ 'twintPayment.appSelector.title'|trans() }}</div>

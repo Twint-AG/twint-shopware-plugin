@@ -237,6 +237,6 @@ class PairingEntity extends Entity
 
     public function isOrderProcessing(): bool
     {
-        return (bool)$this->isOrdering;
+        return (bool) $this->isOrdering;
     }
 }

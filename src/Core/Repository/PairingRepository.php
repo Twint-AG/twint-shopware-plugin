@@ -145,7 +145,7 @@ class PairingRepository
             UPDATE ' . PairingDefinition::ENTITY_NAME . '
             SET is_ordering = 1
             WHERE id = :id', [
-            'id' => $pairingId
+            'id' => $pairingId,
         ]);
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Twint\Tests\Storefront\Controller;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
@@ -57,7 +58,7 @@ class CheckoutControllerTest extends TestCase
 
     private CartService $cartService;
 
-    private MonitoringService $monitor;
+    private LoggerInterface $loggerMock;
 
 
     /**
@@ -83,16 +84,16 @@ class CheckoutControllerTest extends TestCase
         $this->pairingRepository = $this->createMock(PairingRepository::class);
         $this->paymentService = $this->createMock(PaymentService::class);
         $this->cartService = $this->createMock(CartService::class);
-        $this->monitor = $this->createMock(MonitoringService::class);
+        $this->loggerMock = $this->createMock(LoggerInterface::class);
         $projectDir = $this->getContainer()->getParameter('kernel.project_dir');
         $this->controller = new CheckoutController(
-            $projectDir
+            $projectDir,
             $this->checkoutService,
             $this->cryptoService,
             $this->pairingRepository,
             $this->paymentService,
             $this->cartService,
-            $this->monitor,
+            $this->loggerMock,
         );
         $this->controller->setContainer($this->container);
     }
