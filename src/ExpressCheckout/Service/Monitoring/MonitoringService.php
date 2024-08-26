@@ -45,7 +45,7 @@ class MonitoringService
         foreach ($pairings as $pairing) {
             try {
                 $this->monitorOne($pairing);
-            }catch (Throwable $e){
+            } catch (Throwable $e) {
                 // Silent error to allow process handle next Pairings
                 $this->logger->error("TWINT cli error: {$pairing->getId()} {$pairing->getToken()} {$e->getMessage()}");
             }
@@ -77,7 +77,9 @@ class MonitoringService
                     throw $e;
                 }
 
-                $this->logger->info("TWINT update pairing is locked {$pairing->getId()} {$pairing->getVersion()} {$pairing->getStatus()}");
+                $this->logger->info(
+                    "TWINT update pairing is locked {$pairing->getId()} {$pairing->getVersion()} {$pairing->getStatus()}"
+                );
                 return $pairing;
             }
 

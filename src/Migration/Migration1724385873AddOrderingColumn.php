@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Twint\Migration;
 
@@ -30,7 +32,7 @@ class Migration1724385873AddOrderingColumn extends MigrationStep
                 SELECT
                   tp.*,
                   (UNIX_TIMESTAMP() - UNIX_TIMESTAMP(tp.checked_at)) AS checked_ago
-                FROM twint_pairing tp;'
+                FROM twint_pairing tp;',
         ];
 
         foreach ($sqls as $sql) {
