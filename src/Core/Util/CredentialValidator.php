@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Twint\Core\Util;
 
 use Exception;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Validation;
 use Twint\Sdk\Certificate\CertificateContainer;
 use Twint\Sdk\Certificate\Pkcs12Certificate;
 use Twint\Sdk\Client;
@@ -22,6 +26,39 @@ class CredentialValidator implements CredentialValidatorInterface
     public function validate(array $certificate, string $storeUuid, bool $testMode): bool
     {
         try {
+            $validator = Validation::createValidator();
+            $storeUuidViolations = $validator->validate(
+                $storeUuid,
+                [
+                    new NotBlank(),
+                    new Length([
+                        'max' => 36,
+                    ]),
+                ]
+            );
+            $certificateViolations = $validator->validate(
+                $certificate['certificate'] ?? '',
+                [
+                    new NotNull(),
+                    new Length([
+                        'max' => 64 * 1024,
+                    ]),
+                ]
+            );
+            $passphraseViolations = $validator->validate(
+                $certificate['passphrase'] ?? '',
+                [
+                    new NotNull(),
+                    new Length([
+                        'max' => 1024,
+                    ]),
+                ]
+            );
+            if (count($storeUuidViolations) > 0 || count($certificateViolations) > 0 || count(
+                $passphraseViolations
+            ) > 0) {
+                return false;
+            }
             $cert = $this->crypto->decrypt($certificate['certificate']);
             $passphrase = $this->crypto->decrypt($certificate['passphrase']);
 
