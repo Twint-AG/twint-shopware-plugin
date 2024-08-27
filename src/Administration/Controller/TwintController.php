@@ -14,6 +14,11 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
@@ -33,6 +38,12 @@ use Twint\Sdk\Value\Order;
 ])]
 class TwintController extends AbstractController
 {
+    public const MAX_PASSWORD_LENGTH = 512;
+
+    public const MAX_CERTIFICATE_FILE_SIZE = 128;
+
+    public const MAX_REFUND_DESCRIPTION_LENGTH = 127;
+
     private CryptoHandler $encryptor;
 
     private CredentialValidatorInterface $validator;
@@ -87,8 +98,43 @@ class TwintController extends AbstractController
     {
         $file = $request->files->get('file');
         $password = $request->get('password') ?? '';
-
+        $validator = Validation::createValidator();
+        $passwordViolations = $validator->validate(
+            $password,
+            [
+                new NotBlank(),
+                new Length([
+                    'max' => self::MAX_PASSWORD_LENGTH,
+                ]),
+            ]
+        );
+        if (count($passwordViolations) > 0) {
+            return $this->json([
+                'success' => false,
+                'message' => $this->translator->trans('twintPayment.administration.extractPem.error.invalidFile'),
+                'errorCode' => 'ERROR_INVALID_PASSPHRASE',
+            ], 400);
+        }
         if ($file instanceof UploadedFile) {
+            $fileViolations = $validator->validate(
+                $file,
+                [
+                    new NotNull(),
+                    new File(
+                        [
+                            'maxSize' => self::MAX_CERTIFICATE_FILE_SIZE * 1024,
+                            'mimeTypes' => ['application/x-pkcs12', 'application/octet-stream'],
+                        ]
+                    ),
+                ]
+            );
+            if (count($fileViolations) > 0) {
+                return $this->json([
+                    'success' => false,
+                    'message' => $this->translator->trans('twintPayment.administration.extractPem.error.invalidFile'),
+                    'errorCode' => 'invalid',
+                ], 400);
+            }
             $content = file_get_contents($file->getPathname());
 
             $extractor = new CertificateHandler();
@@ -142,6 +188,21 @@ class TwintController extends AbstractController
         $orderId = $request->get('orderId') ?? '';
         $reason = $request->get('reason') ?? '';
         $amount = (float) ($request->get('amount') ?? 0);
+        $validator = Validation::createValidator();
+        $reasonViolations = $validator->validate(
+            $reason,
+            [
+                new Length([
+                    'max' => self::MAX_REFUND_DESCRIPTION_LENGTH,
+                ]),
+            ]
+        );
+        if (count($reasonViolations) > 0) {
+            return $this->json([
+                'success' => false,
+                'error' => $this->translator->trans('twintPayment.administration.refund.error.fail'),
+            ]);
+        }
         if ($amount <= 0) {
             return $this->json([
                 'success' => false,
