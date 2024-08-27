@@ -8,7 +8,6 @@ export default class AppSwitchHandler extends Plugin {
         appSelector: '#logo-container',
         appLinkSelector: "#app-chooser",
         qrCodeSelector: ".qr-code",
-        appCountDownInterval: 2, //second
     };
 
     init() {
@@ -52,10 +51,6 @@ export default class AppSwitchHandler extends Plugin {
 
         let link = this.$container.getAttribute('data-android-link');
         window.location.replace(link);
-        const checkLocation = setInterval(() => {
-            this.showMobileQrCode();
-            clearInterval(checkLocation);
-        }, this.options.appCountDownInterval * 1000);
     }
 
     onClickBank(event, object) {
@@ -73,22 +68,7 @@ export default class AppSwitchHandler extends Plugin {
         if (link) {
             try {
                 window.location.replace(link);
-
-                const checkLocation = setInterval(() => {
-                    if (window.location.href !== link) {
-                        this.showMobileQrCode();
-                    }
-                    clearInterval(checkLocation);
-                }, this.options.appCountDownInterval * 1000);
-            } catch (e) {
-                this.showMobileQrCode();
-            }
+            } catch (e) {}
         }
-    }
-
-    showMobileQrCode() {
-        this.$qrCode.forEach((object) => {
-            object.classList.remove('d-none');
-        });
     }
 }
