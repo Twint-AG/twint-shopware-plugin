@@ -230,7 +230,7 @@ Component.register('twint-payment-actions', {
                 });
             } else {
                 const parts = this.refundAmount.toString().split('.');
-                if(parts.length == 2) {
+                if(parts.length === 2) {
                     const wholeNumberLength = parts[0].replace('-', '').length;
                     const decimalLength = parts[1] ? parts[1].length : 0;
                     if (wholeNumberLength + decimalLength > 19 || decimalLength > 2) {
