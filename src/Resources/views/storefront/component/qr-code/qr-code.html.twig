@@ -13,7 +13,7 @@
         <div class="row justify-content-center pt-md-3">
             <div class="col-12 col-lg-10">
                 <div class="row h-100 flex-column-reverse flex-md-row {% if not isMobile %}pl-md-3{% endif%}">
-                    <div class="qr-code col-12 {% if not isMobile %}col-md-6 d-md-flex pt-md-0{% endif%} d-flex px-0 justify-content-center bg-white md-rounded pt-4 pd-md-auto d-none flex">
+                    <div class="qr-code col-12 {% if not isMobile %}col-md-6 d-md-flex pt-md-0{% endif%} d-flex px-0 justify-content-center bg-white md-rounded pt-4 pd-md-auto flex">
                         <div data-twint-copy-token class="d-flex flex-column text-center {% if not isMobile %}flex-md-column-reverse{% endif%}">
                             <div class="qr-token text-center mb-3" data-test="qr-code">
                                 <input id="qr-token" class="text-center bg-white" type="text" value="{{ pairingToken }}" disabled>
@@ -58,11 +58,11 @@
                                 }) }}
                             {% endif %}
 
-                            <div class="row qr-code d-none {% if not isMobile %}d-md-none{% endif%}">
+                            <div class="row qr-code {% if not isMobile %}d-md-none{% endif%}">
                                 <div class="separator d-flex py-0 text-center my-3">{{ 'twintPayment.instruction.or'|trans() }}</div>
                             </div>
 
-                            <div class="row qr-code d-none flex {% if not isMobile %}d-md-none"{% endif%} d-flex justify-content-center my-3">
+                            <div class="row qr-code flex {% if not isMobile %}d-md-none"{% endif%} d-flex justify-content-center my-3">
                                 <div class="col-9 text-center">{{ 'twintPayment.instruction.inputCode'|trans() }}</div>
                             </div>
                         </div>
