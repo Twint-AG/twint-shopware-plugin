@@ -67,7 +67,7 @@ Component.register('twint-certificate', {
         valid = false;
       }
 
-      if (!self.certificate && self.currentCertFile == null) {
+      if (!self.certificate && self.currentCertFile === null) {
         self.createNotificationError({
           title: self.$tc('twint.settings.certificate.error.title'),
           message: self.$tc('twint.settings.certificate.error.required')

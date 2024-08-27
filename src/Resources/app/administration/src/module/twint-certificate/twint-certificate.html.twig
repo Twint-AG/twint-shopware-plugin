@@ -9,7 +9,7 @@
                 :disabled="isDisabled"
         >
             <template #caption-label>
-                <span v-if="certificate == null || certificate == ''">
+                <span v-if="certificate === null || certificate === ''">
                     {{ $tc('twint.settings.certificate.placeholder') }}
                 </span>
                 <span v-else>
@@ -19,7 +19,7 @@
         </sw-file-input>
 
         <sw-password-field
-                v-if="certificate == '' || certificate == null"
+                v-if="certificate === '' || certificate === null"
                 v-model:value="currentPassword"
                 :entity-collection="null"
                 :error="passwordError"

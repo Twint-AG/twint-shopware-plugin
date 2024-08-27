@@ -9,13 +9,13 @@
                                 <span class="twint-refundable-amount__title" v-if="refundableAmount > 0">
                                     {{ $tc('twint.order.refund.refundable.title') }}
                                 </span>
-                                <span class="twint-refundable-amount__notice" v-if="refundableAmount == 0">
+                                <span class="twint-refundable-amount__notice" v-if="refundableAmount === 0">
                                 {{ $tc('twint.order.refund.refundable.fullRefundNotice') }}
                                 </span>
                                 <sw-label v-if="refundableAmount > 0">{{ currencyFilter(refundableAmount, currency, decimalPrecision) }}</sw-label>
                                 <sw-button variant="primary"
                                            size="small"
-                                           :disabled="refundableAmount==0 || !acl.can('order.editor')"
+                                           :disabled="refundableAmount === 0 || !acl.can('order.editor')"
                                            @click="showModal">
                                     {{ $tc('twint.order.refund.buttons.refund.label') }}
                                 </sw-button>

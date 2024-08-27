@@ -9,6 +9,10 @@ export default class TwintModal extends PseudoModalUtil {
       self.onClosed(event);
     });
   }
+  _create(){
+    super._useBackdrop = 'static';
+    super._create();
+  }
 
   setOnClosed(cb){
     this.onClosed = cb;

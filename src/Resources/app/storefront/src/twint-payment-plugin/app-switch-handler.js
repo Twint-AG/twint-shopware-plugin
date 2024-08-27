@@ -9,7 +9,6 @@ export default class AppSwitchHandler extends Plugin {
         appLinkSelector: "#app-chooser",
         qrCodeSelector: ".qr-code",
         appCountDownInterval: 2, //second
-        appTimeoutInterval: 10 //second
     };
 
     init() {
@@ -18,7 +17,6 @@ export default class AppSwitchHandler extends Plugin {
         this.isMobile = this.$container.getAttribute('data-mobile') ?? false;
         this.isAndroid = this.$container.getAttribute('data-is-android-device') ?? false;
         this.isIos = this.$container.getAttribute('data-is-ios-device') ?? false;
-        this.selectedApp = false;
 
         if (this.isIos) {
             this.handleIos();
@@ -47,12 +45,6 @@ export default class AppSwitchHandler extends Plugin {
         if (this.$appLinks) {
             this.$appLinks.addEventListener('change', this.onChangeAppList.bind(this))
         }
-        const checkTimeout = setInterval(() => {
-            if (!this.selectedApp) {
-                this.showMobileQrCode();
-            }
-            clearInterval(checkTimeout);
-        }, this.options.appTimeoutInterval * 1000);
     }
 
     handleAndroid() {
@@ -79,7 +71,6 @@ export default class AppSwitchHandler extends Plugin {
 
     openAppBank(link) {
         if (link) {
-            this.selectedApp = true;
             try {
                 window.location.replace(link);
 
