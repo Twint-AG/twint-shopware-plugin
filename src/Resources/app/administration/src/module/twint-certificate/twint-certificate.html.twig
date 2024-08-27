@@ -3,7 +3,7 @@
         <sw-file-input
                 v-model="currentCertFile"
                 :allowed-mime-types="['application/x-pkcs12']"
-                :maxFileSize="8*1024*1024"
+                :maxFileSize="128*1024"
                 @change="onFileChange"
                 required
                 :disabled="isDisabled"
