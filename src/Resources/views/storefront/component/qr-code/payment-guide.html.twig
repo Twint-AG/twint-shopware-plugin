@@ -3,26 +3,29 @@
         <div class="row justify-content-center p-4">
             <div class="col-lg-10 modal-lg-12">
                 <div class="row justify-content-center">
-                    <div class="col-12 {% if expressCheckout and not isMobile %}col-md-6 mb-4{% else %}col-md-12{% endif %}">
-                        <div class="d-flex flex-column align-items-center" data-test="tutorial-scan">
-                            <div class="d-flex justify-content-center">
-                                <img class="guide-icon"
-                                     src="{{ asset('bundles/twintpayment/assets/icons/icon-scan.svg') }}" alt="scan"/>
+                    {% if not isMobile %}
+                        <div class="col-12 {% if expressCheckout and not isMobile %}col-md-6 mb-4{% else %}col-md-12{% endif %}">
+                            <div class="d-flex flex-column align-items-center" data-test="tutorial-scan">
+                                <div class="d-flex justify-content-center">
+                                    <img class="guide-icon"
+                                         src="{{ asset('bundles/twintpayment/assets/icons/icon-scan.svg') }}" alt="scan"/>
+                                </div>
+                                <div class="text-center mt-4">{{ "twintPayment.instruction.scanQR"|trans() }}</div>
                             </div>
-                            <div class="text-center mt-4">{{ "twintPayment.instruction.scanQR"|trans() }}</div>
                         </div>
-                    </div>
+                    {% endif %}
+
                     {% if expressCheckout %}
-                    <div class="col-12 {% if not isMobile %}col-md-6{% endif %}">
-                        <div class="d-flex flex-column align-items-center" data-test="tutorial-contact">
-                            <div class="d-flex justify-content-center">
-                                <img class="guide-icon"
-                                     src="{{ asset('bundles/twintpayment/assets/icons/icon-contact.svg') }}"
-                                     alt="scan"/>
+                        <div class="col-12 {% if not isMobile %}col-md-6{% endif %}">
+                            <div class="d-flex flex-column align-items-center" data-test="tutorial-contact">
+                                <div class="d-flex justify-content-center">
+                                    <img class="guide-icon"
+                                         src="{{ asset('bundles/twintpayment/assets/icons/icon-contact.svg') }}"
+                                         alt="scan"/>
+                                </div>
+                                <div class="text-center mt-4">{{ "twintPayment.instruction.selectAddress"|trans() }}</div>
                             </div>
-                            <div class="text-center mt-4">{{ "twintPayment.instruction.selectAddress"|trans() }}</div>
                         </div>
-                    </div>
                     {% endif %}
                 </div>
             </div>
