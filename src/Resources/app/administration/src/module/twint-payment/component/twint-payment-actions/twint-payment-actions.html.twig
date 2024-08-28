@@ -51,12 +51,12 @@
                                     {% endblock %}
 
                                     {% block twint_refund_reason %}
-                                        <sw-textarea-field
+                                        <twint-textarea-input
                                                 v-model:value="reason"
-                                                maxLength="128"
+                                                maxLength="2048"
                                                 :label="$tc('twint.order.refundAction.reason.label')"
                                                 :placeholder="$tc('twint.order.refundAction.reason.placeholder')">
-                                        </sw-textarea-field>
+                                        </twint-textarea-input>
                                     {% endblock %}
 
                                     {% block twint_refund_confirm_button %}
