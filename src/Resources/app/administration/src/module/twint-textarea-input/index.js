@@ -2,7 +2,12 @@ import template from './twint-textarea-input.html.twig';
 
 const {Component} = Shopware;
 
-Component.extend('twint-textarea-input', 'sw-textarea-field', {
+let parentComponent = 'sw-textarea-field';
+if(Component.getComponentRegistry().has('sw-textarea-field-deprecated')){
+  parentComponent = 'sw-textarea-field-deprecated';
+}
+
+Component.extend('twint-textarea-input', parentComponent, {
   template: template,
   props: {
     value: {
