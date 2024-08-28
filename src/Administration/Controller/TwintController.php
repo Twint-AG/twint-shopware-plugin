@@ -40,9 +40,9 @@ class TwintController extends AbstractController
 {
     public const MAX_PASSWORD_LENGTH = 512;
 
-    public const MAX_CERTIFICATE_FILE_SIZE = 128;
+    public const MAX_CERTIFICATE_FILE_SIZE = 128 * 1024;
 
-    public const MAX_REFUND_DESCRIPTION_LENGTH = 127;
+    public const MAX_REFUND_DESCRIPTION_LENGTH = 128;
 
     private CryptoHandler $encryptor;
 
@@ -116,19 +116,8 @@ class TwintController extends AbstractController
             ], 400);
         }
         if ($file instanceof UploadedFile) {
-            $fileViolations = $validator->validate(
-                $file,
-                [
-                    new NotNull(),
-                    new File(
-                        [
-                            'maxSize' => self::MAX_CERTIFICATE_FILE_SIZE * 1024,
-                            'mimeTypes' => ['application/x-pkcs12', 'application/octet-stream'],
-                        ]
-                    ),
-                ]
-            );
-            if (count($fileViolations) > 0) {
+            $fileSize = @filesize($file->getPath());
+            if ($fileSize !== null && $fileSize > self::MAX_CERTIFICATE_FILE_SIZE) {
                 return $this->json([
                     'success' => false,
                     'message' => $this->translator->trans('twintPayment.administration.extractPem.error.invalidFile'),
