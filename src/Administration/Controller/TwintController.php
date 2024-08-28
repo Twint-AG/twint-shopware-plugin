@@ -42,7 +42,7 @@ class TwintController extends AbstractController
 
     public const MAX_CERTIFICATE_FILE_SIZE = 128 * 1024;
 
-    public const MAX_REFUND_DESCRIPTION_LENGTH = 128;
+    public const MAX_REFUND_DESCRIPTION_LENGTH = 2048;
 
     private CryptoHandler $encryptor;
 
