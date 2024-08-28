@@ -13,8 +13,10 @@
         <div class="row justify-content-center pt-md-3">
             <div class="col-12 col-lg-10">
                 <div class="row h-100 flex-column-reverse flex-md-row {% if not isMobile %}pl-md-3{% endif%}">
-                    <div class="qr-code col-12 {% if not isMobile %}col-md-6 d-md-flex pt-md-0{% endif%} d-flex px-0 justify-content-center bg-white md-rounded pt-4 pd-md-auto flex">
+
+                    <div class="qr-code col-12 {% if not isMobile %}col-md-6 d-md-flex pt-md-0 {% else %} pb-4 {% endif %} d-flex px-0 justify-content-center bg-white md-rounded pt-4 pd-md-auto flex">
                         <div data-twint-copy-token class="d-flex flex-column text-center {% if not isMobile %}flex-md-column-reverse{% endif%}">
+
                             <div class="qr-token text-center mb-3" data-test="qr-code">
                                 <input id="qr-token" class="text-center bg-white" type="text" value="{{ pairingToken }}" disabled>
                             </div>
@@ -23,13 +25,15 @@
                                 <button id="btn-copy-token" data-clipboard-action="copy" data-clipboard-target="#qr-token" class="text-center p-2 px-3 bg-white rounded text-secondary border-secondary border-1 ">{{ "twintPayment.button.copyCode"|trans() }}</button>
                             </div>
 
-                            {% if qrCode %}
+
+                            {% if qrCode and not isMobile %}
                                 <div class="text-center" data-test="code">
                                     <img src="{{ qrCode }}" alt="QR Code" class="qr-img col-12 img-fluid md-rounded">
                                 </div>
                             {% endif %}
                         </div>
                     </div>
+
                     <div class="{% if not isMobile %}col-md-6{% endif%} pl-0 d-flex flex-column">
                         <div class="row h-100">
                             <div class="col-12 d-flex flex-column row-gap-1 row-gap-md-3 px-0 px-md-3">
@@ -44,7 +48,7 @@
                             </div>
                         </div>
 
-                        <div data-app-selector>
+                        <div data-app-selector {% if not isMobile %}class="pb-3" {% endif%}>
                             {% if isIosDevice %}
                                 {{ include('@TwintPayment/storefront/component/qr-code/mobile-ios.html.twig',{
                                     payLinks: payLinks,
@@ -58,13 +62,15 @@
                                 }) }}
                             {% endif %}
 
-                            <div class="row qr-code {% if not isMobile %}d-md-none{% endif%}">
+
+                            <div class="row qr-code {% if not isMobile %}d-md-none{% endif %}">
                                 <div class="separator d-flex py-0 text-center my-3">{{ 'twintPayment.instruction.or'|trans() }}</div>
                             </div>
 
                             <div class="row qr-code flex {% if not isMobile %}d-md-none"{% endif%} d-flex justify-content-center my-3">
                                 <div class="col-9 text-center">{{ 'twintPayment.instruction.inputCode'|trans() }}</div>
                             </div>
+
                         </div>
                     </div>
                 </div>
