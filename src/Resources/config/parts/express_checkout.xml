@@ -32,6 +32,7 @@
             <argument type="service" id="Twint\Core\Factory\ClientBuilder"/>
             <argument type="service" id="twint_pairing.repository"/>
             <argument type="service" id="Twint\Core\Service\ApiService"/>
+            <argument type="service" id="Twint\Core\Repository\PairingRepository"/>
         </service>
 
         <service id="Twint\ExpressCheckout\Service\Monitoring\CustomerRegisterService">

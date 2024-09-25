@@ -69,7 +69,10 @@ class MonitoringService
         $res = $this->paymentService->monitoring($pairing->getId(), $pairing->getSalesChannelId());
         $state = $res->getReturn();
         $this->pairingService->fetchCart($pairing, $this->context->getContext($pairing->getSalesChannelId()));
-        if ($this->isChanged($pairing, $state)) {
+        if (!$this->isChanged($pairing, $state) && $pairing->isTimedOut()) {
+            $this->paymentService->cancelFastCheckoutCheckIn($pairing);
+            $this->pairingService->markAsCancelled($pairing);
+        } elseif ($this->isChanged($pairing, $state)) {
             try {
                 $this->pairingService->update($pairing, $state);
             } catch (Exception\DriverException $e) {

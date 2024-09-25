@@ -102,6 +102,7 @@
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Twint\Core\Service\OrderService"/>
             <argument type="service" id="logger"/>
+            <argument type="service" id="Twint\Core\Repository\PairingRepository"/>
         </service>
 
         <service id="Twint\Core\Repository\PairingRepository">

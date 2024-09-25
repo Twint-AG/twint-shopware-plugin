@@ -18,6 +18,8 @@ use Throwable;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\Core\Factory\ClientBuilder;
 use Twint\Core\Model\ApiResponse;
+use Twint\Core\Repository\PairingRepository;
+use Twint\Sdk\Value\Money;
 use Twint\Sdk\Value\Order;
 use Twint\Sdk\Value\OrderId;
 use Twint\Sdk\Value\Uuid;
@@ -30,7 +32,8 @@ class PairingService
         private readonly ClientBuilder $builder,
         private readonly OrderTransactionStateHandler $transactionStateHandler,
         private readonly OrderService $orderService,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly PairingRepository $pairingRepository
     ) {
     }
 
@@ -56,6 +59,8 @@ class PairingService
                 'orderId' => $order->getId(),
             ],
         ], $context->getContext());
+        //update the createdAt with NOW()
+        $this->pairingRepository->updateCreatedAt($tOrder->id()->__toString());
 
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('id', $tOrder->id()->__toString()));
@@ -100,14 +105,30 @@ class PairingService
                 return false;
             }
         }
-
         if ($tOrder->isPending()) {
+            if ($tOrder->isConfirmationPending()) {
+                $confirmRes = $this->api->call($client, 'confirmOrder', [
+                    $tOrder->id(),
+                    new Money(Money::CHF, $pairing->getAmount()),
+                ]);
+                $this->updateLog($confirmRes->getLog(), $pairing);
+            }
+
+            if ($org->isTimedOut()) {
+                $cancelRes = $this->api->call($client, 'cancelOrder', [$tOrder->id()]);
+                $this->updateLog($cancelRes->getLog(), $pairing);
+            }
             return false;
         }
-
-        /** @var string $transactionId */
-        $transactionId = $pairing->getOrder()
-            ?->getTransactions()?->first()?->getId();
+        if ($pairing->getOrderId() && !$pairing->getOrder() instanceof OrderEntity) {
+            $order = $this->orderService->getOrder($pairing->getOrderId());
+            /** @var string $transactionId */
+            $transactionId = $order->getTransactions()?->first()?->getId();
+        } else {
+            /** @var string $transactionId */
+            $transactionId = $pairing->getOrder()
+                ?->getTransactions()?->first()?->getId();
+        }
 
         if (!$org->isSuccess() && $tOrder->isSuccessful()) {
             $this->transactionStateHandler->paid($transactionId, Context::createDefaultContext());
