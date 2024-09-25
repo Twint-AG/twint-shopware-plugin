@@ -15,6 +15,7 @@ class PairingViewDefinition extends PairingDefinition
     {
         $collection = parent::defineFields();
         $collection->add(new IntField('checked_ago', 'checkedAgo'));
+        $collection->add(new IntField('created_ago', 'createdAgo'));
 
         return $collection;
     }
