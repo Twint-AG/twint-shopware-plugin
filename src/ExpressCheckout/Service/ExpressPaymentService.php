@@ -12,6 +12,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\Core\Factory\ClientBuilder;
 use Twint\Core\Model\ApiResponse;
+use Twint\Core\Repository\PairingRepository;
 use Twint\Core\Service\ApiService;
 use Twint\Core\Setting\Settings;
 use Twint\Sdk\Exception\SdkError;
@@ -30,8 +31,9 @@ class ExpressPaymentService
 {
     public function __construct(
         private readonly ClientBuilder $clientBuilder,
-        private readonly EntityRepository $pairingRepository,
+        private readonly EntityRepository $repository,
         public readonly ApiService $api,
+        private readonly PairingRepository $pairingRepository
     ) {
     }
 
@@ -57,7 +59,7 @@ class ExpressPaymentService
 
         $pairing = $res->getReturn();
 
-        $this->pairingRepository->create([
+        $this->repository->create([
             [
                 'id' => (string) $pairing->pairingUuid(),
                 'isExpress' => true,
@@ -73,7 +75,8 @@ class ExpressPaymentService
                 'customerData' => null,
             ],
         ], $context->getContext());
-
+        //update the createdAt with NOW()
+        $this->pairingRepository->updateCreatedAt((string) $pairing->pairingUuid());
         return $pairing;
     }
 
@@ -101,6 +104,25 @@ class ExpressPaymentService
             PairingUuid::fromString($pairing->getId()),
             new UnfiledMerchantTransactionReference($orderId),
             new Money($order->getCurrency()?->getIsoCode() ?? Settings::ALLOWED_CURRENCY, $order->getAmountTotal()),
+        ]);
+    }
+
+    public function confirmOrder(OrderEntity $order, OrderId $orderId): ApiResponse
+    {
+        $client = $this->clientBuilder->build($order->getSalesChannelId(), Version::NEXT);
+
+        return $this->api->call($client, 'confirmOrder', [
+            $orderId,
+            new Money($order->getCurrency()?->getIsoCode() ?? Settings::ALLOWED_CURRENCY, $order->getAmountTotal()),
+        ]);
+    }
+
+    public function cancelFastCheckoutCheckIn(PairingEntity $pairing): ApiResponse
+    {
+        $client = $this->clientBuilder->build($pairing->getSalesChannelId(), Version::NEXT);
+
+        return $this->api->call($client, 'cancelFastCheckoutCheckIn', [
+            PairingUuid::fromString($pairing->getId()),
         ]);
     }
 

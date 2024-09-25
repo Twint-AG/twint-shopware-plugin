@@ -38,6 +38,7 @@ use Twint\ExpressCheckout\Service\Monitoring\CustomerRegisterService;
 use Twint\ExpressCheckout\Service\PairingService;
 use Twint\ExpressCheckout\Util\PaymentMethodUtil;
 use Twint\Sdk\Value\FastCheckoutCheckIn;
+use Twint\Sdk\Value\Order;
 
 class OnPaidHandler implements StateHandlerInterface
 {
@@ -162,6 +163,13 @@ class OnPaidHandler implements StateHandlerInterface
 
             return false;
         }
+
+        if ($tOrder->isPending() && $tOrder->isConfirmationPending()) {
+            $confirmRes = $this->paymentService->confirmOrder($order, $tOrder->id());
+            // Append fields to transaction log
+            $this->appendLogFields($order, $confirmRes->getLog());
+        }
+
 
         // Request until get success/fail. Assume TWINT API will finish within a few seconds
         $res = $this->paymentService->monitoringOrder($tOrder->id()->__toString(), $order->getSalesChannelId());

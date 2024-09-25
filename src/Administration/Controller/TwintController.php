@@ -14,10 +14,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
@@ -117,7 +115,7 @@ class TwintController extends AbstractController
         }
         if ($file instanceof UploadedFile) {
             $fileSize = @filesize($file->getPath());
-            if ($fileSize !== null && $fileSize > self::MAX_CERTIFICATE_FILE_SIZE) {
+            if ($fileSize > self::MAX_CERTIFICATE_FILE_SIZE) {
                 return $this->json([
                     'success' => false,
                     'message' => $this->translator->trans('twintPayment.administration.extractPem.error.invalidFile'),
