@@ -12,6 +12,7 @@ use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
+use Twint\Core\Setting\Settings;
 use Twint\Sdk\Value\OrderStatus;
 
 class PairingEntity extends Entity
@@ -61,6 +62,8 @@ class PairingEntity extends Entity
     protected int $isOrdering;
 
     protected ?int $checkedAgo;
+
+    protected ?int $createdAgo;
 
     protected ?DateTimeInterface $checkedAt = null;
 
@@ -230,6 +233,11 @@ class PairingEntity extends Entity
         return $this->checkedAgo;
     }
 
+    public function getCreatedAgo(): ?int
+    {
+        return $this->createdAgo;
+    }
+
     public function getCheckedAt(): ?DateTimeInterface
     {
         return $this->checkedAt;
@@ -238,5 +246,10 @@ class PairingEntity extends Entity
     public function isOrderProcessing(): bool
     {
         return (bool) $this->isOrdering;
+    }
+
+    public function isTimedOut(): bool
+    {
+        return $this->getCreatedAgo() > ($this->getIsExpress() ? Settings::PAIRING_TIMEOUT_EXPRESS : Settings::PAIRING_TIMEOUT_REGULAR);
     }
 }

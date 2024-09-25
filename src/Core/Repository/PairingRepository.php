@@ -139,6 +139,19 @@ class PairingRepository
         ]);
     }
 
+    /**
+     * @throws Exception
+     */
+    public function updateCreatedAt(string $pairingId): int|string
+    {
+        return $this->db->executeStatement('
+            UPDATE ' . PairingDefinition::ENTITY_NAME . '
+            SET created_at = NOW()
+            WHERE id = :id', [
+            'id' => $pairingId,
+        ]);
+    }
+
     public function markAsOrdering(string $pairingId): int|string
     {
         return $this->db->executeStatement('
