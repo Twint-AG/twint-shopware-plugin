@@ -4,11 +4,11 @@
 
 ### 1. Download the extension
 
-Download the plugin zip file from out git repo
+- Download the latest plugin ZIP file from our [Git repository here.](https://github.com/Twint-AG/twint-shopware-plugin/tags)
 
-Or download form the Shopware Extensions Store. 
+<img src="./screenshots/download-zip.png" alt="Download the extension in zip" width="900" height="auto">
 
-<img src="./screenshots/download-zip.png" alt="Download the extension in zip" width="600" height="auto">
+- Or download form the Shopware Extensions Store. 
 
 ### 2. Upload the extension
 
@@ -23,10 +23,9 @@ Or download form the Shopware Extensions Store.
 
 ### 3 Install the extension
 
-After the extension was imported -> Click the `Install` link to install the extention
+After the `TWINT` plugin was uploaded -> Click the `Install` link to install the extention
 
 <img src="./screenshots/extension-imported.png" alt="Enable the TWINT Payment extension" width="900" height="auto">
-
 
 ## Enable the extension
 
@@ -34,7 +33,7 @@ After the extension was imported -> Click the `Install` link to install the exte
 
 #### 2. Go to `Extensions -> My extensions`
 
-Under the `Apps` tab -> Ensure that `TWINT Payment` is enabled
+Under the `Apps` tab -> Ensure that `TWINT` is enabled
 
 <img src="./screenshots/twint-enable-extension.png" alt="Enable the TWINT Payment extension" width="900" height="auto">
 
@@ -44,22 +43,26 @@ Under the `Apps` tab -> Ensure that `TWINT Payment` is enabled
 
 #### 1. Login to the Admin console panel
 
-#### 2. Go to `Settings -> Extensions -> TWINT Credentials`
+#### 2. Go to `Settings -> Extensions -> TWINT credentials`
 
-- Enter the `Merchant ID`.
-- Under the `Certificate File` click `Choose file` and browse to the `*.p12` certificate file.
-- Enter the `Certificate Password`.
+- Enter the `Store UUID`.
+- Under the `Certificate file` click `Choose file` and browse to the `*.p12` certificate file.
+- Enter the `Certificate password`.
 - **For test environment:** please turn on the `Switch to test mode` switch or else leave it off.
 
 > 🚩 **Note:**
 > 
-> After entering the certification password, please wait for the flash message saying `Certificate validation successful` before clicking Save. 
+> After entering the certification password, please wait for the flash message saying `Certificate validation successful` before clicking `Save`. 
 
 <img src="./screenshots/cert-validated.png" alt="Certification validated" width="300" height="auto">
 
 - Click the `Save` button at the top right corner.
+ 
+<img src="./screenshots/twint-credentials.png" alt="Configure TWINT credential" width="900" height="auto">
 
-<img src="./screenshots/twint-credential.png" alt="Configure TWINT credential" width="900" height="auto">
+- ` Certificate encrypted and stored` should be displayed.
+
+<img src="./screenshots/certificate-stored.png" alt="Certificate stored" width="900" height="auto">
 
 #### 3. Go to `Settings -> Extensions -> TWINT Express Checkout`
 
@@ -68,8 +71,8 @@ Under the `Display options` section -> Choose the placement for displaying the `
 #### 4. Go to `Settings -> Payment methods`
 
 - Ensure that the below payment methods are enabled:
-    - TWINT 
-    - TWINT Express Checkout
+    - TWINT - Express Checkout
+    - TWINT - Checkout
 - The payment method can be customized (e.g. add logo) by clicking the "Edit details" link next to each payment method.
 
 <img src="./screenshots/twint-payment-methods.png" alt="Active TWINT payment methods" width="900" height="auto">
@@ -80,7 +83,7 @@ Under the `Display options` section -> Choose the placement for displaying the `
 
 > 🚩 **Note:**
 >
-> TWINT payment extension supports **CHF** currency only. Please make sure CHF currency is added to the Sale channel (also know as the Storefront).
+> TWINT plugin supports **CHF** currency only. Please make sure CHF currency is added to the Sale channel (also know as the Storefront).
 >
 > If **CHF** currency was already created, please skip this section.
 
@@ -113,9 +116,9 @@ Under the `Display options` section -> Choose the placement for displaying the `
 > At this stage, the Sale channel should be set up and configured. The information below serves as kind reminder.  
 > Below are some information that need our attention on.
 
-- Ensure CHF currency is added to the desired sale channel.:
+- Ensure TWINT payment methods are added to the desired sale channel.:
     - TWINT - Express Checkout
-    - TWINT - Regular Checkout
+    - TWINT - Checkout
 - Ensure CHF currency is added to your sale channel.
 
 <img src="./screenshots/sale-channel.png" alt="Add payment methods and currencies to the Sale channel" width="900" height="auto">
