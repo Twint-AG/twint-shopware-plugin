@@ -83,7 +83,7 @@ Under the `Display options` section -> Choose the placement for displaying the `
 
 > 🚩 **Note:**
 >
-> TWINT plugin supports **CHF** currency only. Please make sure CHF currency is added to the Sale channel (also know as the Storefront).
+> TWINT plugin supports **CHF** currency only. Please make sure CHF currency is added to the Sale channel (also known as the Storefront).
 >
 > If **CHF** currency was already created, please skip this section.
 
