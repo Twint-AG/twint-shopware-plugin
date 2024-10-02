@@ -23,7 +23,7 @@
 
 ### 3 Install the extension
 
-After the `TWINT` plugin was uploaded -> Click the `Install` link to install the extention
+After the `TWINT` plugin was uploaded -> Click the `Install` link to install the extension
 
 <img src="./screenshots/extension-imported.png" alt="Enable the TWINT Payment extension" width="900" height="auto">
 
