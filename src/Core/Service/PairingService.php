@@ -19,6 +19,7 @@ use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\Core\Factory\ClientBuilder;
 use Twint\Core\Model\ApiResponse;
 use Twint\Core\Repository\PairingRepository;
+use Twint\Sdk\InvocationRecorder\InvocationRecordingClient;
 use Twint\Sdk\Value\Money;
 use Twint\Sdk\Value\Order;
 use Twint\Sdk\Value\OrderId;
@@ -115,8 +116,7 @@ class PairingService
             }
 
             if ($org->isTimedOut()) {
-                $cancelRes = $this->api->call($client, 'cancelOrder', [$tOrder->id()]);
-                $this->updateLog($cancelRes->getLog(), $pairing);
+                $this->cancel($client, $pairing);
             }
             return false;
         }
@@ -141,6 +141,13 @@ class PairingService
         $this->updateLog($res->getLog(), $pairing);
 
         return true;
+    }
+
+    public function cancel(PairingEntity $pairing): void
+    {
+        $client = $this->builder->build($pairing->getSalesChannelId());
+        $cancelRes = $this->api->call($client, 'cancelOrder', [$pairing->getId()]);
+        $this->updateLog($cancelRes->getLog(), $pairing);
     }
 
     /**
