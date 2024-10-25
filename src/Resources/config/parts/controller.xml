@@ -23,6 +23,8 @@
             <argument type="service" id="Twint\Core\Service\PaymentService"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
             <argument type="service" id="logger"/>
+            <argument type="service" id="Twint\ExpressCheckout\Service\ExpressPaymentService"/>
+            <argument type="service" id="Twint\Core\Service\PairingService"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>

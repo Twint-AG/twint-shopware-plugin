@@ -73,10 +73,25 @@ export default class PaymentStatusRefresh extends Plugin {
   onModalClosed(event) {
     clearTimeout(this.timeoutId);
     PaymentStatusRefresh.startedAt = null;
+
+    this.cancelPayment();
     
     if (this.isOnCartPage() && this.success) {
       window.location.reload();
     }
+  }
+
+  cancelPayment() {
+    let url = window.router['frontend.twint.cancel'];
+    url = url.replace('--hash--', this.options.pairingHash);
+
+    this.client.post(url, [], (response, request) => {
+      const data = JSON.parse(response);
+
+      if (request.status !== 200 || !data.success) {
+        console.error("Cannot cancel payment");
+      }
+    });
   }
 
   checkExpressCheckoutStatus() {
