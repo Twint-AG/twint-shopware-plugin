@@ -19,7 +19,6 @@ use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\Core\Factory\ClientBuilder;
 use Twint\Core\Model\ApiResponse;
 use Twint\Core\Repository\PairingRepository;
-use Twint\Sdk\InvocationRecorder\InvocationRecordingClient;
 use Twint\Sdk\Value\Money;
 use Twint\Sdk\Value\Order;
 use Twint\Sdk\Value\OrderId;
@@ -116,7 +115,7 @@ class PairingService
             }
 
             if ($org->isTimedOut()) {
-                $this->cancel($client, $pairing);
+                $this->cancel($pairing);
             }
             return false;
         }

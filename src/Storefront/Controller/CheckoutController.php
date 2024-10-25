@@ -141,15 +141,16 @@ class CheckoutController extends StorefrontController
     #[Route(path: '/payment/cancel/{paringHash}', name: 'frontend.twint.cancel', defaults: [
         'XmlHttpRequest' => true,
     ], methods: ['POST'])]
-    public function cancel(Request $request, SalesChannelContext $context): Response {
+    public function cancel(Request $request, SalesChannelContext $context): Response
+    {
         $pairingHash = $request->get('paringHash');
         try {
             $pairingUuid = $this->cryptoService->unHash($pairingHash);
             $pairing = $this->paringLoader->load($pairingUuid, $context->getContext());
 
-            if($pairing->getIsExpress()){
+            if ($pairing->getIsExpress()) {
                 $this->expressPaymentService->cancelFastCheckoutCheckIn($pairing);
-            }else{
+            } else {
                 $this->pairingService->cancel($pairing);
             }
 
@@ -229,7 +230,7 @@ class CheckoutController extends StorefrontController
         $page = new CheckoutFinishPage();
         $this->paringLoader->fetchOrder($pairing, $context);
 
-        if (!($pairing->getOrder()  instanceof OrderEntity)) {
+        if (!($pairing->getOrder() instanceof OrderEntity)) {
             $this->addFlash(self::DANGER, $this->trans('twintPayment.error.orderNotFound'));
             return $this->redirectToRoute('frontend.account.order.page');
         }
