@@ -20,9 +20,11 @@ use Shopware\Storefront\Test\Controller\StorefrontControllerTestBehaviour;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\Core\Repository\PairingRepository;
+use Twint\Core\Service\PairingService;
 use Twint\Core\Service\PaymentService;
 use Twint\Core\Util\CryptoHandler;
 use Twint\ExpressCheckout\Service\ExpressCheckoutServiceInterface;
+use Twint\ExpressCheckout\Service\ExpressPaymentService;
 use Twint\ExpressCheckout\Service\Monitoring\MonitoringService;
 use Twint\Sdk\Value\PairingStatus;
 use Twint\Sdk\Value\PairingUuid;
@@ -94,6 +96,8 @@ class CheckoutControllerTest extends TestCase
             $this->paymentService,
             $this->cartService,
             $this->loggerMock,
+            $this->createMock(ExpressPaymentService::class),
+            $this->createMock(PairingService::class),
         );
         $this->controller->setContainer($this->container);
     }
