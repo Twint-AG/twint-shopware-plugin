@@ -115,8 +115,7 @@ class PairingService
             }
 
             if ($org->isTimedOut()) {
-                $cancelRes = $this->api->call($client, 'cancelOrder', [$tOrder->id()]);
-                $this->updateLog($cancelRes->getLog(), $pairing);
+                $this->cancel($pairing);
             }
             return false;
         }
@@ -141,6 +140,13 @@ class PairingService
         $this->updateLog($res->getLog(), $pairing);
 
         return true;
+    }
+
+    public function cancel(PairingEntity $pairing): void
+    {
+        $client = $this->builder->build($pairing->getSalesChannelId());
+        $cancelRes = $this->api->call($client, 'cancelOrder', [$pairing->getId()]);
+        $this->updateLog($cancelRes->getLog(), $pairing);
     }
 
     /**
