@@ -9,6 +9,7 @@ use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Throwable;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\Core\Factory\ClientBuilder;
 use Twint\Core\Model\ApiResponse;
@@ -117,6 +118,9 @@ class ExpressPaymentService
         ]);
     }
 
+    /**
+     * @throws Throwable
+     */
     public function cancelFastCheckoutCheckIn(PairingEntity $pairing): ApiResponse
     {
         $client = $this->clientBuilder->build($pairing->getSalesChannelId(), Version::NEXT);

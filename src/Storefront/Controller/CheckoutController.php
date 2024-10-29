@@ -23,10 +23,12 @@ use Throwable;
 use Twint\Command\TwintPollCommand;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\Core\Repository\PairingRepository;
+use Twint\Core\Service\PairingService;
 use Twint\Core\Service\PaymentService;
 use Twint\Core\Util\CryptoHandler;
 use Twint\ExpressCheckout\Exception\PairingException;
 use Twint\ExpressCheckout\Service\ExpressCheckoutServiceInterface;
+use Twint\ExpressCheckout\Service\ExpressPaymentService;
 
 #[Route(defaults: [
     '_routeScope' => ['storefront'],
@@ -42,7 +44,9 @@ class CheckoutController extends StorefrontController
         private readonly PairingRepository $paringLoader,
         private PaymentService $paymentService,
         private readonly CartService $cartService,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly ExpressPaymentService $expressPaymentService,
+        private readonly PairingService $pairingService,
     ) {
     }
 
@@ -134,6 +138,34 @@ class CheckoutController extends StorefrontController
         ]);
     }
 
+    #[Route(path: '/payment/cancel/{paringHash}', name: 'frontend.twint.cancel', defaults: [
+        'XmlHttpRequest' => true,
+    ], methods: ['POST'])]
+    public function cancel(Request $request, SalesChannelContext $context): Response
+    {
+        $pairingHash = $request->get('paringHash');
+        try {
+            $pairingUuid = $this->cryptoService->unHash($pairingHash);
+            $pairing = $this->paringLoader->load($pairingUuid, $context->getContext());
+
+            if ($pairing->getIsExpress()) {
+                $this->expressPaymentService->cancelFastCheckoutCheckIn($pairing);
+            } else {
+                $this->pairingService->cancel($pairing);
+            }
+
+            return $this->json([
+                'success' => true,
+            ]);
+        } catch (Throwable $e) {
+            $this->logger->error('TWINT start process error: ' . $e->getMessage());
+        }
+
+        return $this->json([
+            'success' => false,
+        ]);
+    }
+
     protected function getFinishedResponse(PairingEntity $pairing, SalesChannelContext $context): JsonResponse
     {
         $data = [
@@ -198,7 +230,7 @@ class CheckoutController extends StorefrontController
         $page = new CheckoutFinishPage();
         $this->paringLoader->fetchOrder($pairing, $context);
 
-        if (!($pairing->getOrder()  instanceof OrderEntity)) {
+        if (!($pairing->getOrder() instanceof OrderEntity)) {
             $this->addFlash(self::DANGER, $this->trans('twintPayment.error.orderNotFound'));
             return $this->redirectToRoute('frontend.account.order.page');
         }
