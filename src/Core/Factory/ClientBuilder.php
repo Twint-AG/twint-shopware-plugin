@@ -19,7 +19,11 @@ use Twint\Sdk\InvocationRecorder\Soap\MessageRecorder;
 use Twint\Sdk\InvocationRecorder\Soap\RecordingTransport;
 use Twint\Sdk\Io\InMemoryStream;
 use Twint\Sdk\Value\Environment;
-use Twint\Sdk\Value\PrefixedCashRegisterId;
+use Twint\Sdk\Value\InstallSource;
+use Twint\Sdk\Value\PlatformVersion;
+use Twint\Sdk\Value\PluginVersion;
+use Twint\Sdk\Value\ShopPlatform;
+use Twint\Sdk\Value\ShopPluginInformation;
 use Twint\Sdk\Value\StoreUuid;
 use Twint\Sdk\Value\Version;
 
@@ -29,7 +33,8 @@ class ClientBuilder
 
     public function __construct(
         private readonly SettingServiceInterface $settingService,
-        private readonly CryptoHandler $cryptoService
+        private readonly CryptoHandler $cryptoService,
+        private readonly string $shopwareVersion
     ) {
     }
 
@@ -71,7 +76,14 @@ class ClientBuilder
             $client = new InvocationRecordingClient(
                 new Client(
                     CertificateContainer::fromPkcs12(new Pkcs12Certificate(new InMemoryStream($cert), $passphrase)),
-                    new PrefixedCashRegisterId(StoreUuid::fromString($storeUuid), Settings::PLATFORM),
+                    new ShopPluginInformation(
+                        StoreUuid::fromString($storeUuid),
+                        ShopPlatform::SHOPWARE(),
+                        // @phpstan-ignore-next-line
+                        new PlatformVersion($this->shopwareVersion),
+                        new PluginVersion(Settings::PLUGIN_VERSION),
+                        new InstallSource(Settings::INSTALL_SOURCE)
+                    ),
                     // @phpstan-ignore-next-line
                     new Version($version),
                     $environment,
