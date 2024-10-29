@@ -16,6 +16,7 @@
 
         <service id="Twint\Core\Util\CredentialValidatorInterface" class="Twint\Core\Util\CredentialValidator">
             <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
+            <argument>%kernel.shopware_version%</argument>
         </service>
 
         <service id="Twint\Core\Service\SettingServiceInterface" class="Twint\Core\Service\SettingService">
@@ -62,6 +63,7 @@
         <service id="Twint\Core\Factory\ClientBuilder">
             <argument type="service" id="Twint\Core\Service\SettingServiceInterface"/>
             <argument type="service" id="Twint\Core\Util\CryptoHandler"/>
+            <argument>%kernel.shopware_version%</argument>
         </service>
 
         <service id="twint.twig_extension"

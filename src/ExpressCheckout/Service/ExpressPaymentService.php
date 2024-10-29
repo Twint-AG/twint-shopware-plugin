@@ -46,7 +46,7 @@ class ExpressPaymentService
         Cart $cart,
         ShippingMethods $methods
     ): InteractiveFastCheckoutCheckIn {
-        $client = $this->clientBuilder->build($context->getSalesChannel()->getId(), Version::NEXT);
+        $client = $this->clientBuilder->build($context->getSalesChannel()->getId(), Version::LATEST);
 
         $amount = $cart->getPrice()
             ->getPositionPrice();
@@ -83,7 +83,7 @@ class ExpressPaymentService
 
     public function monitoring(string $pairingUUid, string $channelId): ApiResponse
     {
-        $client = $this->clientBuilder->build($channelId, Version::NEXT);
+        $client = $this->clientBuilder->build($channelId, Version::LATEST);
 
         return $this->api->call(
             $client,
@@ -96,7 +96,7 @@ class ExpressPaymentService
 
     public function startFastCheckoutOrder(OrderEntity $order, PairingEntity $pairing): ApiResponse
     {
-        $client = $this->clientBuilder->build($order->getSalesChannelId(), Version::NEXT);
+        $client = $this->clientBuilder->build($order->getSalesChannelId(), Version::LATEST);
 
         /** @var non-empty-string $orderId */
         $orderId = $order->getOrderNumber();
@@ -110,7 +110,7 @@ class ExpressPaymentService
 
     public function confirmOrder(OrderEntity $order, OrderId $orderId): ApiResponse
     {
-        $client = $this->clientBuilder->build($order->getSalesChannelId(), Version::NEXT);
+        $client = $this->clientBuilder->build($order->getSalesChannelId(), Version::LATEST);
 
         return $this->api->call($client, 'confirmOrder', [
             $orderId,
@@ -123,7 +123,7 @@ class ExpressPaymentService
      */
     public function cancelFastCheckoutCheckIn(PairingEntity $pairing): ApiResponse
     {
-        $client = $this->clientBuilder->build($pairing->getSalesChannelId(), Version::NEXT);
+        $client = $this->clientBuilder->build($pairing->getSalesChannelId(), Version::LATEST);
 
         return $this->api->call($client, 'cancelFastCheckoutCheckIn', [
             PairingUuid::fromString($pairing->getId()),
