@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Twint\Core\Setting;
 
+use Twint\Sdk\Value\InstallSource;
+
 class Settings
 {
-    public const PLATFORM = 'Shopware';
+    public const INSTALL_SOURCE = InstallSource::DIRECT;
+
+    public const PLUGIN_VERSION = '9.9.9-dev';
 
     public const ENVIRONMENT_PROD = false;
 
