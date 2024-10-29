@@ -9,18 +9,26 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Validation;
+use Twint\Core\Setting\Settings;
 use Twint\Sdk\Certificate\CertificateContainer;
 use Twint\Sdk\Certificate\Pkcs12Certificate;
 use Twint\Sdk\Client;
 use Twint\Sdk\Io\InMemoryStream;
 use Twint\Sdk\Value\Environment;
+use Twint\Sdk\Value\InstallSource;
+use Twint\Sdk\Value\PlatformVersion;
+use Twint\Sdk\Value\PluginVersion;
+use Twint\Sdk\Value\ShopPlatform;
+use Twint\Sdk\Value\ShopPluginInformation;
 use Twint\Sdk\Value\StoreUuid;
 use Twint\Sdk\Value\Version;
 
 class CredentialValidator implements CredentialValidatorInterface
 {
-    public function __construct(readonly CryptoHandler $crypto)
-    {
+    public function __construct(
+        readonly CryptoHandler $crypto,
+        readonly string $shopwareVersion
+    ) {
     }
 
     public function validate(array $certificate, string $storeUuid, bool $testMode): bool
@@ -68,7 +76,14 @@ class CredentialValidator implements CredentialValidatorInterface
 
             $client = new Client(
                 CertificateContainer::fromPkcs12(new Pkcs12Certificate(new InMemoryStream($cert), $passphrase)),
-                StoreUuid::fromString($storeUuid),
+                new ShopPluginInformation(
+                    StoreUuid::fromString($storeUuid),
+                    ShopPlatform::SHOPWARE(),
+                    // @phpstan-ignore-next-line
+                    new PlatformVersion($this->shopwareVersion),
+                    new PluginVersion(Settings::PLUGIN_VERSION),
+                    new InstallSource(Settings::INSTALL_SOURCE)
+                ),
                 Version::latest(),
                 $testMode ? Environment::TESTING() : Environment::PRODUCTION(),
             );

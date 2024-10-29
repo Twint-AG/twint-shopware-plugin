@@ -23,7 +23,7 @@
         }
     ],
     "require": {
-        "twint-ag/sdk": "^1.2",
+        "twint-ag/sdk": "^1.4.0",
         "chillerlan/php-qrcode": "4.3.4",
         "ext-openssl": "*"
     },
