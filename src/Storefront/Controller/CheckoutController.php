@@ -170,8 +170,13 @@ class CheckoutController extends StorefrontController
     {
         $data = [
             'completed' => true,
-            'orderId' => $pairing->getStatus() === PairingEntity::STATUS_CANCELED ? null : $pairing->getOrderId(),
+            'orderId' => $pairing->getStatus() === PairingEntity::STATUS_DONE ? $pairing->getOrderId() : null,
+            'status' => $pairing->getStatus(),
         ];
+
+        if ($pairing->getStatus() === PairingEntity::STATUS_FAILED) {
+            $data['error-message'] = $this->trans('twintPayment.error.paymentError');
+        }
 
         if (isset($data['orderId']) && ($data['orderId'] !== '' && $data['orderId'] !== '0')) {
             $data['thank-you'] = $this->thankYouPage($pairing, $context)->getContent();

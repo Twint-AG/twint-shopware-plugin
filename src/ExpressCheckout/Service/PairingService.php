@@ -56,6 +56,14 @@ class PairingService
         ]);
     }
 
+    public function markAsFailed(PairingEntity $pairing): EntityWrittenContainerEvent
+    {
+        $pairing->setStatus(PairingEntity::STATUS_FAILED);
+        return $this->persist($pairing, [
+            'status' => PairingEntity::STATUS_FAILED,
+        ]);
+    }
+
     private function persist(PairingEntity $pairing, array $data): EntityWrittenContainerEvent
     {
         $id = [
