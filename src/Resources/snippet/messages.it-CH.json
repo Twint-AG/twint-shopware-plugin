@@ -2,7 +2,8 @@
     "twintPayment": {
         "error": {
             "orderNotFound": "Questo ordine non è stato trovato.",
-            "pairingNotFound": "Invalid transaction"
+            "pairingNotFound": "Invalid transaction",
+            "paymentError": "Il pagamento non è riuscito, si prega di provare un altro metodo di pagamento."
         },
         "notice": {
             "hasProductInCart": "Ci sono già prodotti nel carrello. Si prega di controllare il carrello prima di continuar"

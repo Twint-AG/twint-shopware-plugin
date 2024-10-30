@@ -23,6 +23,8 @@ class PairingEntity extends Entity
 
     public const STATUS_CANCELED = 'CANCELLED';
 
+    public const STATUS_FAILED = 'FAILED';
+
     protected ?Cart $cart = null;
 
     protected string $cartToken;
@@ -202,7 +204,7 @@ class PairingEntity extends Entity
     public function isFinished(): bool
     {
         if ($this->isExpress) {
-            return in_array($this->status, [self::STATUS_DONE, self::STATUS_CANCELED], true);
+            return in_array($this->status, [self::STATUS_DONE, self::STATUS_CANCELED, self::STATUS_FAILED], true);
         }
 
         return in_array($this->status, [OrderStatus::SUCCESS, OrderStatus::FAILURE], true);

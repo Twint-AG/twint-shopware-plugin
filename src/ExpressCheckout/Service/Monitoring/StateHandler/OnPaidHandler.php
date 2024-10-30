@@ -120,9 +120,10 @@ class OnPaidHandler implements StateHandlerInterface
                 //Flag as done
                 $this->pairingService->markAsDone($entity);
             } else {
-                $this->pairingService->markAsCancelled($entity);
+                $this->pairingService->markAsFailed($entity);
             }
         } catch (Throwable $e) {
+            $this->pairingService->markAsFailed($entity);
             $this->logger->error('TWINT error: ' . $e->getMessage());
             throw $e;
         }

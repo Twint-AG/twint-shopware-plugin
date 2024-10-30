@@ -120,12 +120,15 @@ export default class PaymentStatusRefresh extends Plugin {
         PaymentStatusRefresh.startedAt = null;
 
         if (data.orderId) {
-          this.onExpressPaid(data);
-        } else {
-          ExpressCheckoutButton.modal.close();
-          this.onModalClosed();
+          return this.onExpressPaid(data);
         }
 
+        if(data.status === 'FAILED'){
+          return this.onFailed(data);
+        }
+
+        ExpressCheckoutButton.modal.close();
+        this.onModalClosed();
       } else {
         let interval = this.getInterval();
         if(interval > 0) {
@@ -133,6 +136,12 @@ export default class PaymentStatusRefresh extends Plugin {
         }
       }
     });
+  }
+
+  onFailed(data){
+    ExpressCheckoutButton.modal.updateContent(data['error-message']);
+    let titleEl = DomAccess.querySelector(document, '.js-pseudo-modal .twint-modal .modal-title');
+    titleEl.innerHTML = titleEl.getAttribute('data-finish');
   }
 
   isOnCartPage() {
