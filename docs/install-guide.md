@@ -1,16 +1,18 @@
-<p align="center" style="font-size:150%"><b>TWINT Payment Extension Guideline</b></p>
+# TWINT Shopware Plugin Guide
 
 ## Installation
 
-### 1. Download the extension
+### 1. Install the extension
 
-- Download the latest plugin ZIP file from our [Git repository here.](https://github.com/Twint-AG/twint-shopware-plugin/tags)
+Install the plugin via composer by running the following command:
+
+```bash
+composer require twint-ag/twint-shopware-plugin
+```
+
+- Alternatively, for manual installation, download the latest plugin ZIP file from our [Git repository here.](https://github.com/Twint-AG/twint-shopware-plugin/tags)
 
 <img src="./screenshots/download-zip.png" alt="Download the extension in zip" width="900" height="auto">
-
-- Or download form the Shopware Extensions Store. 
-
-### 2. Upload the extension
 
 - Go to `Extensions -> My extensions`.
 - Click the `Upload extension`.
@@ -21,7 +23,7 @@
 
 <img src="./screenshots/warning-popup.png" alt="Confirm the warning popup" width="600" height="auto">
 
-### 3 Install the extension
+### 2 Install the extension
 
 After the `TWINT` plugin was uploaded -> Click the `Install` link to install the extension
 
