@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace Twint\Core\Util;
 
-use Exception;
+use DateTime;
+use Doctrine\DBAL\Connection;
+use Psr\Log\LoggerInterface;
+use Shopware\Core\Defaults;
+use Shopware\Core\Framework\DataAbstractionLayer\Doctrine\MultiInsertQueryQueue;
+use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Validation;
+use Throwable;
 use Twint\Core\Setting\Settings;
 use Twint\Sdk\Certificate\CertificateContainer;
 use Twint\Sdk\Certificate\Pkcs12Certificate;
@@ -27,7 +33,9 @@ class CredentialValidator implements CredentialValidatorInterface
 {
     public function __construct(
         readonly CryptoHandler $crypto,
-        readonly string $shopwareVersion
+        readonly string $shopwareVersion,
+        private readonly LoggerInterface $logger,
+        readonly Connection $connection
     ) {
     }
 
@@ -88,10 +96,53 @@ class CredentialValidator implements CredentialValidatorInterface
                 $testMode ? Environment::TESTING() : Environment::PRODUCTION(),
             );
             $status = $client->checkSystemStatus();
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
+            $this->writeEventLog($this->buildLogMessage($e));
+            $this->logger->error($this->buildLogMessage($e));
             return false;
         }
 
         return $status->isOk();
+    }
+
+    private function buildLogMessage(Throwable $e, string $message = ''): string
+    {
+        // Set a default message if none is provided
+        if ($message === '' || $message === '0') {
+            $message = 'TWINT verify certificate error: ' . $e->getMessage();
+        }
+
+        // Append details about previous exceptions recursively
+        $previous = $e->getPrevious();
+        if ($previous instanceof Throwable) {
+            $message .= sprintf(
+                "\n %s:%d %s -> %s",
+                $previous->getFile(),
+                $previous->getLine(),
+                get_class($previous),
+                $this->buildLogMessage($previous)
+            );
+        }
+
+        return $message;
+    }
+
+    private function writeEventLog(string $message = ''): void
+    {
+        $queue = new MultiInsertQueryQueue($this->connection);
+        $record = [
+            'id' => Uuid::randomBytes(),
+            'message' => 'admin.twint.validate',
+            'level' => 1,
+            'channel' => 'business_events',
+            'context' => json_encode([
+                'message' => $message,
+            ]),
+            'extra' => json_encode([]),
+            'updated_at' => null,
+            'created_at' => (new DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
+        ];
+        $queue->addInsert('log_entry', $record);
+        $queue->execute();
     }
 }
