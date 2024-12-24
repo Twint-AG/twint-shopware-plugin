@@ -25,8 +25,13 @@ class Migration1724385873AddOrderingColumn extends MigrationStep
      */
     public function update(Connection $connection): void
     {
+        if (!$this->columnExists($connection, 'twint_pairing', 'is_ordering')) {
+            $connection->executeStatement(
+                'ALTER TABLE twint_pairing ADD COLUMN `is_ordering` int unsigned NOT NULL DEFAULT 0'
+            );
+        }
+
         $sqls = [
-            'ALTER TABLE twint_pairing ADD COLUMN `is_ordering` int unsigned NOT NULL DEFAULT 0;',
             'DROP VIEW IF EXISTS twint_pairing_view;',
             'CREATE VIEW twint_pairing_view AS
                 SELECT
