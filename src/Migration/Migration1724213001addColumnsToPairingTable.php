@@ -25,10 +25,16 @@ class Migration1724213001addColumnsToPairingTable extends MigrationStep
      */
     public function update(Connection $connection): void
     {
-        $sqls = [
-            'ALTER TABLE twint_pairing ADD COLUMN `checked_at` datetime(3) NULL;',
-            'ALTER TABLE twint_pairing ADD COLUMN `version` int unsigned NOT NULL DEFAULT 1;',
-            "            
+        if (!$this->columnExists($connection, 'twint_pairing', 'checked_at')) {
+            $connection->executeStatement('ALTER TABLE twint_pairing ADD COLUMN `checked_at` datetime(3) NULL');
+        }
+        if (!$this->columnExists($connection, 'twint_pairing', 'version')) {
+            $connection->executeStatement(
+                'ALTER TABLE twint_pairing ADD COLUMN `version` int unsigned NOT NULL DEFAULT 1'
+            );
+        }
+        if (!$this->triggerExists($connection, 'before_update_twint_pairing')) {
+            $sql = "            
             CREATE TRIGGER `before_update_twint_pairing` BEFORE UPDATE ON `twint_pairing` FOR EACH ROW BEGIN
 	
                 DECLARE changed_columns INT;
@@ -93,18 +99,26 @@ class Migration1724213001addColumnsToPairingTable extends MigrationStep
                   SET NEW.version = OLD.version + 1;
                END IF;  
                     
-            END;",
-            // Create view
-            'CREATE VIEW twint_pairing_view AS
+            END;";
+            $connection->executeStatement($sql);
+        }
+        //create view
+        $sql = 'CREATE OR REPLACE VIEW twint_pairing_view AS
                 SELECT
                   tp.*,
                   (UNIX_TIMESTAMP() - UNIX_TIMESTAMP(tp.checked_at)) AS checked_ago
-                FROM twint_pairing tp;',
-        ];
+                FROM twint_pairing tp';
+        $connection->executeStatement($sql);
+    }
 
-        foreach ($sqls as $sql) {
-            $connection->executeStatement($sql);
-        }
+    public function triggerExists(Connection $connection, string $trigger): bool
+    {
+        $sql = sprintf("SELECT TRIGGER_NAME
+                    FROM INFORMATION_SCHEMA.TRIGGERS
+                    WHERE TRIGGER_NAME = '%s'
+                      AND TRIGGER_SCHEMA = DATABASE();", $trigger);
+        return $connection->executeQuery($sql)
+            ->rowCount() > 0;
     }
 
     public function updateDestructive(Connection $connection): void
