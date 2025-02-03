@@ -114,8 +114,7 @@ class TwintController extends AbstractController
             ], 400);
         }
         if ($file instanceof UploadedFile) {
-            $fileSize = @filesize($file->getPath());
-            if ($fileSize > self::MAX_CERTIFICATE_FILE_SIZE) {
+            if ($file->getSize() > self::MAX_CERTIFICATE_FILE_SIZE) {
                 return $this->json([
                     'success' => false,
                     'message' => $this->translator->trans('twintPayment.administration.extractPem.error.invalidFile'),
