@@ -21,16 +21,18 @@ class Migration1723007876AddCustomerIdColumn extends MigrationStep
 
     public function update(Connection $connection): void
     {
-        $sql = 'ALTER TABLE twint_pairing ADD COLUMN customer_id binary(16) DEFAULT NULL;';
-        $connection->executeStatement($sql);
+        if (!$this->columnExists($connection, 'twint_pairing', 'customer_id')) {
+            $sql = 'ALTER TABLE twint_pairing ADD COLUMN customer_id binary(16) DEFAULT NULL;';
+            $connection->executeStatement($sql);
 
-        $sql = 'ALTER TABLE `twint_pairing`
+            $sql = 'ALTER TABLE `twint_pairing`
                 ADD CONSTRAINT `fk.twint_pairing.customer_id`
                 FOREIGN KEY (`customer_id`)
                 REFERENCES `customer` (`id`)
                 ON DELETE SET NULL
                 ON UPDATE CASCADE;';
-        $connection->executeStatement($sql);
+            $connection->executeStatement($sql);
+        }
     }
 
     public function updateDestructive(Connection $connection): void

@@ -60,7 +60,6 @@ Unit test will use environment variable in `infra/demo66/.env.test` for test (si
 
 Review the `DATABASE_URL` in there and make sure that matches with test database you prepared in the previous step.
 
-
 #### Run tests
 From inside the container, run the following command once:
 ```
