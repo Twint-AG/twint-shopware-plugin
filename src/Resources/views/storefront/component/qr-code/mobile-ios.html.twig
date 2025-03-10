@@ -5,20 +5,21 @@
                 <div class="app-chooser-title my-4">{{ 'twintPayment.appSelector.title'|trans() }}</div>
                 {% set prefinedApps = {
                     'UBS TWINT' : 'bank-ubs',
-                    'Raiffeisen TWINT' : 'bank-raiffeisen',
                     'PostFinance TWINT' : 'bank-pf',
-                    'ZKB TWINT' :'bank-zkb',
+                    'Raiffeisen TWINT' : 'bank-raiffeisen',
                     'Credit Suisse TWINT' : 'bank-cs',
+                    'ZKB TWINT' :'bank-zkb',
                     'BCV TWINT' : 'bank-bcv',
                 } %}
 
                 <div class="row app-logos-container m-3 mb-2 text-center justify-content-center" id="logo-container">
-                    {% for payLink in payLinks.ios %}
-                        {% if payLink.name in prefinedApps|keys %}
+                    {% for key, prefinedApp in prefinedApps %}
+                        {% set existedItem = payLinks.ios|filter(item => item.name == key)|first %}
+                        {% if existedItem %}
                             <div class="col-4 mb-3 text-center">
                                 <img class="bank-logo"
-                                     src="{{ asset('bundles/twintpayment/assets/apps/' ~ prefinedApps[payLink.name] ~ '.png') }}"
-                                     data-link="{{ payLink.link }}" alt=""/>
+                                     src="{{ asset('bundles/twintpayment/assets/apps/' ~ prefinedApps[existedItem.name] ~ '.png') }}"
+                                     data-link="{{ existedItem.link }}" alt=""/>
                             </div>
                         {% endif %}
                     {% endfor %}
