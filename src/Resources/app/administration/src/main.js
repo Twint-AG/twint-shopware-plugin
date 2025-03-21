@@ -1,6 +1,7 @@
 // Import admin module
 import './snippet';
 import './service';
+import './module/twint-mode';
 import './module/twint-certificate';
 import './module/sw-input-file';
 import './module/twint-store-uuid';
