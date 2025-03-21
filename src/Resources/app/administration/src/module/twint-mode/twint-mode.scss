@@ -1,6 +1,6 @@
 .is--twint-hidden{
     display:none;
 }
-.sw-card-wrapper:has(.is--twint-hidden) {
+.sw-card:has(.is--twint-hidden) {
   display: none;
 }
