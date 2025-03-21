@@ -1,6 +1,10 @@
 # TWINT Shopware Plugin Guide
 
 ## Installation
+### Requirement 
+1. PHP 8.1 for both web service (Apache) and CLI 
+2. Minimum Requirement for Shop-system versions: 
+ -  Shopware versions: 6.5 
 
 ### 1. Install the extension
 
