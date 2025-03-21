@@ -12,7 +12,7 @@
         <title lang="it-IT">Ambiente</title>
         <title lang="it-CH">Ambiente</title>
 
-        <input-field type="bool">
+        <component name="twint-mode">
             <name>testMode</name>
             <label>Switch to test mode</label>
             <label lang="de-DE">Zum Testmodus wechseln</label>
@@ -31,7 +31,7 @@
             <helpText lang="it-CH">Passando alla modalità di prova sarà utilizzato l’ambiente TWINT PAT. PAT è l’acronimo di «Production Acceptance Test» e consente di testare l’integrazione di TWINT in un ambiente simile all’ambiente di produzione senza dover effettivamente caricare un account TWINT.</helpText>
 
             <defaultValue>false</defaultValue>
-        </input-field>
+        </component>
     </card>
 
     <card>
