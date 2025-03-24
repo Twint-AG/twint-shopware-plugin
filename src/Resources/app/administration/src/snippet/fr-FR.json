@@ -17,7 +17,7 @@
       "testCredentials": {
         "error": {
           "title": "Erreur d’identifiants",
-          "message": "Identifiants invalides. Veuillez vérifier à nouveau: UUID de votre commerce, certificat et environnement (mode)"
+          "message": "Identifiants invalides. Veuillez vérifier à nouveau: UUID de votre commerce et certificat"
         }
       },
       "storeUuid": {

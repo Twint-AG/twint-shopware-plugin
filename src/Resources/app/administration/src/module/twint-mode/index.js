@@ -10,8 +10,11 @@ if(Component.getComponentRegistry().has('sw-switch-field-deprecated')){
 
 Component.extend('twint-mode', parentComponent, {
   template: template,
+  inject: ['feature', 'systemConfigApiService'],
+
   props: {
     props: {
+
       noMarginTop: {
         type: Boolean,
         required: false,
@@ -29,12 +32,17 @@ Component.extend('twint-mode', parentComponent, {
       },
     },
   },
+  data() {
+    return {
+      testMode: false, // Initial empty state
+    };
+  },
   computed: {
     swSwitchFieldClasses() {
-      let swSwitchFieldClasses = this.$super('swSwitchFieldClasses');
-      if (typeof swSwitchFieldClasses[0] !== 'undefined') {
+      const swSwitchFieldClasses = this.$super('swSwitchFieldClasses') ?? [];
+      if (swSwitchFieldClasses?.[0]) {
         swSwitchFieldClasses[0]['sw-field--switch-bordered'] = true;
-        if(this.$route.query.showTwintEnvOptions != '1'){
+        if(this.$route.query.showTwintEnvOptions != '1' && this.testMode != true){
           swSwitchFieldClasses[0]['is--twint-hidden'] = true;
         }
       }
@@ -43,6 +51,20 @@ Component.extend('twint-mode', parentComponent, {
         `sw-field--${this.size}`,
       ];
 
+    },
+  },
+  async created() {
+    this.loadSettings();
+  },
+  methods: {
+    async loadSettings() {
+      this.isLoading = true;
+
+      const settings = await this.systemConfigApiService.getValues('TwintPayment.settings');
+      if (Object.keys(settings).length > 0) {
+        this.testMode = settings['TwintPayment.settings.testMode'];
+      }
+      this.isLoading = false;
     },
   }
 });
