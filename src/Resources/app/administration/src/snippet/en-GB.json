@@ -63,6 +63,12 @@
         "button": {
           "label": "Upload new certificate"
         }
+      },
+      "environment": {
+        "testMode": {
+          "label": "Switch to test mode",
+          "helpText": "Turning on test mode will use the TWINT PAT environment. PAT stands for Production Acceptance Test and allows you to test your TWINT integration on an environment closeley resembling the production environment without actually charging a TWINT account"
+        }
       }
     },
     "order": {
