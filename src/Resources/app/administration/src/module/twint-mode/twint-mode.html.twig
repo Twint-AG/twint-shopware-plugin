@@ -8,6 +8,8 @@
         >
             <div class="sw-field--switch__content">
                 <div class="sw-field--switch__input">
+                    <!-- eslint-disable vue/no-duplicate-attributes, vue/no-parsing-error -->
+                    <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
                     <input
                             :id="formFieldName || identification"
                             type="checkbox"
@@ -16,10 +18,12 @@
                             :disabled="disabled"
                             @change="onChange"
                     >
+                    <!-- eslint-enable vue/no-duplicate-attributes, vue/no-parsing-error -->
                     <div class="sw-field__switch-state">
                         <div class="sw-field__switch-state-knob"></div>
                     </div>
                 </div>
+                <!-- eslint-disable vue/no-duplicate-attributes, vue/no-parsing-error -->
                 <sw-base-field
                         v-bind="{
                             ...$attrs,
@@ -29,7 +33,8 @@
                         :is-inherited="inheritanceAttrs.isInherited"
                         :name="formFieldName || identification"
                         :disabled="disabled"
-                        :label="label"
+                        :label="$tc('twint.settings.environment.testMode.label')"
+                        :help-text="$tc('twint.settings.environment.testMode.helpText')"
                         @inheritance-restore="onInheritanceRestore($event)"
                         @inheritance-remove="$emit('inheritance-remove', $event)"
                 >
