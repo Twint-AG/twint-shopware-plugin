@@ -17,7 +17,7 @@
       "testCredentials": {
         "error": {
           "title": "Fehler bei den Zugangsdaten",
-          "message": "Ungültige Zugangsdaten. Bitte überprüfen: UUID Ihres Stores, Zertifikat und Umfeld (Modus)"
+          "message": "Ungültige Zugangsdaten. Bitte überprüfen: UUID Ihres Stores und Zertifikat"
         }
       },
       "storeUuid": {
