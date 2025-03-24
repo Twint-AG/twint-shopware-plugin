@@ -17,7 +17,7 @@
       "testCredentials": {
         "error": {
           "title": "Errore credenziali",
-          "message": "Credenziali non valide. Ti preghiamo di ricontrollare: UUID del suo negozio, certificato e ambiente (modalità)"
+          "message": "Credenziali non valide. Ti preghiamo di ricontrollare: UUID del suo negozio e certificato"
         }
       },
       "storeUuid": {
