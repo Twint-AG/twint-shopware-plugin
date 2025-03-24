@@ -63,6 +63,12 @@
         "button": {
           "label": "Neues Zertifikat hochladen"
         }
+      },
+      "environment": {
+        "testMode": {
+          "label": "Zum Testmodus wechseln",
+          "helpText": "Der Testmodus nutzt die TWINT PAT Umgebung. PAT bedeutet Production Acceptance Test: So lässt sich die Integration von TWINT in einer Umgebung testen, die sich weitgehend mit der Produktionsumgebung deckt, ohne jedoch ein TWINT Konto zu belasten."
+        }
       }
     },
     "order": {

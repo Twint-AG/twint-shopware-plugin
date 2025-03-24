@@ -63,6 +63,12 @@
         "button": {
           "label": "Télécharger un nouveau certificat"
         }
+      },
+      "environment": {
+        "testMode": {
+          "label": "Passer en mode test",
+          "helpText": "L’activation du mode test entraîne l’utilisation de l’environnement TWINT PAT. PAT signifie «Production Acceptance Test» et vous permet de tester votre intégration TWINT dans un environnement proche de l’environnement de production sans avoir à payer avec un compte TWINT."
+        }
       }
     },
     "order": {

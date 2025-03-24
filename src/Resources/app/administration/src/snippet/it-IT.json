@@ -63,6 +63,12 @@
         "button": {
           "label": "Carica nuovo certificato"
         }
+      },
+      "environment": {
+        "testMode": {
+          "label": "Passa alla modalità di prova",
+          "helpText": "Passando alla modalità di prova sarà utilizzato l’ambiente TWINT PAT. PAT è l’acronimo di «Production Acceptance Test» e consente di testare l’integrazione di TWINT in un ambiente simile all’ambiente di produzione senza dover effettivamente caricare un account TWINT."
+        }
       }
     },
     "order": {
