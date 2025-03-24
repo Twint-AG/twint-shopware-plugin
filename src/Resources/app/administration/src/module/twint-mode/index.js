@@ -12,29 +12,31 @@ Component.extend('twint-mode', parentComponent, {
   template: template,
   props: {
     props: {
-      value: {
+      noMarginTop: {
         type: Boolean,
         required: false,
+        default: false,
       },
 
-      checked: {
-        type: Boolean,
+      size: {
+        type: String,
         required: false,
+        default: 'default',
+        validValues: ['small', 'medium', 'default'],
+        validator(val) {
+          return ['small', 'medium', 'default'].includes(val);
+        },
       },
-
-      showTwintEnvOptions: {
-        type: Boolean,
-        required: false,
-        default: false
-      }
     },
   },
   computed: {
     swSwitchFieldClasses() {
       let swSwitchFieldClasses = this.$super('swSwitchFieldClasses');
-      if(this.$route.query.showTwintEnvOptions != '1'){
-        this.showTwintEnvOptions = true;
-        swSwitchFieldClasses[0]['is--twint-hidden'] = true;
+      if (typeof swSwitchFieldClasses[0] !== 'undefined') {
+        swSwitchFieldClasses[0]['sw-field--switch-bordered'] = true;
+        if(this.$route.query.showTwintEnvOptions != '1'){
+          swSwitchFieldClasses[0]['is--twint-hidden'] = true;
+        }
       }
       return [
         swSwitchFieldClasses,
