@@ -17,7 +17,7 @@
       "testCredentials": {
         "error": {
           "title": "Credentials error",
-          "message": "Invalid credentials. Please check again: Store UUID, certificate and environment (mode)"
+          "message": "Invalid credentials. Please check again: Store UUID and certificate"
         }
       },
       "storeUuid": {
