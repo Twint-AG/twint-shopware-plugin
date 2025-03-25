@@ -62,8 +62,6 @@ Under the `Apps` tab -> Ensure that `TWINT` is enabled
 <img src="./screenshots/cert-validated.png" alt="Certification validated" width="300" height="auto">
 
 - Click the `Save` button at the top right corner.
- 
-<img src="./screenshots/twint-credentials.png" alt="Configure TWINT credential" width="900" height="auto">
 
 - ` Certificate encrypted and stored` should be displayed.
 
