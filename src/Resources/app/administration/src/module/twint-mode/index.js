@@ -59,7 +59,13 @@ Component.extend('twint-mode', parentComponent, {
   async created() {
     this.loadSettings();
     if(this.$route.query.showTwintEnvOptions == '0'){
-      this.$emit('update:value', false);
+      if (this.feature.isActive('VUE3')) {
+        this.$emit('update:value', false);
+
+        return;
+      }
+
+      this.$emit('change', false);
     }
   },
   methods: {
