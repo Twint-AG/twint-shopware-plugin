@@ -54,7 +54,6 @@ Under the `Apps` tab -> Ensure that `TWINT` is enabled
 - Enter the `Store UUID`.
 - Under the `Certificate file` click `Choose file` and browse to the `*.p12` certificate file.
 - Enter the `Certificate password`.
-- **For test environment:** please turn on the `Switch to test mode` switch or else leave it off.
 
 > 🚩 **Note:**
 > 
