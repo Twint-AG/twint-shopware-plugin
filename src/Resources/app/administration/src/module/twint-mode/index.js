@@ -34,7 +34,7 @@ Component.extend('twint-mode', parentComponent, {
   },
   data() {
     return {
-      testMode: false, // Initial empty state
+      testMode: false,
     };
   },
   computed: {
@@ -42,7 +42,10 @@ Component.extend('twint-mode', parentComponent, {
       const swSwitchFieldClasses = this.$super('swSwitchFieldClasses') ?? [];
       if (swSwitchFieldClasses?.[0]) {
         swSwitchFieldClasses[0]['sw-field--switch-bordered'] = true;
-        if(this.$route.query.showTwintEnvOptions != '1' && this.testMode != true){
+        if(this.$route.query.showTwintEnvOptions == '0'){
+          swSwitchFieldClasses[0]['is--twint-hidden'] = true;
+        }
+        else if(this.$route.query.showTwintEnvOptions != '1' && this.testMode != true){
           swSwitchFieldClasses[0]['is--twint-hidden'] = true;
         }
       }
@@ -55,6 +58,9 @@ Component.extend('twint-mode', parentComponent, {
   },
   async created() {
     this.loadSettings();
+    if(this.$route.query.showTwintEnvOptions == '0'){
+      this.$emit('update:value', false);
+    }
   },
   methods: {
     async loadSettings() {
