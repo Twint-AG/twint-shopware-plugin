@@ -11,7 +11,6 @@ if(Component.getComponentRegistry().has('sw-switch-field-deprecated')){
 Component.extend('twint-mode', parentComponent, {
   template: template,
   inject: ['feature', 'systemConfigApiService'],
-
   props: {
     props: {
 
@@ -59,13 +58,13 @@ Component.extend('twint-mode', parentComponent, {
   async created() {
     this.loadSettings();
     if(this.$route.query.showTwintEnvOptions == '0'){
-      if (this.feature.isActive('VUE3')) {
+      if (this.feature.isActive('VUE3') || parentComponent === 'sw-switch-field-deprecated') {
         this.$emit('update:value', false);
 
         return;
       }
-
       this.$emit('change', false);
+      this.testMode = false;
     }
   },
   methods: {
