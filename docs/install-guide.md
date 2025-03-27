@@ -54,7 +54,8 @@ Under the `Apps` tab -> Ensure that `TWINT` is enabled
 - Enter the `Store UUID`.
 - Under the `Certificate file` click `Choose file` and browse to the `*.p12` certificate file.
 - Enter the `Certificate password`.
-- **For test environment:** please turn on the `Switch to test mode` switch or else leave it off.
+
+<img src="./screenshots/twint-credentials.png" alt="Configure TWINT credential" width="900" height="auto">
 
 > 🚩 **Note:**
 > 
@@ -63,8 +64,6 @@ Under the `Apps` tab -> Ensure that `TWINT` is enabled
 <img src="./screenshots/cert-validated.png" alt="Certification validated" width="300" height="auto">
 
 - Click the `Save` button at the top right corner.
- 
-<img src="./screenshots/twint-credentials.png" alt="Configure TWINT credential" width="900" height="auto">
 
 - ` Certificate encrypted and stored` should be displayed.
 

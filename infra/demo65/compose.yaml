@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   shop:
     container_name: sw65
@@ -15,7 +13,7 @@ services:
     volumes:
       - ".:/var/www/html:rw"
       - "./../..:/var/www/html/custom/plugins/TwintPayment:rw"
-      - "sw66_volume:/var/lib/mysql:rw"
+      - "sw65_volume:/var/lib/mysql:rw"
       # prevent recursive binding volumes
       - "/var/www/html/custom/plugins/TwintPayment/infra"
       - "/var/www/html/custom/plugins/TwintPayment/vendor"

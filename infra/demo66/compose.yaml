@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   shop:
     container_name: sw66

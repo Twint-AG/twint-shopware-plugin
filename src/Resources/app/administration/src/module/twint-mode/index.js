@@ -43,6 +43,9 @@ Component.extend('twint-mode', parentComponent, {
         swSwitchFieldClasses[0]['sw-field--switch-bordered'] = true;
         if(this.$route.query.showTwintEnvOptions == '0'){
           swSwitchFieldClasses[0]['is--twint-hidden'] = true;
+          if(this.value){
+            this.toggleTestMode();
+          }
         }
         else if(this.$route.query.showTwintEnvOptions != '1' && this.testMode != true){
           swSwitchFieldClasses[0]['is--twint-hidden'] = true;
@@ -56,16 +59,7 @@ Component.extend('twint-mode', parentComponent, {
     },
   },
   async created() {
-    this.loadSettings();
-    if(this.$route.query.showTwintEnvOptions == '0'){
-      if (this.feature.isActive('VUE3') || parentComponent === 'sw-switch-field-deprecated') {
-        this.$emit('update:value', false);
-
-        return;
-      }
-      this.$emit('change', false);
-      this.testMode = false;
-    }
+    await this.loadSettings();
   },
   methods: {
     async loadSettings() {
@@ -75,7 +69,19 @@ Component.extend('twint-mode', parentComponent, {
       if (Object.keys(settings).length > 0) {
         this.testMode = settings['TwintPayment.settings.testMode'];
       }
+      if(this.$route.query.showTwintEnvOptions == '0'){
+        this.toggleTestMode();
+      }
       this.isLoading = false;
     },
+    toggleTestMode(){
+      if (this.feature.isActive('VUE3') || parentComponent === 'sw-switch-field-deprecated') {
+        this.$emit('update:value', false);
+      }
+      else{
+        this.$emit('change', false);
+      }
+      this.testMode = false;
+    }
   }
 });
