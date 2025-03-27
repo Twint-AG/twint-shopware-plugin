@@ -55,6 +55,8 @@ Under the `Apps` tab -> Ensure that `TWINT` is enabled
 - Under the `Certificate file` click `Choose file` and browse to the `*.p12` certificate file.
 - Enter the `Certificate password`.
 
+<img src="./screenshots/twint-credentials.png" alt="Configure TWINT credential" width="900" height="auto">
+
 > 🚩 **Note:**
 > 
 > After entering the certification password, please wait for the flash message saying `Certificate validation successful` before clicking `Save`. 
