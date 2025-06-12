@@ -13,22 +13,18 @@
                  data-android-link="{{ payLinks.android }}"
                  data-pairing-id="{{ pairing }}">
 
-                {{
-                    include('@TwintPayment/storefront/component/qr-code/qr-code.html.twig',{
-                        qrCode: qrCode,
-                        pairingToken: pairingToken,
-                        payLinks: payLinks,
-                        isAndroid: isAndroid,
-                        isIosDevice: isIosDevice
-                    })
-                }}
+                {% sw_include '@Storefront/storefront/component/qr-code/qr-code.html.twig' with {
+                    qrCode: qrCode,
+                    pairingToken: pairingToken,
+                    payLinks: payLinks,
+                    isAndroid: isAndroid,
+                    isIosDevice: isIosDevice
+                } %}
 
-                {{
-                    include('@TwintPayment/storefront/component/qr-code/payment-guide.html.twig', {
-                        expressCheckout: expressCheckout,
-                        isMobile: isMobile,
-                    })
-                }}
+                {% sw_include '@Storefront/storefront/component/qr-code/payment-guide.html.twig' with {
+                    expressCheckout: expressCheckout,
+                    isMobile: isMobile,
+                } %}
             </div>
         {% endblock %}
     </div>
