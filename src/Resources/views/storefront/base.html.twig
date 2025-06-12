@@ -3,7 +3,7 @@
 {% block base_main %}
     {{ parent() }}
 
-    {{ include('@TwintPayment/storefront/component/loading/loading.html.twig') }}
-    {{ include('@TwintPayment/storefront/component/modal/payment-modal.html.twig') }}
+    {{ sw_include('@TwintPayment/storefront/component/loading/loading.html.twig') }}
+    {{ sw_include('@TwintPayment/storefront/component/modal/payment-modal.html.twig') }}
 
 {% endblock %}
