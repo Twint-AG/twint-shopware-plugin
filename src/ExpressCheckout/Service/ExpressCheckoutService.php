@@ -149,8 +149,11 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
         $event = new ShippingMethodRouteRequestEvent($request, $request->duplicate(), $context, $criteria);
         $this->eventDispatcher->dispatch($event);
 
+        $request = $event->getStoreApiRequest();
+        $request->query->set('onlyAvailable', '1');
+
         return $this->shippingMethodRoute
-            ->load($event->getStoreApiRequest(), $context, $event->getCriteria())
+            ->load($request, $context, $event->getCriteria())
             ->getShippingMethods();
     }
 
