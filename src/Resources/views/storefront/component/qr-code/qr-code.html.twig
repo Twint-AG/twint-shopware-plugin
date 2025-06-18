@@ -50,16 +50,16 @@
 
                         <div data-app-selector {% if not isMobile %}class="pb-3" {% endif%}>
                             {% if isIosDevice %}
-                                {{ include('@TwintPayment/storefront/component/qr-code/mobile-ios.html.twig',{
+                                {% sw_include '@Storefront/storefront/component/qr-code/mobile-ios.html.twig' with {
                                     payLinks: payLinks,
                                     isIosDevice: isIosDevice
-                                }) }}
+                                } %}
                             {% endif %}
 
                             {% if isAndroid %}
-                                {{ include('@TwintPayment/storefront/component/qr-code/mobile-android.html.twig', {
+                                {% sw_include '@Storefront/storefront/component/qr-code/mobile-android.html.twig' with {
                                     isAndroid: isAndroid
-                                }) }}
+                                } %}
                             {% endif %}
 
 
