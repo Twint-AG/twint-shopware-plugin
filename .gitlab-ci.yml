@@ -84,7 +84,7 @@ test:
     - vendor/bin/rector process src --dry-run
 
     # Run PhpStan
-    - vendor/bin/phpstan analyse -c phpstan.neon --autoload-file="$CI_PROJECT_DIR/shopware/vendor/autoload.php" src
+    - vendor/bin/phpstan analyse -c phpstan.neon src
 
     # Install Shopware to running unit test
     - cd "$CI_PROJECT_DIR/shopware"
