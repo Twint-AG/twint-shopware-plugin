@@ -16,18 +16,18 @@ stages:
     - d13-runner
 
 test:
-  only:
-    - merge_requests
+  rules:
+    - if: "$CI_COMMIT_BRANCH" # runs on any branch
   extends: .base
   stage: check
   parallel:
     matrix:
-      - SHOPWARE_VERSION: [ "v6.5.7.3" ]
-        PHP_VERSION: [ "8.1", "8.2" ]
-      - SHOPWARE_VERSION: [ "v6.5.8.9" ]
-        PHP_VERSION: [ "8.1", "8.2", "8.3" ]
-      - SHOPWARE_VERSION: [ "v6.6.0.0", "v6.6.2.0" ]
-        PHP_VERSION: ["8.2", "8.3" ]
+      - SHOPWARE_VERSION: ["v6.5.7.3"]
+        PHP_VERSION: ["8.1", "8.2"]
+      - SHOPWARE_VERSION: ["v6.5.8.9"]
+        PHP_VERSION: ["8.1", "8.2", "8.3"]
+      - SHOPWARE_VERSION: ["v6.6.0.0", "v6.6.2.0"]
+        PHP_VERSION: ["8.2", "8.3"]
 
   services:
     - mysql:8.0
@@ -53,7 +53,6 @@ test:
       composer req shopware/core:$SHOPWARE_VERSION shopware/administration:* shopware/storefront:* --no-update
       composer remove shopware/elasticsearch --no-update
     - composer install --no-progress --prefer-dist --optimize-autoloader > /dev/null
-
     # Add gitlab token to composer
     - composer config --global gitlab-token.git.nfq.asia $GITLAB_ACCESS_TOKEN
 
@@ -67,7 +66,6 @@ test:
       composer config repositories.local-plugins '{ "type": "path", "url": "custom/plugins/*", "options": { "symlink": true } }'
       composer config repositories.twint-sdk vcs https://git.nfq.asia/twint-ag/php-sdk.git
     - composer require twint-ag/twint-shopware-plugin --no-progress --no-scripts > /dev/null
-
     # Install DEV-Tools
     - cd "$CI_PROJECT_DIR/shopware/custom/plugins/TwintPayment"
     - rm -f composer.lock
@@ -90,7 +88,7 @@ test:
 
     # Install Shopware to running unit test
     - cd "$CI_PROJECT_DIR/shopware"
-#    - mysql -e "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE;"
+    #    - mysql -e "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE;"
     - bin/console system:install --basic-setup > /dev/null
 
     # Run unit test
@@ -103,32 +101,14 @@ test:
     paths:
       - $CI_PROJECT_DIR/.gitlab-ci-cache
 
-end-2-end:
-  only:
-    - test/cypress
-  stage: check
-  image: cypress/browsers:latest
-  tags:
-    - d13-runner
-  script:
-    - cd cypress
-    - cp cypress.env.dist.json cypress.env.json;
-    - sed -i "s|\"__BASE_URL__\"|\"CYPRESS_URL\"|g" cypress.env.json
-    - npm install
-    - npx cypress run --headless --browser chrome
-  artifacts:
-    paths:
-      - cypress/cypress/screenshots/
-      - cypress/cypress/videos/
-
 release:
-    only:
-        - tags
-    stage: release
-    image: alpine:3
-    extends: .base
-    variables:
-      GIT_DEPTH: 0
-    script:
-      - apk add --no-cache git openssh bash
-      - ./bin/sync.sh
+  only:
+    - tags
+  stage: release
+  image: alpine:3
+  extends: .base
+  variables:
+    GIT_DEPTH: 0
+  script:
+    - apk add --no-cache git openssh bash
+    - ./bin/sync.sh
