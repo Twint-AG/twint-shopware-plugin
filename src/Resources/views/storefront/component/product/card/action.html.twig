@@ -2,8 +2,10 @@
 
 {% block page_product_detail_product_buy_button %}
     {{ parent() }}
-    {% block twint_buy_button_plp %}
-        {{ isTwintExpress('PLP') ? include('@TwintPayment/storefront/component/button/express-checkout-button.html.twig') : '' }}
-    {% endblock %}
 
+    {% if isTwintExpress('PLP') %}
+        {% block twint_buy_button_plp %}
+            {% sw_include '@Storefront/storefront/component/button/express-checkout-button.html.twig' %}
+        {% endblock %}
+    {% endif %}
 {% endblock %}

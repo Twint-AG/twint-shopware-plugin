@@ -43,8 +43,7 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
         private readonly AbstractSalesChannelContextFactory $contextFactory,
         private readonly CartPersister $cartPersister,
         private readonly CurrencyService $currencyService,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws SdkError
@@ -145,6 +144,8 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
 
         $criteria = new Criteria();
         $criteria->setTitle('generic-page::shipping-methods');
+
+        $request->query->set('onlyAvailable', '1');
 
         $event = new ShippingMethodRouteRequestEvent($request, $request->duplicate(), $context, $criteria);
         $this->eventDispatcher->dispatch($event);

@@ -47,8 +47,7 @@ class CheckoutController extends StorefrontController
         private readonly LoggerInterface $logger,
         private readonly ExpressPaymentService $expressPaymentService,
         private readonly PairingService $pairingService,
-    ) {
-    }
+    ) {}
 
     #[Route(path: '/twint/express-checkout', name: 'frontend.twint.express-checkout', methods: ['POST'], defaults: [
         'XmlHttpRequest' => true,
@@ -218,7 +217,7 @@ class CheckoutController extends StorefrontController
         );
         $qrcode = (new QRCode($options))->render($pairing->getToken());
 
-        return $this->renderStorefront('@TwintPayment/storefront/page/express-payment.html.twig', [
+        return $this->renderStorefront('@Storefront/storefront/page/express-payment.html.twig', [
             'pairingHash' => $pairingHash,
             'orderNumber' => 'CART',
             'qrCode' => $qrcode,
@@ -242,7 +241,7 @@ class CheckoutController extends StorefrontController
 
         $page->setOrder($pairing->getOrder());
 
-        return $this->renderStorefront('@TwintPayment/storefront/page/express-finish.html.twig', [
+        return $this->renderStorefront('@Storefront/storefront/page/express-finish.html.twig', [
             'page' => $page,
         ]);
     }
@@ -266,7 +265,7 @@ class CheckoutController extends StorefrontController
         $qrcode = (new QRCode($options))->render($pairing->getToken()); // @phpstan-ignore-line
 
         // @phpstan-ignore-next-line
-        return $this->renderStorefront('@TwintPayment/storefront/page/express-payment.html.twig', [
+        return $this->renderStorefront('@Storefront/storefront/page/express-payment.html.twig', [
             'pairingHash' => $pairingHash,
             'orderNumber' => 'CART',
             'qrCode' => $qrcode,

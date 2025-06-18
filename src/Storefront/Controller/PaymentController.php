@@ -29,8 +29,7 @@ class PaymentController extends StorefrontController
         private EntityRepository $pairingRepository,
         private CryptoHandler $cryptoService,
         private PaymentService $paymentService,
-    ) {
-    }
+    ) {}
 
     #[Route(path: '/payment/waiting/{pairingId}', name: 'frontend.twint.waiting', methods: ['GET'])]
     public function showWaiting(Request $request, SalesChannelContext $context): Response
@@ -64,7 +63,7 @@ class PaymentController extends StorefrontController
             ]
         );
 
-        return $this->renderStorefront('@TwintPayment/storefront/page/waiting.html.twig', [
+        return $this->renderStorefront('@Storefront/storefront/page/waiting.html.twig', [
             'pairing' => $hash,
             'qrCode' => (new QRCode($options))->render($pairing->getToken()),
             'pairingToken' => $pairing->getToken(),

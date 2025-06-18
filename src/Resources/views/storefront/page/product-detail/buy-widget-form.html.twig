@@ -6,7 +6,7 @@
         {% if isTwintExpress('PDP') %}
             <div class="row g-2 mt-0 justify-content-end ms-1">
                 <div class="col-8 ps-0">
-                	{{ include('@TwintPayment/storefront/component/button/express-checkout-button.html.twig') }}
+                	{% sw_include '@Storefront/storefront/component/button/express-checkout-button.html.twig' %}
             	</div>
             </div>
         {% endif %}

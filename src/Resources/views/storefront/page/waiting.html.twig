@@ -18,21 +18,19 @@
             window.storefrontUrl = "{{ app.request.get('sw-storefront-url') }}";
         </script>
 
-        {{ include('@TwintPayment/storefront/component/qr-code/qr-container.html.twig',
-            {
-                qrCode: qrCode,
-                androidLink: androidLink,
-                isAndroid: isAndroid,
-                isIosDevice: isIosDevice,
-                payLinks: payLinks,
-                cart: cart,
-                pairing : pairing,
-                pairingToken : pairingToken,
-                pairingHash : pairingHash,
-                expressCheckout: false,
-            }
-        )
-        }}
+        {% sw_include '@Storefront/storefront/component/qr-code/qr-container.html.twig' with {
+            qrCode: qrCode,
+            androidLink: androidLink,
+            isAndroid: isAndroid,
+            isIosDevice: isIosDevice,
+            payLinks: payLinks,
+            cart: cart,
+            pairing: pairing,
+            pairingToken: pairingToken,
+            pairingHash: pairingHash,
+            expressCheckout: false
+        } %}
+
     {% endblock %}
 {% endblock %}
 
