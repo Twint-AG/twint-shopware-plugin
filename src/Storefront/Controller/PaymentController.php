@@ -29,7 +29,8 @@ class PaymentController extends StorefrontController
         private EntityRepository $pairingRepository,
         private CryptoHandler $cryptoService,
         private PaymentService $paymentService,
-    ) {}
+    ) {
+    }
 
     #[Route(path: '/payment/waiting/{pairingId}', name: 'frontend.twint.waiting', methods: ['GET'])]
     public function showWaiting(Request $request, SalesChannelContext $context): Response
