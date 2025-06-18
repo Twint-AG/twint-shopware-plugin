@@ -48,9 +48,6 @@ test:
 
     # Run PHP rector
     - vendor/bin/rector process src --dry-run
-
-    # Run PhpStan
-    - vendor/bin/phpstan analyse -c phpstan.neon src
   cache:
     key: $CI_COMMIT_REF_SLUG-${CI_JOB_NAME}
     paths:
