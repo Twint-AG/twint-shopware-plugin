@@ -47,7 +47,8 @@ class CheckoutController extends StorefrontController
         private readonly LoggerInterface $logger,
         private readonly ExpressPaymentService $expressPaymentService,
         private readonly PairingService $pairingService,
-    ) {}
+    ) {
+    }
 
     #[Route(path: '/twint/express-checkout', name: 'frontend.twint.express-checkout', methods: ['POST'], defaults: [
         'XmlHttpRequest' => true,

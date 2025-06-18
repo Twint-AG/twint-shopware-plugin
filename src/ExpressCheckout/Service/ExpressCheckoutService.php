@@ -43,7 +43,8 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
         private readonly AbstractSalesChannelContextFactory $contextFactory,
         private readonly CartPersister $cartPersister,
         private readonly CurrencyService $currencyService,
-    ) {}
+    ) {
+    }
 
     /**
      * @throws SdkError
