@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Twint\ExpressCheckout\Service;
 
-use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Exception; // @phpstan-ignore-line
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
