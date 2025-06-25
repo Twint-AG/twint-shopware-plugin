@@ -11,6 +11,7 @@
         <import resource="./parts/dal.xml"/>
         <import resource="./parts/monitoring.xml"/>
         <import resource="./parts/express_checkout.xml"/>
+        <import resource="./parts/reporting.xml"/>
     </imports>
     <services>
 
