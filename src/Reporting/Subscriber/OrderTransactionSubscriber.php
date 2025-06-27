@@ -12,6 +12,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Twint\Core\Handler\TwintExpressPaymentHandler;
 use Twint\Core\Handler\TwintRegularPaymentHandler;
 use Twint\Core\Service\SettingServiceInterface;
+use Twint\Core\Setting\Settings;
+use Twint\Sdk\Value\InstallSource;
 use function in_array;
 use function round;
 
@@ -42,7 +44,7 @@ class OrderTransactionSubscriber implements EventSubscriberInterface
         $setting = $this->settingService->getSetting($event->getSalesChannelId());
         $isTestMode = $setting->isTestMode();
 
-        if (!isset($transaction, $handlerId) || $isTestMode || $event->getContext()->getVersionId() !== Defaults::LIVE_VERSION || !in_array(
+        if (!isset($transaction, $handlerId) || $isTestMode || Settings::INSTALL_SOURCE !== InstallSource::STORE || $event->getContext()->getVersionId() !== Defaults::LIVE_VERSION || !in_array(
             $handlerId,
             [TwintExpressPaymentHandler::class, TwintRegularPaymentHandler::class],
             true
