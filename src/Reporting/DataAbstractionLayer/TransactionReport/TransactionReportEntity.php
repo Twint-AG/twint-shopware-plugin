@@ -6,6 +6,7 @@ namespace Twint\Reporting\DataAbstractionLayer\TransactionReport;
 
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
 use Shopware\Core\Framework\Log\Package;
 
 /**
@@ -13,9 +14,11 @@ use Shopware\Core\Framework\Log\Package;
  *
  * @codeCoverageIgnore
  */
-#[Package('checkout')]
+#[Package('administration')]
 class TransactionReportEntity extends Entity
 {
+    use EntityIdTrait;
+
     protected string $orderTransactionId;
 
     protected string $orderTransactionVersionId;
