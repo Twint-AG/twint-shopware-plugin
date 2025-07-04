@@ -6,21 +6,18 @@ namespace Twint\Reporting\ScheduledTask;
 
 use DateTime;
 use DateTimeInterface;
-use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Connection;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Promise\Promise;
 use GuzzleHttp\Promise\Utils;
 use GuzzleHttp\RequestOptions;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Twint\Reporting\Service\TransactionReportService;
 use function round;
 use function sprintf;
 
@@ -31,15 +28,14 @@ use function sprintf;
 #[Package('checkout')]
 class TurnoverReportingTaskHandler extends ScheduledTaskHandler
 {
-    private const API_IDENTIFIER = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx';
+    private const API_IDENTIFIER = '89b03700-3fdf-4a27-a938-70d52c026da9';
 
     private Client $client;
 
     public function __construct(
         EntityRepository $scheduledTaskRepository,
         private readonly LoggerInterface $logger,
-        private readonly Connection $connection,
-        private readonly EntityRepository $transactionReportRepository,
+        private readonly TransactionReportService $transactionReportService,
         private readonly string $shopwareVersion,
         private readonly ?string $instanceId,
     ) {
@@ -51,49 +47,27 @@ class TurnoverReportingTaskHandler extends ScheduledTaskHandler
 
     public function run(): void
     {
-        $transactionReportIds = $this->transactionReportRepository
-            ->searchIds(new Criteria(), Context::createDefaultContext())->getIds();
+        $context = Context::createDefaultContext();
+        $transactionReportIds = $this->transactionReportService->getPaidTransactionReportIds($context);
+        $refundTransactionReportIds = $this->transactionReportService->getRefundTransactionReportIds($context);
 
-        /**
-         * All transactions no longer in paid state will be ignored, but deleted at the end
-         *
-         * e.g. ['EUR' => '900.98', 'GBP' => '100']
-         *
-         * @var array<string, string>
-         */
-        $reports = $this->connection->executeQuery(
-            '
-                SELECT tr.currency_iso, SUM(tr.total_price) as turnover
-                    FROM twint_transaction_report as tr
-                LEFT JOIN order_transaction as ot
-                    ON tr.order_transaction_id = ot.id AND tr.order_transaction_version_id = ot.version_id
-                LEFT JOIN state_machine_state as sms
-                    ON ot.state_id = sms.id
-                WHERE sms.technical_name = (:state) AND LOWER(HEX(tr.order_transaction_id)) in (:ids)
-                GROUP BY tr.currency_iso
-            ',
-            [
-                'state' => OrderTransactionStates::STATE_PAID,
-                'ids' => $transactionReportIds,
-            ],
-            [
-                'ids' => ArrayParameterType::STRING,
-            ]
-        )->fetchAllKeyValue();
+        $reports = $this->transactionReportService->getAggregatedPaidTurnover($transactionReportIds);
+        $refundReports = $this->transactionReportService->getAggregatedRefundTurnover($refundTransactionReportIds);
 
         $requests = [];
+        $refundRequests = [];
         foreach ($reports as $currency => $turnover) {
-            $body = [
-                'identifier' => self::API_IDENTIFIER,
-                'reportDate' => (new DateTime())->format(DateTimeInterface::ATOM),
-                'instanceId' => $this->instanceId,
-                'shopwareVersion' => $this->shopwareVersion,
-                'reportDataKeys' => [
-                    'turnover' => round((float) $turnover, 2),
-                ],
-                'currency' => $currency,
-            ];
+            $body = $this->buildRequestBody((float) $turnover, (string) $currency);
             $requests[$currency] = $this->client->postAsync(
+                '/shopwarepartners/reports/technology',
+                [
+                    RequestOptions::JSON => $body,
+                ]
+            );
+        }
+        foreach ($refundReports as $currency => $turnover) {
+            $body = $this->buildRequestBody((float) $turnover, (string) $currency);
+            $refundRequests[$currency] = $this->client->postAsync(
                 '/shopwarepartners/reports/technology',
                 [
                     RequestOptions::JSON => $body,
@@ -102,6 +76,21 @@ class TurnoverReportingTaskHandler extends ScheduledTaskHandler
         }
 
         $rejectedCurrencies = [];
+        /** @var array{state: string, reason: ClientException} $response */
+        foreach (Utils::settle($refundRequests)->wait() as $currency => $response) {
+            if ($response['state'] !== Promise::REJECTED) {
+                continue;
+            }
+
+            $this->logger->warning(sprintf(
+                'Failed to report refund for "%s": %s',
+                $currency,
+                $response['reason']->getMessage()
+            ));
+
+            $rejectedCurrencies[] = $currency;
+        }
+        $rejectedRefundCurrencies = [];
         /** @var array{state: string, reason: ClientException} $response */
         foreach (Utils::settle($requests)->wait() as $currency => $response) {
             if ($response['state'] !== Promise::REJECTED) {
@@ -114,22 +103,23 @@ class TurnoverReportingTaskHandler extends ScheduledTaskHandler
                 $response['reason']->getMessage()
             ));
 
-            $rejectedCurrencies[] = $currency;
+            $rejectedRefundCurrencies[] = $currency;
         }
+        $this->transactionReportService->deleteReports($transactionReportIds, $rejectedCurrencies);
+        $this->transactionReportService->deleteReports($refundTransactionReportIds, $rejectedRefundCurrencies);
+    }
 
-        $this->connection->executeStatement(
-            '
-            DELETE FROM `twint_transaction_report`
-            WHERE LOWER(HEX(`order_transaction_id`)) IN (:ids)
-            ' . ($rejectedCurrencies !== [] ? 'AND `currency_iso` NOT IN (:rejectedCurrencies)' : ''),
-            [
-                'ids' => $transactionReportIds,
-                'rejectedCurrencies' => $rejectedCurrencies,
+    public function buildRequestBody(float $amount, string $currency): array
+    {
+        return [
+            'identifier' => self::API_IDENTIFIER,
+            'reportDate' => (new DateTime())->format(DateTimeInterface::ATOM),
+            'instanceId' => $this->instanceId,
+            'shopwareVersion' => $this->shopwareVersion,
+            'reportDataKeys' => [
+                'turnover' => round($amount, 2),
             ],
-            [
-                'ids' => ArrayParameterType::STRING,
-                'rejectedCurrencies' => ArrayParameterType::STRING,
-            ],
-        );
+            'currency' => $currency,
+        ];
     }
 }

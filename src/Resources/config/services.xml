@@ -50,6 +50,7 @@
             <argument type="service" id="Shopware\Core\Checkout\Cart\Price\CashRounding"/>
             <argument type="service" id="Twint\Core\Service\OrderService"/>
             <argument type="service" id="Twint\Core\Service\ApiService"/>
+            <argument type="service" id="Twint\Reporting\Service\TransactionReportService"/>
         </service>
 
         <service id="Twint\Core\Service\OrderService">
