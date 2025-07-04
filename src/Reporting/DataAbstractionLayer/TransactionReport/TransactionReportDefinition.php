@@ -10,6 +10,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\PrimaryKey;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\FloatField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\ManyToOneAssociationField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\ReferenceVersionField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
@@ -31,6 +32,13 @@ class TransactionReportDefinition extends EntityDefinition
         return self::ENTITY_NAME;
     }
 
+    public function getDefaults(): array
+    {
+        $defaults = parent::getDefaults();
+
+        return $defaults;
+    }
+
     public function getEntityClass(): string
     {
         return TransactionReportEntity::class;
@@ -44,6 +52,7 @@ class TransactionReportDefinition extends EntityDefinition
     protected function defineFields(): FieldCollection
     {
         return new FieldCollection([
+            (new IdField('id', 'id'))->setFlags(new PrimaryKey(), new Required()),
             (new FkField('order_transaction_id', 'orderTransactionId', OrderTransactionDefinition::class))->addFlags(
                 new PrimaryKey(),
                 new Required()

@@ -6,7 +6,7 @@
 
     <services>
         <service id="Twint\Reporting\DataAbstractionLayer\TransactionReport\TransactionReportDefinition">
-            <tag name="shopware.entity.definition" entity="twint_transaction_report_entity"/>
+            <tag name="shopware.entity.definition" entity="twint_transaction_report"/>
         </service>
 
         <service id="Twint\Reporting\ScheduledTask\TurnoverReportingTask">
@@ -16,8 +16,7 @@
         <service id="Twint\Reporting\ScheduledTask\TurnoverReportingTaskHandler">
             <argument type="service" id="scheduled_task.repository"/>
             <argument type="service" id="logger"/>
-            <argument type="service" id="Doctrine\DBAL\Connection"/>
-            <argument type="service" id="twint_transaction_report.repository"/>
+            <argument type="service" id="Twint\Reporting\Service\TransactionReportService"/>
             <argument>%kernel.shopware_version%</argument>
             <argument>%instance_id%</argument>
             <tag name="messenger.message_handler"/>
@@ -26,6 +25,17 @@
         <service id="Twint\Reporting\Subscriber\OrderTransactionSubscriber">
             <argument type="service" id="twint_transaction_report.repository"/>
             <argument type="service" id="Twint\Core\Service\SettingServiceInterface"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Twint\Reporting\Service\TransactionReportService">
+            <argument type="service" id="twint_transaction_report.repository"/>
+            <argument type="service" id="Twint\Core\Service\SettingServiceInterface"/>
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
+        </service>
+
+        <service id="Twint\Reporting\Subscriber\OrderTransactionSubscriber">
+            <argument type="service" id="Twint\Reporting\Service\TransactionReportService"/>
             <tag name="kernel.event_subscriber"/>
         </service>
     </services>
