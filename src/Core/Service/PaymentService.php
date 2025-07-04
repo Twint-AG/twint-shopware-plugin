@@ -26,6 +26,7 @@ use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\Core\Factory\ClientBuilder;
 use Twint\Core\Handler\TransactionLog\TransactionLogWriterInterface;
 use Twint\Core\Model\ApiResponse;
+use Twint\Reporting\Service\TransactionReportService;
 use Twint\Sdk\Value\Money;
 use Twint\Sdk\Value\Order;
 use Twint\Sdk\Value\OrderId;
@@ -46,6 +47,7 @@ class PaymentService
         private readonly CashRounding $rounding,
         private readonly OrderService $orderService,
         private readonly ApiService $apiService,
+        private readonly TransactionReportService $transactionReportService,
     ) {
         $this->context = new Context(new SystemSource());
     }
@@ -145,6 +147,11 @@ class PaymentService
                 $order->getTransactions()?->first()?->getId() ?? '',
                 $innovations,
                 $this->context
+            );
+            $this->transactionReportService->processTransactionReport(
+                $order,
+                $this->context,
+                $amount
             );
         }
     }
