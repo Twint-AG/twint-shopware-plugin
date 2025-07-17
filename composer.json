@@ -25,7 +25,8 @@
   "require": {
     "twint-ag/sdk": "^1.6.2",
     "chillerlan/php-qrcode": "4.3.4",
-    "ext-openssl": "*"
+    "ext-openssl": "*",
+    "shopware/core": ">=6.5.0.0"
   },
   "require-dev": {
     "phpstan/phpstan": "^1.10",
@@ -34,8 +35,7 @@
     "slevomat/coding-standard": "^8.15",
     "rector/rector": "^1.0",
     "symfony/browser-kit": "*",
-    "dg/bypass-finals": "^1.8",
-    "shopware/core": ">=6.5.0.0"
+    "dg/bypass-finals": "^1.8"
   },
   "extra": {
     "shopware-plugin-class": "Twint\\TwintPayment",
