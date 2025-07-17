@@ -5,23 +5,34 @@ set -euo pipefail
 RELEASE_BOT_NAME="TWINT Release Bot"
 RELEASE_BOT_EMAIL="plugin@twint.ch"
 
+export GIT_COMMITTER_NAME="${RELEASE_BOT_NAME}"
+export GIT_COMMITTER_EMAIL="${RELEASE_BOT_EMAIL}"
+export GIT_AUTHOR_NAME="${RELEASE_BOT_NAME}"
+export GIT_AUTHOR_EMAIL="${RELEASE_BOT_EMAIL}"
+
 [ -z "${1+x}" ] && echo "Usage: $0 <version>" && exit 1
 
 base_dir=$(dirname "$0")/../
 
 version="$1"
 
-git diff --exit-code
-git diff --exit-code --cached
+if [ -z "$TWINT_DRY_RUN" ]; then
+  git diff --exit-code
+  git diff --exit-code --cached
+fi
 
 FILES=("${base_dir}/composer.json" "${base_dir}/src/Core/Setting/Settings.php")
 
-for FILE in "${FILES[@]}"; do
-  sed -i -e "s@dev-master@${version}@g" "${FILE}"
-  sed -i -e "s@9.9.9-dev@${version}@g" "${FILE}"
-done
+sed -i -e "s@dev-master@${version}@g" "${FILES[@]}"
+git commit -m "chore(release-management): create release ${version} (direct installation)" "${FILES[@]}"
+git tag -a "${version}" -m "chore(release-management): tag ${version} (direct installation)" --no-sign
 
-GIT_COMMITTER_NAME="${RELEASE_BOT_NAME}" GIT_COMMITTER_EMAIL="${RELEASE_BOT_EMAIL}" GIT_AUTHOR_NAME="${RELEASE_BOT_NAME}" GIT_AUTHOR_EMAIL="${RELEASE_BOT_EMAIL}" git commit -m "chore(release-management): create release ${version}" composer.json src/Core/Setting/Settings.php
-GIT_COMMITTER_NAME="${RELEASE_BOT_NAME}" GIT_COMMITTER_EMAIL="${RELEASE_BOT_EMAIL}" git tag -a "${version}" -m "chore(release-management): tag ${version}" --no-sign
-git reset --hard HEAD^
-git push origin "${version}"
+sed -i -e "s@public const INSTALL_SOURCE = .*;@public const INSTALL_SOURCE = InstallSource::STORE;@g" "${FILES[@]}"
+git commit -m "chore(release-management): create release ${version} (store installation)" "${FILES[@]}"
+git tag -a "${version}-store" -m "chore(release-management): tag ${version} (store installation)" --no-sign
+
+if [ -z "$TWINT_DRY_RUN" ]; then
+    git reset --hard HEAD^^
+    git push origin "${version}" "${version}-store"
+fi
+
