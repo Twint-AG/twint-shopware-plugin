@@ -46,8 +46,16 @@ class TransactionReportService
             )) {
             return;
         }
-        $totalPrice = $refundPrice > 0 ? -1 * $refundPrice : $transaction->getAmount()
-            ->getTotalPrice();
+        $gross = $transaction->getAmount()->getTotalPrice();
+        $taxes = $transaction->getAmount()->getCalculatedTaxes();
+
+        $taxAmount = 0.0;
+        foreach ($taxes as $tax) {
+            $taxAmount += $tax->getTax();
+        }
+
+        $netPrice = $gross - $taxAmount;
+        $totalPrice = $refundPrice > 0 ? -1 * $refundPrice : $netPrice;
         $id = $totalPrice > 0
             ? $this->getPaidTransactionReportId($order, $context) ?? Uuid::randomHex()
             : Uuid::randomHex();
