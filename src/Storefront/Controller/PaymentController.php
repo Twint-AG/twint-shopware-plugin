@@ -81,7 +81,10 @@ class PaymentController extends StorefrontController
         $criteria->addAssociation('order.transactions.stateMachineState');
 
         /** @var PairingEntity $pairing */
-        $pairing = $this->pairingRepository->search($criteria, $context->getContext())
+        $pairing = $this->pairingRepository->search(
+            $criteria,
+            $context->getContext()
+        )
             ->first();
 
         if (!$pairing instanceof PairingEntity) {

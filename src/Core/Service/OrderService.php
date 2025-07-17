@@ -143,8 +143,11 @@ class OrderService
      *
      * @throws Exception
      */
-    public function getOrder(string $orderId, Context $context = null, array $associations = []): OrderEntity
-    {
+    public function getOrder(
+        string $orderId,
+        Context $context = null,
+        array $associations = []
+    ): OrderEntity {
         $defaults = [
             'currency',
             'addresses',

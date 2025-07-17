@@ -26,8 +26,9 @@ class SettingService implements SettingServiceInterface
     /**
      * Get Twint settings from configuration.
      */
-    public function getSetting(?string $salesChannel = null): TwintSettingStruct
-    {
+    public function getSetting(
+        ?string $salesChannel = null
+    ): TwintSettingStruct {
         $structData = [];
         $config = $this->configService->getDomain(self::SYSTEM_CONFIG_DOMAIN, $salesChannel, true);
 
@@ -47,8 +48,9 @@ class SettingService implements SettingServiceInterface
      * Validate Twint credentials.
      * And store the validation status in the configuration.
      */
-    public function validateCredentials(?string $saleChannel = null): void
-    {
+    public function validateCredentials(
+        ?string $saleChannel = null
+    ): void {
         $config = $this->configService->getDomain(self::SYSTEM_CONFIG_DOMAIN, $saleChannel, true);
         $valid = $this->validator->validate(
             $config[Settings::CERTIFICATE],

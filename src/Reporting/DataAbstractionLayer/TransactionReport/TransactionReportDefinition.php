@@ -57,7 +57,10 @@ class TransactionReportDefinition extends EntityDefinition
                 new PrimaryKey(),
                 new Required()
             ),
-            (new ReferenceVersionField(OrderTransactionDefinition::class))->addFlags(new PrimaryKey(), new Required()),
+            (new ReferenceVersionField(OrderTransactionDefinition::class))->addFlags(
+                new PrimaryKey(),
+                new Required()
+            ),
             (new StringField('currency_iso', 'currencyIso'))->addFlags(new Required()),
             (new FloatField('total_price', 'totalPrice'))->addFlags(new Required()),
 

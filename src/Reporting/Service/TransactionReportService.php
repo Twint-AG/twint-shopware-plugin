@@ -40,14 +40,16 @@ class TransactionReportService
         $isTestMode = $setting->isTestMode();
 
         if (!isset($handlerId) || $isTestMode || Settings::INSTALL_SOURCE !== InstallSource::STORE || $context->getVersionId() !== Defaults::LIVE_VERSION || !in_array(
-                $handlerId,
-                [TwintExpressPaymentHandler::class, TwintRegularPaymentHandler::class],
-                true
-            )) {
+            $handlerId,
+            [TwintExpressPaymentHandler::class, TwintRegularPaymentHandler::class],
+            true
+        )) {
             return;
         }
-        $gross = $transaction->getAmount()->getTotalPrice();
-        $taxes = $transaction->getAmount()->getCalculatedTaxes();
+        $gross = $transaction->getAmount()
+            ->getTotalPrice();
+        $taxes = $transaction->getAmount()
+            ->getCalculatedTaxes();
 
         $taxAmount = 0.0;
         foreach ($taxes as $tax) {
@@ -113,8 +115,9 @@ class TransactionReportService
      * @param array<string> $transactionReportIds
      * @return array<int|string, mixed>
      */
-    public function getAggregatedPaidTurnover(array $transactionReportIds): array
-    {
+    public function getAggregatedPaidTurnover(
+        array $transactionReportIds
+    ): array {
         if (empty($transactionReportIds)) {
             return [];
         }
@@ -143,8 +146,9 @@ class TransactionReportService
      * @param array<string> $refundTransactionReportIds
      * @return array<int|string, mixed>
      */
-    public function getAggregatedRefundTurnover(array $refundTransactionReportIds): array
-    {
+    public function getAggregatedRefundTurnover(
+        array $refundTransactionReportIds
+    ): array {
         if (empty($refundTransactionReportIds)) {
             return [];
         }
@@ -173,8 +177,10 @@ class TransactionReportService
      * @param array<string> $transactionReportIds
      * @param array<string> $rejectedCurrencies
      */
-    public function deleteReports(array $transactionReportIds, array $rejectedCurrencies): void
-    {
+    public function deleteReports(
+        array $transactionReportIds,
+        array $rejectedCurrencies
+    ): void {
         if (empty($transactionReportIds)) {
             return;
         }

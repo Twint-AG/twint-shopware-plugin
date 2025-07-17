@@ -87,8 +87,11 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
      * Hard to cart calculate shipping costs for each shipping method
      * Shopware forces to set shipping method to SalesChannelContext
      */
-    private function buildShippingOptions(Cart $cart, EntityCollection $methods, SalesChannelContext $context): mixed
-    {
+    private function buildShippingOptions(
+        Cart $cart,
+        EntityCollection $methods,
+        SalesChannelContext $context
+    ): mixed {
         $options = [];
         /** @var ShippingMethodEntity $method */
         foreach ($methods as $key => $method) {

@@ -42,8 +42,10 @@ class ClientBuilder
      * @phpstan-type FutureVersionId = int<Version::NEXT,max>
      * @phpstan-type version = FutureVersionId
      */
-    public function build(string $salesChannelId, int $version = Version::LATEST): InvocationRecordingClient
-    {
+    public function build(
+        string $salesChannelId,
+        int $version = Version::LATEST
+    ): InvocationRecordingClient {
         if (isset(self::$instances[$salesChannelId . $version])) {
             return self::$instances[$salesChannelId . $version];
         }
