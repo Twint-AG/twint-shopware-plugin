@@ -47,7 +47,9 @@ class MonitoringService
                 $this->monitorOne($pairing);
             } catch (Throwable $e) {
                 // Silent error to allow process handle next Pairings
-                $this->logger->error("TWINT cli error: {$pairing->getId()} {$pairing->getToken()} {$e->getMessage()}");
+                $this->logger->error(
+                    "TWINT cli error: {$pairing->getId()} {$pairing->getToken()} {$e->getMessage()}"
+                );
             }
         }
     }
@@ -64,8 +66,9 @@ class MonitoringService
      * @throws Exception\DriverException
      * @throws Exception
      */
-    public function monitorExpress(PairingEntity $pairing): PairingEntity
-    {
+    public function monitorExpress(
+        PairingEntity $pairing
+    ): PairingEntity {
         $res = $this->paymentService->monitoring($pairing->getId(), $pairing->getSalesChannelId());
         $state = $res->getReturn();
         $this->pairingService->fetchCart($pairing, $this->context->getContext($pairing->getSalesChannelId()));
@@ -104,8 +107,10 @@ class MonitoringService
     /**
      * @throws Exception
      */
-    protected function handle(PairingEntity $entity, FastCheckoutState $state): PairingEntity
-    {
+    protected function handle(
+        PairingEntity $entity,
+        FastCheckoutState $state
+    ): PairingEntity {
         switch ($state->pairingStatus()->__toString()) {
             case PairingStatus::PAIRING_ACTIVE:
                 if ($state instanceof FastCheckoutCheckIn && $state->hasCustomerData()) {

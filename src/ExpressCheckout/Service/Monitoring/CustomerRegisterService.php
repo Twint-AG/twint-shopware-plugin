@@ -34,8 +34,10 @@ class CustomerRegisterService
     /**
      * @throws Exception
      */
-    public function register(PairingEntity $pairing, SalesChannelContext $context): array
-    {
+    public function register(
+        PairingEntity $pairing,
+        SalesChannelContext $context
+    ): array {
         $customerData = $this->generateCustomerData($pairing, $context);
 
         $customer = $pairing->getCustomer();
@@ -108,8 +110,10 @@ class CustomerRegisterService
     /**
      * @throws Exception
      */
-    public function generateCustomerData(PairingEntity $pairing, SalesChannelContext $context): array
-    {
+    public function generateCustomerData(
+        PairingEntity $pairing,
+        SalesChannelContext $context
+    ): array {
         /** @var CustomerData $customerData */
         $customerData = $pairing->getCustomerData();
 

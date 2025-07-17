@@ -239,7 +239,10 @@ class PaymentService
         $criteria->addAggregation(new SumAggregation('totalReversal', 'amount'));
 
         /** @var SumResult $totalReversal */
-        $totalReversal = $this->reversalHistoryRepository->aggregate($criteria, $this->context)
+        $totalReversal = $this->reversalHistoryRepository->aggregate(
+            $criteria,
+            $this->context
+        )
             ->get('totalReversal');
         return $totalReversal->getSum() ?? -1;
     }
@@ -282,9 +285,12 @@ class PaymentService
 
         if (($pairing = $this->orderService->getPairing($order->getId())) instanceof PairingEntity) {
             $amountMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $pairing->getAmount());
-            $totalReversalMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $this->getTotalReversal(
-                $order->getId()
-            ));
+            $totalReversalMoney = new Money(
+                $order->getCurrency()?->getIsoCode() ?? Money::CHF,
+                $this->getTotalReversal(
+                    $order->getId()
+                )
+            );
             if ($amountMoney->compare(
                 $totalReversalMoney
             ) === 0 && $lastTransactionStateName !== OrderTransactionStates::STATE_REFUNDED) {

@@ -68,7 +68,9 @@ class ExpressCheckoutButtonService
         /**
          * Get the payment methods for the sales channel. Already filtered by active rules.
          */
-        $paymentMethods = $this->getPaymentMethods($context);
+        $paymentMethods = $this->getPaymentMethods(
+            $context
+        );
         $context->getSalesChannel()
             ->setPaymentMethods($paymentMethods);
 
@@ -86,7 +88,9 @@ class ExpressCheckoutButtonService
         }
 
         // Check if the express checkout is enabled
-        $enabled = $this->paymentMethodUtil->isExpressCheckoutEnabled($context);
+        $enabled = $this->paymentMethodUtil->isExpressCheckoutEnabled(
+            $context
+        );
         if (!$enabled) {
             self::$buttons = [];
             return self::$buttons;

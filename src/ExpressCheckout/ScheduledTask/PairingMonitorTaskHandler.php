@@ -51,7 +51,9 @@ if (interface_exists('Symfony\Component\Messenger\Handler\MessageSubscriberInter
             $this->service->monitor();
 
             // @phpstan-ignore-next-line: compatible backwards compatibility
-            $this->exceptionLogger?->info('Cron ran successfully');
+            $this->exceptionLogger?->info(
+                'Cron ran successfully'
+            );
         }
     }
 }
