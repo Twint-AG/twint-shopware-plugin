@@ -16,7 +16,7 @@ base_dir=$(dirname "$0")/../
 
 version="$1"
 
-if [ -z "$TWINT_DRY_RUN" ]; then
+if [ -z "${TWINT_DRY_RUN:=}" ]; then
   git diff --exit-code
   git diff --exit-code --cached
 fi
