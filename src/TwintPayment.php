@@ -90,10 +90,7 @@ class TwintPayment extends Plugin
         return new Installer(
             new PaymentMethodInstaller(
                 // @phpstan-ignore-next-line
-                $this->getRepository(
-                    $this->container,
-                    PaymentMethodDefinition::ENTITY_NAME
-                ),
+                $this->getRepository($this->container, PaymentMethodDefinition::ENTITY_NAME),
                 // @phpstan-ignore-next-line
                 $this->getRepository($this->container, RuleDefinition::ENTITY_NAME),
                 // @phpstan-ignore-next-line
@@ -102,35 +99,23 @@ class TwintPayment extends Plugin
                     // @phpstan-ignore-next-line
                     $this->container,
                     // @phpstan-ignore-next-line
-                    $this->getRepository(
-                        $this->container,
-                        PaymentMethodDefinition::ENTITY_NAME
-                    ),
+                    $this->getRepository($this->container, PaymentMethodDefinition::ENTITY_NAME),
                     []
                 ),
                 new MediaInstaller(
                     // @phpstan-ignore-next-line
                     $this->getRepository($this->container, MediaDefinition::ENTITY_NAME),
                     // @phpstan-ignore-next-line
-                    $this->getRepository(
-                        $this->container,
-                        MediaFolderDefinition::ENTITY_NAME
-                    ),
+                    $this->getRepository($this->container, MediaFolderDefinition::ENTITY_NAME),
                     // @phpstan-ignore-next-line
-                    $this->getRepository(
-                        $this->container,
-                        PaymentMethodDefinition::ENTITY_NAME
-                    ),
+                    $this->getRepository($this->container, PaymentMethodDefinition::ENTITY_NAME),
                     // @phpstan-ignore-next-line
                     $this->container->get(FileSaver::class)
                 ),
             ),
             new ConfigInstaller(
                 // @phpstan-ignore-next-line
-                $this->getRepository(
-                    $this->container,
-                    SystemConfigDefinition::ENTITY_NAME
-                ),
+                $this->getRepository($this->container, SystemConfigDefinition::ENTITY_NAME),
                 // @phpstan-ignore-next-line
                 $this->container->get(SystemConfigService::class)
             )

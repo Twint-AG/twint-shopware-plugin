@@ -77,9 +77,7 @@ class TurnoverReportingTaskHandler extends ScheduledTaskHandler
 
         $rejectedCurrencies = [];
         /** @var array{state: string, reason: ClientException} $response */
-        foreach (Utils::settle(
-            $refundRequests
-        )->wait() as $currency => $response) {
+        foreach (Utils::settle($refundRequests)->wait() as $currency => $response) {
             if ($response['state'] !== Promise::REJECTED) {
                 continue;
             }
@@ -94,9 +92,7 @@ class TurnoverReportingTaskHandler extends ScheduledTaskHandler
         }
         $rejectedRefundCurrencies = [];
         /** @var array{state: string, reason: ClientException} $response */
-        foreach (Utils::settle(
-            $requests
-        )->wait() as $currency => $response) {
+        foreach (Utils::settle($requests)->wait() as $currency => $response) {
             if ($response['state'] !== Promise::REJECTED) {
                 continue;
             }

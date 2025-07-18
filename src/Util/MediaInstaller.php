@@ -59,10 +59,7 @@ class MediaInstaller
         $criteria = new Criteria([$paymentMethodId]);
         $criteria->addAssociation('media');
         /** @var PaymentMethodEntity|null $paymentMethod */
-        $paymentMethod = $this->paymentMethodRepository->search(
-            $criteria,
-            $context
-        )
+        $paymentMethod = $this->paymentMethodRepository->search($criteria, $context)
             ->first();
         if ($paymentMethod === null) {
             throw PaymentException::unknownPaymentMethodById($paymentMethodId);

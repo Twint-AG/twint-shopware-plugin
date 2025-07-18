@@ -78,10 +78,8 @@ class PairingService
     /**
      * @throws Exception
      */
-    public function update(
-        PairingEntity $entity,
-        FastCheckoutState $state
-    ): EntityWrittenContainerEvent {
+    public function update(PairingEntity $entity, FastCheckoutState $state): EntityWrittenContainerEvent
+    {
         if (!($state instanceof FastCheckoutCheckIn)) {
             throw new Exception('Invalid state');
         }

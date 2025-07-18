@@ -214,9 +214,9 @@ class TwintController extends AbstractController
                         'error' => $this->translator->trans(
                             'twintPayment.administration.refund.error.exceededAmount',
                             [
-                            '%amount%' => $refundableAmount,
-                            '%currency%' => $order->getCurrency()?->getIsoCode(),
-                        ]
+                                '%amount%' => $refundableAmount,
+                                '%currency%' => $order->getCurrency()?->getIsoCode(),
+                            ]
                         ),
                     ]);
                 }
@@ -285,9 +285,7 @@ class TwintController extends AbstractController
     #[Route(
         path: '/api/_actions/twint/order/{orderId}/pairing',
         name: 'api.action.twint.order.pairing',
-        methods: [
-        'GET',
-    ]
+        methods: ['GET']
     )]
     public function pairing(string $orderId): Response
     {

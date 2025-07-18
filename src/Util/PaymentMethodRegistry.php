@@ -19,10 +19,7 @@ class PaymentMethodRegistry
     /**
      * Need to add manual here due to the fact that the methods are not loaded when the plugin has not installed yet
      */
-    private const PAYMENT_METHODS = [
-        RegularPaymentMethod::class,
-        ExpressPaymentMethod::class,
-    ];
+    private const PAYMENT_METHODS = [RegularPaymentMethod::class, ExpressPaymentMethod::class];
 
     /**
      * @var AbstractMethod[]
@@ -63,10 +60,7 @@ class PaymentMethodRegistry
         $criteria->addFilter(new EqualsFilter('handlerIdentifier', $method->getHandler()));
 
         /** @var PaymentMethodEntity|null $paymentMethod */
-        $paymentMethod = $this->paymentMethodRepository->search(
-            $criteria,
-            $context
-        )
+        $paymentMethod = $this->paymentMethodRepository->search($criteria, $context)
             ->first();
 
         return $paymentMethod;

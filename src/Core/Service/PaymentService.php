@@ -148,11 +148,7 @@ class PaymentService
                 $innovations,
                 $this->context
             );
-            $this->transactionReportService->processTransactionReport(
-                $order,
-                $this->context,
-                $amount
-            );
+            $this->transactionReportService->processTransactionReport($order, $this->context, $amount);
         }
     }
 
@@ -239,10 +235,7 @@ class PaymentService
         $criteria->addAggregation(new SumAggregation('totalReversal', 'amount'));
 
         /** @var SumResult $totalReversal */
-        $totalReversal = $this->reversalHistoryRepository->aggregate(
-            $criteria,
-            $this->context
-        )
+        $totalReversal = $this->reversalHistoryRepository->aggregate($criteria, $this->context)
             ->get('totalReversal');
         return $totalReversal->getSum() ?? -1;
     }
@@ -287,9 +280,7 @@ class PaymentService
             $amountMoney = new Money($order->getCurrency()?->getIsoCode() ?? Money::CHF, $pairing->getAmount());
             $totalReversalMoney = new Money(
                 $order->getCurrency()?->getIsoCode() ?? Money::CHF,
-                $this->getTotalReversal(
-                    $order->getId()
-                )
+                $this->getTotalReversal($order->getId())
             );
             if ($amountMoney->compare(
                 $totalReversalMoney

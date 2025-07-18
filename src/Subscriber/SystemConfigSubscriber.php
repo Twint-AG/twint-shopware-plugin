@@ -65,9 +65,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
         $key = $event->getKey();
         if ($key === Settings::VALIDATED) {
             // The event doesn't allow to remove the key from the config array then need to reset the value via data from database
-            $setting = $this->settingService->getSetting(
-                $event->getSalesChannelId()
-            );
+            $setting = $this->settingService->getSetting($event->getSalesChannelId());
             $event->setValue($setting->getValidated());
         }
     }
@@ -77,9 +75,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
         $channel = $event->getSalesChannelId();
 
         // Filter the config array to only include the keys that are defined TwintPayment plugin
-        $keys = array_keys(
-            $event->getConfig()
-        );
+        $keys = array_keys($event->getConfig());
         $credentialKeys = [Settings::CERTIFICATE, Settings::STORE_UUID, Settings::TEST_MODE];
 
         if (array_intersect($keys, $credentialKeys) !== []) {
@@ -95,9 +91,8 @@ class SystemConfigSubscriber implements EventSubscriberInterface
      *      "TwintPayment.settings.validated": true // This value should not be updated via API call
      * }
      */
-    public function onBeforeMultipleSystemConfigChanged(
-        BeforeSystemConfigMultipleChangedEvent $event
-    ): void {
+    public function onBeforeMultipleSystemConfigChanged(BeforeSystemConfigMultipleChangedEvent $event): void
+    {
         if (self::$allowUpdateValidated) {
             return;
         }
@@ -105,9 +100,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
         $config = $event->getConfig();
         if (isset($config[Settings::VALIDATED])) {
             // The event doesn't allow to remove the key from the config array then need to reset the value via data from database
-            $setting = $this->settingService->getSetting(
-                $event->getSalesChannelId()
-            );
+            $setting = $this->settingService->getSetting($event->getSalesChannelId());
             $event->setValue(Settings::VALIDATED, $setting->getValidated());
         }
     }
@@ -125,9 +118,8 @@ class SystemConfigSubscriber implements EventSubscriberInterface
     /**
      * Remove Twint payment method from the list of active payment methods
      */
-    public function onPaymentMethodCriteriaBuild(
-        SalesChannelProcessCriteriaEvent $event
-    ): void {
+    public function onPaymentMethodCriteriaBuild(SalesChannelProcessCriteriaEvent $event): void
+    {
         $channel = $event->getSalesChannelContext()
             ->getSalesChannelId();
         $setting = $this->settingService->getSetting($channel);

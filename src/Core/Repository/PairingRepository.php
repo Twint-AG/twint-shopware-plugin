@@ -106,10 +106,7 @@ class PairingRepository
     {
         //validate $data to make sure always has version
 
-        return $this->repository->update(
-            $data,
-            Context::createDefaultContext()
-        );
+        return $this->repository->update($data, Context::createDefaultContext());
     }
 
     public function findByOrderId(string $orderId, array $associations = []): ?PairingEntity
@@ -123,10 +120,7 @@ class PairingRepository
 
 
         /** @var PairingEntity $entity */
-        $entity = $this->repository->search(
-            $criteria,
-            Context::createDefaultContext()
-        )
+        $entity = $this->repository->search($criteria, Context::createDefaultContext())
             ->first();
 
         return $entity;

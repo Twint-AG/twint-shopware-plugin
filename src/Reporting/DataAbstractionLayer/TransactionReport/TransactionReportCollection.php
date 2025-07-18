@@ -14,9 +14,7 @@ use Shopware\Core\Framework\Log\Package;
  *
  * @extends EntityCollection<TransactionReportEntity>
  */
-#[Package(
-    'checkout'
-)]
+#[Package('checkout')]
 class TransactionReportCollection extends EntityCollection
 {
     protected function getExpectedClass(): string

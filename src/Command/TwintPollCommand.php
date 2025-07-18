@@ -41,10 +41,8 @@ class TwintPollCommand extends Command
      * @throws DriverException
      * @throws PairingException|Throwable
      */
-    protected function execute(
-        InputInterface $input,
-        OutputInterface $output
-    ): int {
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
         $pairingId = $input->getArgument('pairing-id');
         $pairing = $this->repository->load($pairingId, Context::createDefaultContext());
 
@@ -69,10 +67,8 @@ class TwintPollCommand extends Command
      * Regular: first 3m every 5s, afterwards 10s
      * Express: first 10m every 2s, afterwards 10s
      */
-    private function getInterval(
-        PairingEntity $pairing,
-        DateTime $startedAt
-    ): int {
+    private function getInterval(PairingEntity $pairing, DateTime $startedAt): int
+    {
         $now = new DateTime();
         $interval = $now->diff($startedAt);
         $seconds = $interval->s + ($interval->i * 60) + ($interval->h * 3600) + ($interval->d * 86400);
