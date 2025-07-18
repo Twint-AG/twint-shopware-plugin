@@ -34,9 +34,7 @@ class TransactionReportDefinition extends EntityDefinition
 
     public function getDefaults(): array
     {
-        $defaults = parent::getDefaults();
-
-        return $defaults;
+        return parent::getDefaults();
     }
 
     public function getEntityClass(): string

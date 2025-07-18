@@ -23,9 +23,8 @@ class CryptoHandler
      * @throws InvalidArgumentException If the encryption fails.
      * @return string The encrypted data, base64 encoded.
      */
-    public function encrypt(
-        string $data
-    ): string {
+    public function encrypt(string $data): string
+    {
         $ivLen = openssl_cipher_iv_length(self::CIPHERING);
         if ($ivLen === false) {
             throw new InvalidArgumentException('Invalid cipher algorithm.');
@@ -53,9 +52,8 @@ class CryptoHandler
      * @throws InvalidArgumentException If the input data is invalid or cannot be decrypted.
      * @return string The decrypted data.
      */
-    public function decrypt(
-        string $encodedData
-    ): string {
+    public function decrypt(string $encodedData): string
+    {
         $c = base64_decode($encodedData, true);
         if ($c === false) {
             throw new InvalidArgumentException('Invalid base64 encoded data.');
@@ -98,9 +96,8 @@ class CryptoHandler
      * @param string $data The input string to be hashed.
      * @return string The base64-encoded hexadecimal representation of the input string.
      */
-    public function hash(
-        string $data
-    ): string {
+    public function hash(string $data): string
+    {
         $hexString = unpack('H*', $data);
         if ($hexString === false) {
             throw new InvalidArgumentException('Failed to convert input data to hexadecimal.');
@@ -121,9 +118,8 @@ class CryptoHandler
      * @throws InvalidArgumentException If the input data is not a valid base64-encoded hexadecimal string.
      * @return string The original string representation of the encoded data.
      */
-    public function unHash(
-        string $encodedData
-    ): string {
+    public function unHash(string $encodedData): string
+    {
         $hex = base64_decode($encodedData, true);
         if ($hex === false) {
             throw new InvalidArgumentException('Invalid base64-encoded hexadecimal string.');

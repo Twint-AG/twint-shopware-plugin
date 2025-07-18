@@ -250,10 +250,8 @@ class CheckoutController extends StorefrontController
     /**
      * @throws PairingException
      */
-    private function getPairingContent(
-        string $pairingHash,
-        SalesChannelContext $context
-    ): string {
+    private function getPairingContent(string $pairingHash, SalesChannelContext $context): string
+    {
         $pairingUUid = $this->cryptoService->unHash($pairingHash);
         $pairing = $this->paringLoader->load($pairingUUid, $context->getContext());
         $pairing = $this->paringLoader->fetchCart($pairing, $context);

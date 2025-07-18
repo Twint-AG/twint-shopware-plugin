@@ -115,10 +115,9 @@ class TransactionReportService
      * @param array<string> $transactionReportIds
      * @return array<int|string, mixed>
      */
-    public function getAggregatedPaidTurnover(
-        array $transactionReportIds
-    ): array {
-        if (empty($transactionReportIds)) {
+    public function getAggregatedPaidTurnover(array $transactionReportIds): array
+    {
+        if ($transactionReportIds === []) {
             return [];
         }
 
@@ -146,10 +145,9 @@ class TransactionReportService
      * @param array<string> $refundTransactionReportIds
      * @return array<int|string, mixed>
      */
-    public function getAggregatedRefundTurnover(
-        array $refundTransactionReportIds
-    ): array {
-        if (empty($refundTransactionReportIds)) {
+    public function getAggregatedRefundTurnover(array $refundTransactionReportIds): array
+    {
+        if ($refundTransactionReportIds === []) {
             return [];
         }
 
@@ -177,11 +175,9 @@ class TransactionReportService
      * @param array<string> $transactionReportIds
      * @param array<string> $rejectedCurrencies
      */
-    public function deleteReports(
-        array $transactionReportIds,
-        array $rejectedCurrencies
-    ): void {
-        if (empty($transactionReportIds)) {
+    public function deleteReports(array $transactionReportIds, array $rejectedCurrencies): void
+    {
+        if ($transactionReportIds === []) {
             return;
         }
 
@@ -193,7 +189,7 @@ class TransactionReportService
             'ids' => ArrayParameterType::STRING,
         ];
 
-        if (!empty($rejectedCurrencies)) {
+        if ($rejectedCurrencies !== []) {
             $sql .= ' AND `currency_iso` NOT IN (:rejectedCurrencies)';
             $params['rejectedCurrencies'] = $rejectedCurrencies;
             $types['rejectedCurrencies'] = ArrayParameterType::STRING;

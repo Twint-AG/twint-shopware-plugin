@@ -77,9 +77,8 @@ class PaymentMethodUtil
     /**
      * @throws Exception
      */
-    private function getPaymentMethodIdByHandler(
-        string $handlerIdentifier
-    ): ?string {
+    private function getPaymentMethodIdByHandler(string $handlerIdentifier): ?string
+    {
         if ($this->paymentMethodIds === null) {
             /** @var array<class-string, string> $ids */
             $ids = $this->connection->fetchAllKeyValue(

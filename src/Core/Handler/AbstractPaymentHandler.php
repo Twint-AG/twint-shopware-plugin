@@ -68,30 +68,20 @@ abstract class AbstractPaymentHandler implements AsynchronousPaymentHandlerInter
             ->getId();
 
         // Example check if the user canceled. Might differ for each payment provider
-        if ($request->query->getBoolean(
-            'cancel'
-        )) {
+        if ($request->query->getBoolean('cancel')) {
             throw PaymentException::customerCanceled($transactionId, 'Customer canceled the payment');
         }
 
         // Example check for the actual status of the payment. Might differ for each payment provider
-        $paymentState = $request->query->getAlpha(
-            'status'
-        );
+        $paymentState = $request->query->getAlpha('status');
 
         $context = $salesChannelContext->getContext();
         if ($paymentState === 'completed') {
             // Payment completed, set transaction status to "paid"
-            $this->transactionStateHandler->paid(
-                $transaction->getOrderTransaction()->getId(),
-                $context
-            );
+            $this->transactionStateHandler->paid($transaction->getOrderTransaction() ->getId(), $context);
         } else {
             // Payment not completed, set transaction status to "open"
-            $this->transactionStateHandler->reopen(
-                $transaction->getOrderTransaction()->getId(),
-                $context
-            );
+            $this->transactionStateHandler->reopen($transaction->getOrderTransaction() ->getId(), $context);
         }
     }
 

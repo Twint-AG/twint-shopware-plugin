@@ -67,10 +67,8 @@ class OnPaidHandler implements StateHandlerInterface
      * @throws Exception
      * @throws Throwable
      */
-    public function handle(
-        PairingEntity $entity,
-        FastCheckoutCheckIn $state
-    ): void {
+    public function handle(PairingEntity $entity, FastCheckoutCheckIn $state): void
+    {
         try {
             if (empty($entity->getCustomerData())) {
                 return;
@@ -175,10 +173,7 @@ class OnPaidHandler implements StateHandlerInterface
 
 
         // Request until get success/fail. Assume TWINT API will finish within a few seconds
-        $res = $this->paymentService->monitoringOrder(
-            $tOrder->id()->__toString(),
-            $order->getSalesChannelId()
-        );
+        $res = $this->paymentService->monitoringOrder($tOrder->id() ->__toString(), $order->getSalesChannelId());
 
         return $this->refreshTwintTransactionStatusUntilDone($entity, $order, $res);
     }
@@ -195,10 +190,8 @@ class OnPaidHandler implements StateHandlerInterface
      * @throws BadFormatException
      * @throws EnvironmentIsBrokenException
      */
-    public function massUpdateLogs(
-        OrderEntity $order,
-        string $pairingId
-    ): void {
+    public function massUpdateLogs(OrderEntity $order, string $pairingId): void
+    {
         $table = TwintTransactionLogDefinition::ENTITY_NAME;
         // Your SQL query
         $sql = "UPDATE {$table} SET order_id = :order_id WHERE pairing_id = :pairing_id";
@@ -278,10 +271,7 @@ class OnPaidHandler implements StateHandlerInterface
         $criteria->addAssociation('currency');
 
         /** @var OrderEntity $order */
-        $order = $this->orderRepository->search(
-            $criteria,
-            Context::createDefaultContext()
-        )
+        $order = $this->orderRepository->search($criteria, Context::createDefaultContext())
             ->first();
 
         return $order;
@@ -295,10 +285,8 @@ class OnPaidHandler implements StateHandlerInterface
     /**
      * @throws Exception
      */
-    protected function markTransactionAsPaid(
-        OrderEntity $order,
-        PairingEntity $entity
-    ): void {
+    protected function markTransactionAsPaid(OrderEntity $order, PairingEntity $entity): void
+    {
         $order = $this->reloadOrder($order->getId());
 
         $transaction = $order->getTransactions()
@@ -315,10 +303,8 @@ class OnPaidHandler implements StateHandlerInterface
     /**
      * @throws Exception
      */
-    protected function markTransactionAsCancelled(
-        OrderEntity $order,
-        PairingEntity $entity
-    ): void {
+    protected function markTransactionAsCancelled(OrderEntity $order, PairingEntity $entity): void
+    {
         $order = $this->reloadOrder($order->getId());
 
         $transaction = $order->getTransactions()
