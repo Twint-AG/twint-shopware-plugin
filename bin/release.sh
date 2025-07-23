@@ -15,6 +15,7 @@ export GIT_AUTHOR_EMAIL="${RELEASE_BOT_EMAIL}"
 base_dir=$(dirname "$0")/../
 
 version="$1"
+store_version="${version}-store"
 
 if [ -z "${TWINT_DRY_RUN:=}" ]; then
   git diff --exit-code
@@ -29,10 +30,11 @@ git tag -a "${version}" -m "chore(release-management): tag ${version} (direct in
 
 sed -i -e "s@public const INSTALL_SOURCE = .*;@public const INSTALL_SOURCE = InstallSource::STORE;@g" "${FILES[@]}"
 git commit -m "chore(release-management): create release ${version} (store installation)" "${FILES[@]}"
-git tag -a "${version}-store" -m "chore(release-management): tag ${version} (store installation)" --no-sign
+git tag -a "${store_version}" -m "chore(release-management): tag ${version} (store installation)" --no-sign
+
+git archive --format=zip -o "${base_dir}/twint-shopware-plugin-${store_version}.zip" --prefix="TwintPayment/" "${store_version}"
 
 if [ -z "$TWINT_DRY_RUN" ]; then
     git reset --hard HEAD^^
-    git push origin "${version}" "${version}-store"
+    git push origin "${version}" "${store_version}"
 fi
-
