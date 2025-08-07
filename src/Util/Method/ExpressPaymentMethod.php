@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Twint\Util\Method;
 
-use Twint\Core\Handler\TwintExpressPaymentHandler;
-
 class ExpressPaymentMethod extends AbstractMethod
 {
     public const TECHNICAL_NAME = 'twint_express_checkout';
@@ -31,7 +29,7 @@ class ExpressPaymentMethod extends AbstractMethod
 
     public function getHandler(): string
     {
-        return TwintExpressPaymentHandler::class;
+        return 'Twint\Core\Handler\TwintExpressPaymentHandler';
     }
 
     public function getTechnicalName(): string

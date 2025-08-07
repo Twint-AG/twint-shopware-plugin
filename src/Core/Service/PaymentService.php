@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Twint\Core\Service;
 
 use Exception;
+use InvalidArgumentException;
 use Shopware\Core\Checkout\Cart\Price\CashRounding;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -52,13 +54,21 @@ class PaymentService
         $this->context = new Context(new SystemSource());
     }
 
-    public function createOrder(AsyncPaymentTransactionStruct $transaction): ApiResponse
+    public function createOrder(object $transaction): ApiResponse
     {
+        if ($transaction instanceof AsyncPaymentTransactionStruct) {
+            $orderTransaction = $transaction->getOrderTransaction();
+        } elseif ($transaction instanceof OrderTransactionEntity) {
+            $orderTransaction = $transaction;
+        } else {
+            throw new InvalidArgumentException(
+                'Unsupported type for createOrder. Expected OrderTransactionEntity or AsyncPaymentTransactionStruct.'
+            );
+        }
         $order = $transaction->getOrder();
         if (!$order->getCurrency() instanceof CurrencyEntity) {
             throw PaymentException::asyncProcessInterrupted(
-                $transaction->getOrderTransaction()
-                    ->getId(),
+                $orderTransaction->getId(),
                 'Missing order or currency' . PHP_EOL
             );
         }
@@ -73,22 +83,21 @@ class PaymentService
             return $this->apiService->call($client, 'startOrder', [
                 new UnfiledMerchantTransactionReference($orderId),
                 new Money($currency, $order->getAmountTotal()),
-            ], true, static function (array $log, mixed $return) use ($order, $transaction) {
+            ], true, static function (array $log, mixed $return) use ($order, $orderTransaction) {
                 if ($return instanceof Order) {
                     $log['pairingId'] = $return->id()->__toString();
                     $log['orderId'] = $order->getId();
                     $log['orderVersionId'] = $order->getVersionId();
-                    $log['paymentStateId'] = $transaction->getOrderTransaction()->getStateId();
-                    $log['orderStateId'] = $transaction->getOrder()->getStateId();
-                    $log['transactionId'] = $transaction->getOrderTransaction()->getId();
+                    $log['paymentStateId'] = $orderTransaction->getStateId();
+                    $log['orderStateId'] = $orderTransaction->getOrder()->getStateId();
+                    $log['transactionId'] = $orderTransaction->getId();
                 }
 
                 return $log;
             });
         } catch (Exception $e) {
             throw PaymentException::asyncProcessInterrupted(
-                $transaction->getOrderTransaction()
-                    ->getId(),
+                $orderTransaction->getId(),
                 'An error occurred during the communication with API gateway' . PHP_EOL . $e->getMessage()
             );
         }

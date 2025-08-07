@@ -26,9 +26,12 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
-use Symfony\Component\DependencyInjection\Loader\DirectoryLoader;
 use Symfony\Component\DependencyInjection\Loader\GlobFileLoader;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Twint\DependencyInjection\PaymentHandlerCompilerPass;
+use Twint\DependencyInjection\RemoveSetTwigCompilerPass;
+use Twint\DependencyInjection\UpdateShippingRouteCompilerPass;
 use Twint\Util\ConfigInstaller;
 use Twint\Util\Installer;
 use Twint\Util\MediaInstaller;
@@ -139,19 +142,29 @@ class TwintPayment extends Plugin
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);
+        $container->addCompilerPass(new RemoveSetTwigCompilerPass());
+        $container->addCompilerPass(new UpdateShippingRouteCompilerPass());
+        $container->addCompilerPass(new PaymentHandlerCompilerPass());
+        $locator = new FileLocator(__DIR__ . '/Resources/config');
+        $xmlLoader = new XmlFileLoader($container, $locator);
+        $xmlLoader->load('services.xml');
 
-        $locator = new FileLocator('Resources/config');
+        if (version_compare($container->getParameter('kernel.shopware_version'), '6.7.0.0', '<')) {
+            // For versions older than 6.7.0.0
+            $xmlLoader->load('parts/handler_pre_6_7.xml');
+        } else {
+            // For versions 6.7.0.0 and newer
+            $xmlLoader->load('parts/handler.xml');
+        }
 
+        // 3. Load YAML configuration files.
+        $locator = new FileLocator(__DIR__ . '/Resources/config');
         $resolver = new LoaderResolver([
             new YamlFileLoader($container, $locator),
             new GlobFileLoader($container, $locator),
-            new DirectoryLoader($container, $locator),
         ]);
-
         $configLoader = new DelegatingLoader($resolver);
-
         $confDir = rtrim($this->getPath(), '/') . '/Resources/config';
-
         $configLoader->load($confDir . '/{packages}/*.yaml', 'glob');
     }
 

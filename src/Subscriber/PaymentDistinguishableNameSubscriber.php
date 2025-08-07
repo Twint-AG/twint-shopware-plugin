@@ -9,11 +9,14 @@ use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Twint\Core\Handler\TwintExpressPaymentHandler;
-use Twint\Core\Handler\TwintRegularPaymentHandler;
 
 class PaymentDistinguishableNameSubscriber implements EventSubscriberInterface
 {
+    private const TWINT_HANDLERS = [
+        'Twint\Core\Handler\TwintRegularPaymentHandler',
+        'Twint\Core\Handler\TwintExpressPaymentHandler',
+    ];
+
     public function __construct(
         private readonly TranslatorInterface $translator
     ) {
@@ -30,15 +33,14 @@ class PaymentDistinguishableNameSubscriber implements EventSubscriberInterface
     {
         /** @var PaymentMethodEntity $payment */
         foreach ($event->getEntities() as $payment) {
-            if ($payment->getHandlerIdentifier() === TwintRegularPaymentHandler::class || $payment->getHandlerIdentifier() === TwintExpressPaymentHandler::class) {
-                $payment->addTranslated(
-                    'distinguishableName',
-                    $this->translator->trans('twintPayment.administration.name.' . $payment->getTechnicalName())
-                );
-                $payment->setDistinguishableName(
-                    $this->translator->trans('twintPayment.administration.name.' . $payment->getTechnicalName())
-                );
+            if (!in_array($payment->getHandlerIdentifier(), self::TWINT_HANDLERS, true)) {
+                continue;
             }
+            $translatedName = $this->translator->trans(
+                'twintPayment.administration.name.' . $payment->getTechnicalName()
+            );
+            $payment->addTranslated('distinguishableName', $translatedName);
+            $payment->setDistinguishableName($translatedName);
         }
     }
 }

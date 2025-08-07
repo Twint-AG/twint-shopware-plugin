@@ -32,10 +32,10 @@ use Twint\Sdk\Value\Version;
 class CredentialValidator implements CredentialValidatorInterface
 {
     public function __construct(
-        readonly CryptoHandler $crypto,
-        readonly string $shopwareVersion,
+        public readonly CryptoHandler $crypto,
+        public readonly string $shopwareVersion,
         private readonly LoggerInterface $logger,
-        readonly Connection $connection
+        public readonly Connection $connection
     ) {
     }
 

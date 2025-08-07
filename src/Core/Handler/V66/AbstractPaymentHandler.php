@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Twint\Core\Handler;
+namespace Twint\Core\Handler\V66;
 
 use Exception;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;

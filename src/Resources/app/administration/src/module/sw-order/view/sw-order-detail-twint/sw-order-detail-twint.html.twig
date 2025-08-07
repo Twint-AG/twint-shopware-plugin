@@ -1,23 +1,21 @@
 {% block sw_order_detail_twint %}
     <div class="sw-order-twint-detail">
-    <template>
-        <sw-card-view>
-            {% block sw_order_detail_twint_reversal_card %}
-                <twint-payment-actions
-                        :order="order"
-                        :orderId="orderId"
-                        :currency="order.currency.isoCode"
-                        :decimalPrecision="order.itemRounding.decimals"
-                        :totalAmount="order.amountTotal"
-                >
-                </twint-payment-actions>
-            {% endblock %}
+        {% block sw_order_detail_twint_reversal_card %}
+            <twint-payment-actions
+                    v-if="order"
+                    :order="order"
+                    :orderId="orderId"
+                    :currency="order.currency.isoCode"
+                    :decimalPrecision="order.itemRounding.decimals"
+                    :totalAmount="order.amountTotal"
+            >
+            </twint-payment-actions>
+            <sw-loader v-if="isLoading && !order"></sw-loader>
+        {% endblock %}
+        <component :is="cardComponent" :title="$tc('twint.order.transactionLog.cardTitle')" class="twint-transaction-log">
             {% block sw_order_detail_twint_transaction_log_card_grid %}
-                <sw-card :title="$tc('twint.order.transactionLog.cardTitle')" class="twint-transaction-log" position-identifier="sw-order-detail-twint">
-                    <template
-                            v-if="(transactionLogs && transactionLogs.total > 0)"
-                            #grid
-                    >
+                <template #grid>
+                    <sw-container type="row">
                         {% block twint_transaction_log_list_content %}
                             <sw-entity-listing
                                     class="twint-transaction-logs-grid"
@@ -27,10 +25,19 @@
                                     :columns="transactionLogColumns"
                                     :sort-by="sortBy"
                                     :sort-direction="sortDirection"
-                                    :showSelection="false"
-                                    :allowDelete="false"
-                                    :showDelete="false"
-                                    :isLoading="isLoading"
+                                    {% if not VUE2 %}
+                                        :is-loading="isLoading"
+                                        :show-selection="false"
+                                        :allow-delete="false"
+                                        :show-delete="false"
+                                        :compact-mode="true"
+                                    {% else %}
+                                        :isLoading="isLoading"
+                                        :showActions="false"
+                                        :allowDelete="false"
+                                        :showDelete="false"
+                                    {% endif %}
+                                    :full-page="false"
                                     @on-add-new-refund="getTransactionLogList">
 
                                 {% block twint_transaction_log_list_content_order %}
@@ -41,9 +48,6 @@
                                             </router-link>
                                         {% else %}
                                             {{ item.orderId }}
-                                        {% endif %}
-                                        {% if item.order.orderNumber is not empty %}
-                                        xx{{ item.order.orderNumber }}xxx
                                         {% endif %}
                                     </template>
                                 {% endblock %}
@@ -237,10 +241,9 @@
                                 {% endblock %}
                             </sw-entity-listing>
                         {% endblock %}
-                    </template>
-                </sw-card>
+                    </sw-container>
+                </template>
             {% endblock %}
-        </sw-card-view>
-    </template>
+        </component>
     </div>
 {% endblock %}

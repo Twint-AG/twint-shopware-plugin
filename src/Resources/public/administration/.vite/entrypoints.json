@@ -1,0 +1,29 @@
+{
+  "base": "/bundles/twintpayment/administration/",
+  "entryPoints": {
+    "twint-payment": {
+      "css": [
+        "/bundles/twintpayment/administration/assets/twint-payment-Dgn_8U71.css"
+      ],
+      "dynamic": [
+        "/bundles/twintpayment/administration/assets/index-CVuOJyK3.js",
+        "/bundles/twintpayment/administration/assets/index-Koyy8aCt.js",
+        "/bundles/twintpayment/administration/assets/index-CIZZ4mGM.js"
+      ],
+      "js": [
+        "/bundles/twintpayment/administration/assets/twint-payment-CZ35rMKn.js"
+      ],
+      "legacy": false,
+      "preload": []
+    }
+  },
+  "legacy": false,
+  "metadatas": {},
+  "version": [
+    "7.1.0",
+    7,
+    1,
+    0
+  ],
+  "viteServer": null
+}

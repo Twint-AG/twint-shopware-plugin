@@ -23,7 +23,9 @@ test:
       - SHOPWARE_VERSION: ["v6.5.8.9"]
         PHP_VERSION: ["8.1", "8.2", "8.3"]
       - SHOPWARE_VERSION: ["v6.6.2.0"]
-        PHP_VERSION: ["8.2", "8.3"]
+        PHP_VERSION: ["8.2", "8.3", "8.4"]
+      - SHOPWARE_VERSION: [ "v6.7.0.1" ]
+        PHP_VERSION: [ "8.2", "8.3", "8.4" ]
   script:
     # Update spc (See https://github.com/shivammathur/spc for options)
     - spc -U

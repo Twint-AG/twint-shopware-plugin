@@ -14,6 +14,25 @@
             <template #smart-bar-actions>
                 {% block twint_payment_settings_actions_save %}
                     <sw-button-process
+                           v-if="isShopwareGte67"
+                           class="sw-settings-login-registration__save-action"
+                           :is-loading="isLoading"
+                           :process-success="isSaveSuccessful"
+                           :disabled="isLoading || isTesting || isDisabled"
+                           variant="primary"
+                           @update:process-success="saveFinish"
+                           @update-lock="updateLock"
+                           @click="onTest"
+                    >
+                        <span v-if="isTesting">
+                            {{ $tc('twint.settings.button.testing') }}
+                        </span>
+                        <span v-if="!isTesting">
+                            {{ $tc('twint.settings.button.save') }}
+                        </span>
+                    </sw-button-process>
+                    <sw-button-process
+                            v-else
                             class="sw-settings-login-registration__save-action"
                             :isLoading="isLoading"
                             :processSuccess="isSaveSuccessful"
@@ -22,7 +41,7 @@
                             @process-finish="saveFinish"
                             @update-lock="updateLock"
                             @click="onTest"
-                            >
+                    >
                         <span v-if="isTesting">
                             {{ $tc('twint.settings.button.testing') }}
                         </span>
@@ -30,6 +49,7 @@
                             {{ $tc('twint.settings.button.save') }}
                         </span>
                     </sw-button-process>
+
                 {% endblock %}
             </template>
         {% endblock %}
