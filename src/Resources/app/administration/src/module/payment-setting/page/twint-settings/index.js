@@ -1,4 +1,6 @@
 import template from './twint-settings.html.twig';
+import Feature from '../../../../helper/feature.helper';
+import '../../../../helper/version.mixin';
 
 const {Mixin} = Shopware;
 
@@ -9,7 +11,8 @@ export default {
 
     mixins: [
         Mixin.getByName('notification'),
-        Mixin.getByName('sw-inline-snippet')
+        Mixin.getByName('sw-inline-snippet'),
+        Mixin.getByName('twint-version')
     ],
 
     data() {
@@ -29,7 +32,12 @@ export default {
         };
     },
     created() {
-        this.$root.$on('update-lock', this.updateLock);
+        if (Feature.isActive('6.7.0.0')) {
+            Shopware.Utils.EventBus.on('update-lock', this.updateLock);
+        }
+        else{
+            this.$root.$on('update-lock', this.updateLock);
+        }
         document.addEventListener('twint-add-validators', this.onAddValidator.bind(this));
     },
     methods: {
@@ -168,6 +176,11 @@ export default {
         }
     },
     destroyed() {
-        this.$root.$off('update-lock');
+        if (Feature.isActive('6.7.0.0')) {
+            Shopware.Utils.EventBus.off('update-lock', this.updateLock);
+        }
+        else{
+            this.$root.$off('update-lock');
+        }
     }
 };

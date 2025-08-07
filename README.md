@@ -41,6 +41,12 @@ Fixing coding standards violations:
 ```
 vendor/bin/ecs --fix
 ```
+
+Rector
+```
+vendor/bin/rector process src --dry-run
+```
+
 ## Running unit tests
 #### Prepare test database
 For the first time running unit test, we need create test database:

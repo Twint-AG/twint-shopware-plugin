@@ -1,5 +1,6 @@
 import template from './twint-certificate.html.twig';
 import './twint-certificate.scss';
+import Feature from '../../../src/helper/feature.helper';
 
 const {Component, Mixin} = Shopware;
 const {ShopwareError} = Shopware.Classes;
@@ -88,11 +89,22 @@ Component.register('twint-certificate', {
         this.passwordError = new ShopwareError({
           code: 'c1051bb4-d103-4f74-8988-acbcafc7fdc3',
         });
-        this.$root.$emit('update-lock', true);
+        if (Feature.isActive('6.7.0.0')) {
+          Shopware.Utils.EventBus.emit('update-lock', true);
+        }
+        else{
+          this.$root.$emit('update-lock', true);
+        }
+
         return;
       } else if (!this.currentCertFile) {
         this.passwordError = null;
-        this.$root.$emit('update-lock', false);
+        if (Feature.isActive('6.7.0.0')) {
+          Shopware.Utils.EventBus.emit('update-lock', false);
+        }
+        else{
+          this.$root.$emit('update-lock', false);
+        }
         return;
       }
 
@@ -104,7 +116,12 @@ Component.register('twint-certificate', {
         this.passwordError = new ShopwareError({
           code: 'c1051bb4-d103-4f74-8988-acbcafc7fdc3',
         });
-        this.$root.$emit('update-lock', true);
+        if (Feature.isActive('6.7.0.0')) {
+          Shopware.Utils.EventBus.emit('update-lock', true);
+        }
+        else{
+          this.$root.$emit('update-lock', true);
+        }
       } else if (this.currentCertFile) {
         this.passwordError = null;
         this.extractPem();
@@ -127,7 +144,12 @@ Component.register('twint-certificate', {
           message: this.$tc('twint.settings.certificate.success.message'),
           growl: true
         }).then(r => {
-          this.$root.$emit('update-lock', false);
+          if (Feature.isActive('6.7.0.0')) {
+            Shopware.Utils.EventBus.emit('update-lock', false);
+          }
+          else{
+            this.$root.$emit('update-lock', false);
+          }
         });
 
       }).catch((err) => {

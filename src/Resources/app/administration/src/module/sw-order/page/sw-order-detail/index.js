@@ -1,4 +1,5 @@
 import template from './sw-order-detail.html.twig';
+import Feature from '../../../../helper/feature.helper';
 
 const { Criteria } = Shopware.Data;
 
@@ -18,7 +19,12 @@ Shopware.Component.override('sw-order-detail', {
             this.$super('createdComponent');
             this.isLoading = true;
             this.getPairingList();
-            this.$root.$on('save-edits', this.onSaveEdits);
+            if (Feature.isActive('6.7.0.0')) {
+                Shopware.Utils.EventBus.on('save-edits', this.onSaveEdits);
+            }
+            else{
+                this.$root.$on('save-edits', this.onSaveEdits);
+            }
         },
         getPairingList() {
             this.naturalSorting = this.sortBy === 'createdAt';
@@ -41,7 +47,12 @@ Shopware.Component.override('sw-order-detail', {
         }
     },
     destroyed() {
-        this.$root.$off('save-edits');
+        if (Feature.isActive('6.7.0.0')) {
+            Shopware.Utils.EventBus.off('save-edits', this.onSaveEdits);
+        }
+        else{
+            this.$root.$off('save-edits');
+        }
     },
     computed: {
         twintPairingRepository() {

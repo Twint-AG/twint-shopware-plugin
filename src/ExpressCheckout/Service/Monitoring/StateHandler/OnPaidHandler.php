@@ -22,6 +22,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\Feature;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\Profiling\Profiler;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -111,7 +112,12 @@ class OnPaidHandler implements StateHandlerInterface
 
                 // Send Event
                 $context = $this->context->getContext($entity->getSalesChannelId());
-                $event = new CheckoutOrderPlacedEvent($context->getContext(), $order, $entity->getSalesChannelId());
+                if (Feature::isActive('v6_7_0_0')) {
+                    $event = new CheckoutOrderPlacedEvent($context, $order);
+                } else {
+                    $event = new CheckoutOrderPlacedEvent($context->getContext(), $order, $entity->getSalesChannelId());
+                }
+
 
                 Profiler::trace('checkout-order::event-listeners', function () use ($event): void {
                     $this->eventDispatcher->dispatch($event);

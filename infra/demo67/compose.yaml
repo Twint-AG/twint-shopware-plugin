@@ -1,0 +1,34 @@
+services:
+  shop:
+    container_name: sw67
+    image: dockware/dev:6.7.0.1
+    ports:
+      - "22:22"     # ssh
+      - "80:80"     # apache2
+      - "443:443"   # apache2 https
+      - "8888:8888" # watch admin
+      - "9998:9998" # watch storefront proxy
+      - "9999:9999" # watch storefront
+      - "3306:3306" # mysql port
+    volumes:
+      - ".:/var/www/html:rw"
+      - "./../..:/var/www/html/custom/plugins/TwintPayment:rw"
+      - "sw67_volume:/var/lib/mysql:rw"
+      # prevent recursive binding volumes
+      - "/var/www/html/custom/plugins/TwintPayment/infra"
+      - "/var/www/html/custom/plugins/TwintPayment/vendor"
+
+    networks:
+      - web
+    environment:
+      - XDEBUG_ENABLED=0
+      - PHP_VERSION=8.3
+volumes:
+  sw67_volume:
+    driver: local
+## ***********************************************************************
+##  NETWORKS
+## ***********************************************************************
+networks:
+  web:
+    external: false

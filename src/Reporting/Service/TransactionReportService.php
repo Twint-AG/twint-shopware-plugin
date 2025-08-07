@@ -14,14 +14,16 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
-use Twint\Core\Handler\TwintExpressPaymentHandler;
-use Twint\Core\Handler\TwintRegularPaymentHandler;
 use Twint\Core\Service\SettingServiceInterface;
 use Twint\Core\Setting\Settings;
 use Twint\Sdk\Value\InstallSource;
 
 class TransactionReportService
 {
+    private const EXPRESS_HANDLER_ID = 'Twint\\Core\\Handler\\TwintExpressPaymentHandler';
+
+    private const REGULAR_HANDLER_ID = 'Twint\\Core\\Handler\\TwintRegularPaymentHandler';
+
     public function __construct(
         private readonly EntityRepository $transactionReportRepository,
         private readonly SettingServiceInterface $settingService,
@@ -41,7 +43,7 @@ class TransactionReportService
 
         if (!isset($handlerId) || $isTestMode || Settings::INSTALL_SOURCE !== InstallSource::STORE || $context->getVersionId() !== Defaults::LIVE_VERSION || !in_array(
             $handlerId,
-            [TwintExpressPaymentHandler::class, TwintRegularPaymentHandler::class],
+            [self::EXPRESS_HANDLER_ID, self::REGULAR_HANDLER_ID],
             true
         )) {
             return;

@@ -1,8 +1,8 @@
 import template from './twint-payment-actions.html.twig';
 import './twint-payment-actions.scss';
+import '../../../../helper/version.mixin';
 
 const { Component, Mixin } = Shopware;
-const { mapState } = Shopware.Component.getComponentHelper();
 const { Criteria } = Shopware.Data;
 const {ShopwareError} = Shopware.Classes;
 
@@ -14,7 +14,8 @@ Component.register('twint-payment-actions', {
     ],
     mixins: [
         Mixin.getByName('notification'),
-        Mixin.getByName('sw-inline-snippet')
+        Mixin.getByName('sw-inline-snippet'),
+        Mixin.getByName('twint-version')
     ],
     props: {
         order: {
@@ -63,13 +64,6 @@ Component.register('twint-payment-actions', {
         this.createdComponent();
     },
     computed: {
-        ...mapState('swOrderDetail', [
-            'order',
-            'versionContext',
-            'orderAddressIds',
-            'editing',
-            'loading',
-        ]),
         reversalHistoryRepository() {
             return this.repositoryFactory.create('twint_reversal_history');
         },
@@ -108,7 +102,7 @@ Component.register('twint-payment-actions', {
         },
         amountError() {
             return this.amountError ? this.amountError : null;
-        },
+        }
     },
     methods: {
         createdComponent() {
@@ -171,7 +165,12 @@ Component.register('twint-payment-actions', {
                     this.getReversalHistoryList();
                     this.isLoading = false;
                     this.resetRefundForm();
-                    this.$root.$emit('refund-finish');
+                    if (this.isShopwareGte67) {
+                        Shopware.Utils.EventBus.emit('refund-finish');
+                    }
+                    else{
+                        this.$root.$emit('refund-finish');
+                    }
                     this.updatePaymentStatus();
                 } else {
                     this.isLoading = false;
@@ -206,8 +205,14 @@ Component.register('twint-payment-actions', {
                         this.TwintPaymentService.orderStatus(this.orderId).then((response) => {
                             const success = response.success ?? false;
                             if(success) {
-                                this.$root.$emit('save-edits');
-                                this.$root.$emit('refund-finish');
+                                if (this.isShopwareGte67) {
+                                    Shopware.Utils.EventBus.emit('save-edits');
+                                    Shopware.Utils.EventBus.emit('refund-finish');
+                                }
+                                else{
+                                    this.$root.$emit('save-edits');
+                                    this.$root.$emit('refund-finish');
+                                }
                             }
                         });
                     }).catch((error) => {
