@@ -107,7 +107,13 @@ class CheckoutController extends StorefrontController
         } catch (Throwable $e) {
             $this->logger->error('TWINT start process error: ' . $e->getMessage());
             $this->addFlash(self::DANGER, $this->trans('twintPayment.error.pairingNotFound'));
-            return $this->redirectToRoute('frontend.account.order.page');
+            
+            return $this->json([
+                'completed' => true,
+                'orderId' => null,
+                'status' => PairingEntity::STATUS_FAILED,
+                'error-message' => $this->trans('twintPayment.error.paymentError')
+            ]);
         }
 
         if ($pairing->isFinished()) {
