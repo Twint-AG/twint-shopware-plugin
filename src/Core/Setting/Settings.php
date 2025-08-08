@@ -10,7 +10,7 @@ class Settings
 {
     public const INSTALL_SOURCE = InstallSource::STORE;
 
-    public const PLUGIN_VERSION = '1.1.1';
+    public const PLUGIN_VERSION = 'dev-master';
 
     public const ENVIRONMENT_PROD = false;
 
