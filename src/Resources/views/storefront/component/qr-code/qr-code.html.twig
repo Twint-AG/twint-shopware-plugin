@@ -48,7 +48,7 @@
                             </div>
                         </div>
 
-                        <div data-app-selector {% if not isMobile %}class="pb-3" {% endif%}>
+                        <div data-app-selector {% if not isMobile %}class="pb-3 d-none" {% endif%}>
                             {% if isIosDevice %}
                                 {% sw_include '@Storefront/storefront/component/qr-code/mobile-ios.html.twig' with {
                                     payLinks: payLinks,

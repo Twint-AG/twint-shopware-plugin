@@ -1,11 +1,17 @@
 {% sw_extends "@Storefront/storefront/component/product/card/action.html.twig" %}
 
+{# for older version of shopware #}
 {% block page_product_detail_product_buy_button %}
     {{ parent() }}
-
     {% if isTwintExpress('PLP') %}
-        {% block twint_buy_button_plp %}
-            {% sw_include '@Storefront/storefront/component/button/express-checkout-button.html.twig' %}
-        {% endblock %}
+        {% sw_include '@Storefront/storefront/component/button/express-checkout-button.html.twig' %}
+    {% endif %}
+{% endblock %}
+
+{# this one for 6.7 #}
+{% block component_product_box_action_buy_button %}
+    {{ parent() }}
+    {% if isTwintExpress('PLP') %}
+        {% sw_include '@Storefront/storefront/component/button/express-checkout-button.html.twig' %}
     {% endif %}
 {% endblock %}
