@@ -11,9 +11,9 @@ services:
       - "9999:9999" # watch storefront
       - "3306:3306" # mysql port
     volumes:
-      - ".:/var/www/html:rw"
+      - "sw67_volume:/var/www/html"
       - "./../..:/var/www/html/custom/plugins/TwintPayment:rw"
-      - "sw67_volume:/var/lib/mysql:rw"
+      - "sw67_db_volume:/var/lib/mysql:rw"
       # prevent recursive binding volumes
       - "/var/www/html/custom/plugins/TwintPayment/infra"
       - "/var/www/html/custom/plugins/TwintPayment/vendor"
@@ -26,9 +26,8 @@ services:
 volumes:
   sw67_volume:
     driver: local
-## ***********************************************************************
-##  NETWORKS
-## ***********************************************************************
+  sw67_db_volume:
+    driver: local
 networks:
   web:
     external: false
