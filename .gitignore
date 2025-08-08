@@ -9,7 +9,4 @@ build/
 phpunit.clover.xml
 phpunit.junit.xml
 
-src/Resources/public/administration/js/twint-payment.js.map
-**.js.map
-
-**/.vite
+**/*.map
