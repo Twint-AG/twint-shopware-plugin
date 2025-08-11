@@ -26,9 +26,9 @@
     "twint-ag/sdk": "^1.6.2",
     "chillerlan/php-qrcode": "4.3.4",
     "ext-openssl": "*",
-    "shopware/core": ">=6.5.0.0",
-    "shopware/administration": ">=6.5.0.0",
-    "shopware/storefront": ">=6.5.0.0"
+    "shopware/core": "^6.5 || ^6.6 || ^6.7",
+    "shopware/administration": "^6.5 || ^6.6 || ^6.7",
+    "shopware/storefront": "^6.5 || ^6.6 || ^6.7"
   },
   "require-dev": {
     "phpstan/phpstan": "^1.10",
