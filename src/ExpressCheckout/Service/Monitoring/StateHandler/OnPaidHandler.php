@@ -39,7 +39,6 @@ use Twint\ExpressCheckout\Service\Monitoring\CustomerRegisterService;
 use Twint\ExpressCheckout\Service\PairingService;
 use Twint\ExpressCheckout\Util\PaymentMethodUtil;
 use Twint\Sdk\Value\FastCheckoutCheckIn;
-use Twint\Sdk\Value\Order;
 
 class OnPaidHandler implements StateHandlerInterface
 {
