@@ -26,7 +26,7 @@
                 class="twint-config-field"
                 :label="$tc('twint.settings.certificate.password.label')"
                 :help-text="$tc('twint.settings.certificate.password.helpText')"
-                @blur="updatePassword"
+                @change="updatePassword"
                 autocomplete="off"
                 required
                 :disabled="isDisabled"
