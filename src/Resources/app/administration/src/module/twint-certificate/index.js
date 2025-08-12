@@ -81,6 +81,11 @@ Component.register('twint-certificate', {
     },
 
     onFileChange(file) {
+      if (!(file instanceof File || file instanceof Blob)) {
+        console.error("Invalid file: Expected a File or Blob, got", file);
+        return;
+      }
+
       this.certificate = '';
       this.updateCertificate();
 
@@ -143,14 +148,13 @@ Component.register('twint-certificate', {
           title: this.$tc('twint.settings.certificate.success.title'),
           message: this.$tc('twint.settings.certificate.success.message'),
           growl: true
-        }).then(r => {
-          if (Feature.isActive('6.7.0.0')) {
-            Shopware.Utils.EventBus.emit('update-lock', false);
-          }
-          else{
-            this.$root.$emit('update-lock', false);
-          }
         });
+
+        if (Feature.isActive("6.7.0.0")) {
+          Shopware.Utils.EventBus.emit("update-lock", false);
+        } else {
+          this.$root.$emit("update-lock", false);
+        }
 
       }).catch((err) => {
         this.certificate = '';
