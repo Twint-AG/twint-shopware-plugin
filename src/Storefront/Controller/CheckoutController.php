@@ -101,7 +101,7 @@ class CheckoutController extends StorefrontController
                 $process->setOptions([
                     'create_new_console' => true,
                 ]);
-                $process->disableOutput();
+                //$process->disableOutput();
                 $process->start();
             }
         } catch (Throwable $e) {
