@@ -91,29 +91,22 @@ class CheckoutController extends StorefrontController
 
             if (!$pairing->isFinished() && !$this->isRunning($pairing)) {
                 $this->logger->info('TWINT start process: ' . $pairingUuid);
-
-                $process = new Process([
-                    'php',
-                    $this->projectDir . '/bin/console',
-                    TwintPollCommand::COMMAND,
-                    $pairingUuid,
-                ]);
-                $process->setOptions([
-                    'create_new_console' => true,
-                ]);
-                //$process->disableOutput();
-                $process->start();
+                $this->startProcess($pairingUuid, true);
             }
         } catch (Throwable $e) {
             $this->logger->error('TWINT start process error: ' . $e->getMessage());
-            $this->addFlash(self::DANGER, $this->trans('twintPayment.error.pairingNotFound'));
+            try {
+                $this->startProcess($pairingUuid, false);
+            } catch (Throwable $throwable) {
+                $this->addFlash(self::DANGER, $this->trans('twintPayment.error.pairingNotFound'));
 
-            return $this->json([
-                'completed' => true,
-                'orderId' => null,
-                'status' => PairingEntity::STATUS_FAILED,
-                'error-message' => $this->trans('twintPayment.error.paymentError'),
-            ]);
+                return $this->json([
+                    'completed' => true,
+                    'orderId' => null,
+                    'status' => PairingEntity::STATUS_FAILED,
+                    'error-message' => $this->trans('twintPayment.error.paymentError'),
+                ]);
+            }
         }
 
         if ($pairing->isFinished()) {
@@ -286,5 +279,19 @@ class CheckoutController extends StorefrontController
                     ->getId()
             ),
         ])->getContent();
+    }
+
+    protected function startProcess(string $paring, bool $disableInput = true)
+    {
+        $process = new Process(['php', $this->projectDir . '/bin/console', TwintPollCommand::COMMAND, $paring]);
+
+        $process->setOptions([
+            'create_new_console' => true,
+        ]);
+
+        if ($disableInput) {
+            $process->disableOutput();
+        }
+        $process->start();
     }
 }
