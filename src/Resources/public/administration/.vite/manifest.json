@@ -1,6 +1,6 @@
 {
   "main.js": {
-    "file": "assets/twint-payment-Dt4FxNIS.js",
+    "file": "assets/twint-payment-DMYCFJWD.js",
     "name": "twint-payment",
     "src": "main.js",
     "isEntry": true,
@@ -29,7 +29,7 @@
     "isDynamicEntry": true
   },
   "module/payment-setting/page/twint-settings/index.js": {
-    "file": "assets/index-C_Tj6Ceo.js",
+    "file": "assets/index-CrJiH4h8.js",
     "name": "index",
     "src": "module/payment-setting/page/twint-settings/index.js",
     "isDynamicEntry": true,
