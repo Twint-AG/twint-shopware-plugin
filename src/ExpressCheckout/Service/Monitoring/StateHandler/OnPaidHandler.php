@@ -10,8 +10,8 @@ use Defuse\Crypto\Exception\EnvironmentIsBrokenException;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Cart\AbstractCartPersister;
 use Shopware\Core\Checkout\Cart\Cart;
-use Shopware\Core\Checkout\Cart\CartPersister;
 use Shopware\Core\Checkout\Cart\Event\CheckoutOrderPlacedEvent;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -54,7 +54,7 @@ class OnPaidHandler implements StateHandlerInterface
         private readonly RegularPairingService $regularPairingService,
         private readonly ExpressPaymentService $paymentService,
         private readonly Connection $connection,
-        private readonly CartPersister $cartPersister,
+        private readonly AbstractCartPersister $cartPersister,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly LoggerInterface $logger,
         private readonly PairingRepository $pairingRepository
