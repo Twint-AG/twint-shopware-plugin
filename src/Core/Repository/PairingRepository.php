@@ -6,7 +6,7 @@ namespace Twint\Core\Repository;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
-use Shopware\Core\Checkout\Cart\CartPersister;
+use Shopware\Core\Checkout\Cart\AbstractCartPersister;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
@@ -28,7 +28,7 @@ class PairingRepository
 {
     public function __construct(
         private EntityRepository $repository,
-        private CartPersister $cartPersister,
+        private AbstractCartPersister $cartPersister,
         private EntityRepository $orderRepository,
         private CartService $cartService,
         private Connection $db
