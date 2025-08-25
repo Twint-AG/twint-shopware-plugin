@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Twint\ExpressCheckout\Service;
 
+use Shopware\Core\Checkout\Cart\AbstractCartPersister;
 use Shopware\Core\Checkout\Cart\Cart;
-use Shopware\Core\Checkout\Cart\CartPersister;
 use Shopware\Core\Checkout\Cart\Delivery\DeliveryBuilder;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\LineItemFactoryRegistry;
@@ -41,7 +41,7 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
         private readonly ExpressPaymentService $paymentService,
         private readonly PairingRepository $loader,
         private readonly AbstractSalesChannelContextFactory $contextFactory,
-        private readonly CartPersister $cartPersister,
+        private readonly AbstractCartPersister $cartPersister,
         private readonly CurrencyService $currencyService,
     ) {
     }
