@@ -9,13 +9,12 @@ use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twint\Util\Method\ExpressPaymentMethod;
+use Twint\Util\Method\RegularPaymentMethod;
 
 class PaymentDistinguishableNameSubscriber implements EventSubscriberInterface
 {
-    private const TWINT_HANDLERS = [
-        'Twint\Core\Handler\TwintRegularPaymentHandler',
-        'Twint\Core\Handler\TwintExpressPaymentHandler',
-    ];
+    private const TWINT_HANDLERS = [ExpressPaymentMethod::HANDLER, RegularPaymentMethod::HANDLER];
 
     public function __construct(
         private readonly TranslatorInterface $translator

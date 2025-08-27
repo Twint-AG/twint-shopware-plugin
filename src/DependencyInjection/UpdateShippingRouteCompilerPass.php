@@ -12,6 +12,10 @@ class UpdateShippingRouteCompilerPass implements CompilerPassInterface
 {
     private const TARGET_SERVICE_ID = 'twint.service.express.checkout';
 
+    private const SORTED_ROUTE = 'Shopware\Core\Checkout\Shipping\SalesChannel\SortedShippingMethodRoute';
+
+    private const DEFAULT_ROUTE = 'Shopware\Core\Checkout\Shipping\SalesChannel\ShippingMethodRoute';
+
     private const ARGUMENT_INDEX_TO_CHANGE = 2;
 
     public function process(ContainerBuilder $container): void
@@ -19,11 +23,11 @@ class UpdateShippingRouteCompilerPass implements CompilerPassInterface
         if (!$container->hasDefinition(self::TARGET_SERVICE_ID)) {
             return;
         }
-        $shopwareVersion = $container->getParameter('kernel.shopware_version');
-        $shippingRouteServiceId = version_compare($shopwareVersion, '6.7.0.0', '<')
-            ? 'Shopware\Core\Checkout\Shipping\SalesChannel\SortedShippingMethodRoute'
-            : 'Shopware\Core\Checkout\Shipping\SalesChannel\ShippingMethodRoute';
+
+        // Prefer SortedShippingMethodRoute if it exists, otherwise fallback
+        $serviceId = class_exists(self::SORTED_ROUTE) ? self::SORTED_ROUTE : self::DEFAULT_ROUTE;
+
         $definition = $container->getDefinition(self::TARGET_SERVICE_ID);
-        $definition->setArgument(self::ARGUMENT_INDEX_TO_CHANGE, new Reference($shippingRouteServiceId));
+        $definition->setArgument(self::ARGUMENT_INDEX_TO_CHANGE, new Reference($serviceId));
     }
 }

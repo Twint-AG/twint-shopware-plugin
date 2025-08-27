@@ -8,6 +8,8 @@ class RegularPaymentMethod extends AbstractMethod
 {
     public const TECHNICAL_NAME = 'twint_checkout';
 
+    public const HANDLER = 'twint.regular.handler';
+
     public function getTranslations(): array
     {
         return [
@@ -29,7 +31,7 @@ class RegularPaymentMethod extends AbstractMethod
 
     public function getHandler(): string
     {
-        return 'Twint\Core\Handler\TwintRegularPaymentHandler';
+        return self::HANDLER;
     }
 
     public function getTechnicalName(): string
