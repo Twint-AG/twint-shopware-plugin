@@ -4,8 +4,7 @@
 
     <services>
 
-        <service id="Twint\Core\Handler\TwintRegularPaymentHandler"
-                 class="Twint\Core\Handler\TwintRegularPaymentHandler">
+        <service id="twint.regular.handler" class="Twint\Core\Handler\TwintRegularPaymentHandler">
             <argument type="service"
                       id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Twint\Core\Service\PaymentService"/>
@@ -16,8 +15,7 @@
             <tag name="shopware.payment.method.refund"/>
         </service>
 
-        <service id="Twint\Core\Handler\TwintExpressPaymentHandler"
-                 class="Twint\Core\Handler\TwintRegularPaymentHandler">
+        <service id="twint.express.handler" class="Twint\Core\Handler\TwintExpressPaymentHandler">
             <argument type="service"
                       id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="Twint\Core\Service\PaymentService"/>

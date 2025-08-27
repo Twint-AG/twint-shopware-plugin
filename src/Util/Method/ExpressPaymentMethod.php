@@ -8,6 +8,8 @@ class ExpressPaymentMethod extends AbstractMethod
 {
     public const TECHNICAL_NAME = 'twint_express_checkout';
 
+    public const HANDLER = 'twint.express.handler';
+
     public function getTranslations(): array
     {
         return [
@@ -29,7 +31,7 @@ class ExpressPaymentMethod extends AbstractMethod
 
     public function getHandler(): string
     {
-        return 'Twint\Core\Handler\TwintExpressPaymentHandler';
+        return self::HANDLER;
     }
 
     public function getTechnicalName(): string

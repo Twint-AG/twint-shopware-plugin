@@ -18,7 +18,7 @@
         <service id="twint.service.express.checkout" class="Twint\ExpressCheckout\Service\ExpressCheckoutService">
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\LineItemFactoryRegistry"/>
-            <argument type="service" id="Shopware\Core\Checkout\Shipping\SalesChannel\SortedShippingMethodRoute"/>
+            <argument type="service" id="Shopware\Core\Checkout\Shipping\SalesChannel\ShippingMethodRoute" />
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\Delivery\DeliveryBuilder"/>
             <argument type="service" id="Twint\ExpressCheckout\Service\ExpressPaymentService"/>
