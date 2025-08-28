@@ -1,33 +1,39 @@
-services:
-  shop:
-    container_name: sw67
-    image: dockware/dev:6.7.0.1
-    ports:
-      - "22:22"     # ssh
-      - "80:80"     # apache2
-      - "443:443"   # apache2 https
-      - "8888:8888" # watch admin
-      - "9998:9998" # watch storefront proxy
-      - "9999:9999" # watch storefront
-      - "3306:3306" # mysql port
-    volumes:
-      - "sw67_volume:/var/www/html"
-      - "./../..:/var/www/html/custom/plugins/TwintPayment:rw"
-      - "sw67_db_volume:/var/lib/mysql:rw"
-      # prevent recursive binding volumes
-      - "/var/www/html/custom/plugins/TwintPayment/infra"
-      - "/var/www/html/custom/plugins/TwintPayment/vendor"
 
-    networks:
-      - web
+services:
+###> shopware/core ###
+  database:
+    image: mariadb:11.4
     environment:
-      - XDEBUG_ENABLED=0
-      - PHP_VERSION=8.3
+      MARIADB_DATABASE: shopware
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_USER: shopware
+      MARIADB_PASSWORD: shopware
+    volumes:
+      - db-data:/var/lib/mysql:rw
+    healthcheck:
+      test: [ "CMD", "mariadb-admin" ,"ping", "-h", "localhost", "-proot" ]
+      start_period: 10s
+      start_interval: 3s
+      interval: 5s
+      timeout: 1s
+      retries: 10
+###< shopware/core ###
+
+###> shopware/elasticsearch ###
+  opensearch:
+    image: opensearchproject/opensearch:2
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    environment:
+      discovery.type: single-node
+      plugins.security.disabled: 'true'
+###< shopware/elasticsearch ###
+
 volumes:
-  sw67_volume:
-    driver: local
-  sw67_db_volume:
-    driver: local
-networks:
-  web:
-    external: false
+###> shopware/core ###
+  db-data:
+###< shopware/core ###
+
+###> shopware/elasticsearch ###
+  opensearch-data:
+###< shopware/elasticsearch ###
