@@ -6,6 +6,7 @@ use Shopware\Core\Installer\InstallerKernel;
 use Shopware\Core\Framework\Adapter\Kernel\KernelFactory;
 
 $_SERVER['SCRIPT_FILENAME'] = __FILE__;
+$_SERVER['HTTPS'] = 'on';
 
 require_once __DIR__ . '/../vendor/autoload_runtime.php';
 
