@@ -31,7 +31,6 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Twint\DependencyInjection\PaymentHandlerCompilerPass;
 use Twint\DependencyInjection\RemoveSetTwigCompilerPass;
-use Twint\DependencyInjection\UpdateShippingRouteCompilerPass;
 use Twint\Util\ConfigInstaller;
 use Twint\Util\Installer;
 use Twint\Util\MediaInstaller;
@@ -141,9 +140,8 @@ class TwintPayment extends Plugin
 
     public function build(ContainerBuilder $container): void
     {
-        parent::build($container);
+        parent::build(container: $container);
         $container->addCompilerPass(new RemoveSetTwigCompilerPass());
-        $container->addCompilerPass(new UpdateShippingRouteCompilerPass());
         $container->addCompilerPass(new PaymentHandlerCompilerPass());
         $locator = new FileLocator(__DIR__ . '/Resources/config');
         $xmlLoader = new XmlFileLoader($container, $locator);
