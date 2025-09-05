@@ -43,7 +43,7 @@ test:
     - composer config --global gitlab-token.git.nfq.asia $GITLAB_ACCESS_TOKEN
 
     - rm -f composer.lock
-    - composer install --no-progress --prefer-dist --optimize-autoloader > /dev/null
+    - composer install --no-progress --prefer-dist --optimize-autoloader --ignore-platform-reqs > /dev/null
 
     # Run PHP Code Standard
     - ./vendor/bin/ecs --no-progress-bar
