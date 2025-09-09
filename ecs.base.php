@@ -64,16 +64,6 @@ use Symplify\EasyCodingStandard\Config\ECSConfig;
 use Symplify\EasyCodingStandard\ValueObject\Set\SetList;
 
 return static function (ECSConfig $ecsConfig): void {
-    $ecsConfig->paths([__DIR__]);
-    $ecsConfig->skip([
-        __DIR__ . '/vendor',
-        __DIR__ . '/build',
-        __DIR__ . '/infra',
-        __DIR__ . '/var',
-        __DIR__ . '/cypress',
-        FinalClassFixer::class => [__DIR__ . '/src/Generated/'],
-    ]);
-
     $ecsConfig->rules(
         [
             NoUnusedImportsFixer::class,
