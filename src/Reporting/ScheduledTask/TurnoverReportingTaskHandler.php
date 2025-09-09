@@ -24,8 +24,8 @@ use function sprintf;
 /**
  * @internal
  */
-#[Package('checkout')]
 #[AsMessageHandler(handles: TurnoverReportingTask::class)]
+#[Package('checkout')]
 class TurnoverReportingTaskHandler extends ScheduledTaskHandler
 {
     private const API_IDENTIFIER = '89b03700-3fdf-4a27-a938-70d52c026da9';

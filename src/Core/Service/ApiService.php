@@ -89,7 +89,7 @@ class ApiService
                 ?->first()
                 ?->getPayloads()[0];
         } catch (Throwable $e) {
-            $this->logger->error('Cannot log TWINT transaction');
+            $this->logger->error('Cannot log TWINT transaction' . $e->getMessage());
         }
 
         return $log;
