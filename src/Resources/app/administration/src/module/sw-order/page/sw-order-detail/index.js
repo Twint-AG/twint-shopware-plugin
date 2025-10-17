@@ -62,7 +62,7 @@ Shopware.Component.override('sw-order-detail', {
             let transactions = this.order?.transactions ?? [];
 
             for (let transaction of transactions) {
-                if (transaction.paymentMethod.handlerIdentifier.includes('Twint')) {
+                if (transaction.paymentMethod.handlerIdentifier.includes('twint.')) {
                     return true;
                 }
             }
