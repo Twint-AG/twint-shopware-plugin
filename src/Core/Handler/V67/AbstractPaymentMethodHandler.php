@@ -44,7 +44,7 @@ abstract class AbstractPaymentMethodHandler extends AbstractPaymentHandler
 
     public function supports(PaymentHandlerType $type, string $paymentMethodId, Context $context): bool
     {
-        return $type === PaymentHandlerType::RECURRING && $this->isVaultable();
+        return $type === PaymentHandlerType::REFUND;
     }
 
     public function pay(

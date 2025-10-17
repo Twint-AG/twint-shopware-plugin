@@ -1,2 +1,0 @@
-const t=`{% block twint_payment_plugin_icon %} <img class="twint-payment-plugin-icon" :src="assetFilter('twintpayment/plugin.svg')"> {% endblock %}`,e={template:t,computed:{assetFilter(){return Shopware.Filter.getByName("asset")}}};export{e as default};
-//# sourceMappingURL=index-CVuOJyK3.js.map
