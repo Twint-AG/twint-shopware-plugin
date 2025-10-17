@@ -94,7 +94,7 @@ class CheckoutController extends StorefrontController
                 $this->startProcess($pairingUuid, true);
             }
         } catch (Throwable $e) {
-            $this->logger->error('TWINT start process error: ' . $e->getMessage());
+            $this->logger->error('TWINT start process Error: ' . $e->getMessage());
             try {
                 $this->startProcess($pairingUuid, false);
             } catch (Throwable $throwable) {
@@ -157,7 +157,7 @@ class CheckoutController extends StorefrontController
                 'success' => true,
             ]);
         } catch (Throwable $e) {
-            $this->logger->error('TWINT start process error: ' . $e->getMessage());
+            $this->logger->error('TWINT cancel process error: ' . $e->getMessage());
         }
 
         return $this->json([
