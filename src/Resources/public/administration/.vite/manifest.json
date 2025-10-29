@@ -1,0 +1,40 @@
+{
+  "main.js": {
+    "file": "assets/twint-payment-Bm3VmuCT.js",
+    "name": "twint-payment",
+    "src": "main.js",
+    "isEntry": true,
+    "dynamicImports": [
+      "module/payment-setting/component/twint-payment-plugin-icon/index.js",
+      "module/payment-setting/page/twint-settings/index.js",
+      "module/payment-setting/page/express-settings/index.js"
+    ],
+    "css": [
+      "assets/twint-payment-Dgn_8U71.css"
+    ]
+  },
+  "module/payment-setting/component/twint-payment-plugin-icon/index.js": {
+    "file": "assets/index-C_Yf-FIl.js",
+    "name": "index",
+    "src": "module/payment-setting/component/twint-payment-plugin-icon/index.js",
+    "isDynamicEntry": true,
+    "css": [
+      "assets/index-BSbZsI6x.css"
+    ]
+  },
+  "module/payment-setting/page/express-settings/index.js": {
+    "file": "assets/index-CIZZ4mGM.js",
+    "name": "index",
+    "src": "module/payment-setting/page/express-settings/index.js",
+    "isDynamicEntry": true
+  },
+  "module/payment-setting/page/twint-settings/index.js": {
+    "file": "assets/index-CvO_SIq9.js",
+    "name": "index",
+    "src": "module/payment-setting/page/twint-settings/index.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "main.js"
+    ]
+  }
+}
