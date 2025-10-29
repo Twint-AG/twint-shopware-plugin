@@ -45,7 +45,8 @@
     "plugin-icon": "src/Resources/public/plugin.png",
     "copyright": "(c) by TWINT 2024",
     "label": {
-      "en-GB": "TWINT"
+      "en-GB": "TWINT",
+      "de-DE": "TWINT"
     }
   },
   "autoload": {
