@@ -145,7 +145,7 @@ class PairingService
     public function cancel(PairingEntity $pairing): void
     {
         $client = $this->builder->build($pairing->getSalesChannelId());
-        $cancelRes = $this->api->call($client, 'cancelOrder', [$pairing->getId()]);
+        $cancelRes = $this->api->call($client, 'cancelOrder', [new OrderId(new Uuid($pairing->getId()))]);
         $this->updateLog($cancelRes->getLog(), $pairing);
     }
 
