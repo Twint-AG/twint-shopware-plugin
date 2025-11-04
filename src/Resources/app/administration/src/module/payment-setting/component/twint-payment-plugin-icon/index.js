@@ -6,6 +6,7 @@ export default {
 
     computed: {
         assetFilter() {
+            console.log("test")
             return Shopware.Filter.getByName('asset');
         }
     }
