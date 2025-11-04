@@ -1,6 +1,6 @@
 {
   "main.js": {
-    "file": "assets/twint-payment-CqbiHbcb.js",
+    "file": "assets/twint-payment-Bm3VmuCT.js",
     "name": "twint-payment",
     "src": "main.js",
     "isEntry": true,
@@ -14,7 +14,7 @@
     ]
   },
   "module/payment-setting/component/twint-payment-plugin-icon/index.js": {
-    "file": "assets/index-CVuOJyK3.js",
+    "file": "assets/index-C_Yf-FIl.js",
     "name": "index",
     "src": "module/payment-setting/component/twint-payment-plugin-icon/index.js",
     "isDynamicEntry": true,
@@ -29,7 +29,7 @@
     "isDynamicEntry": true
   },
   "module/payment-setting/page/twint-settings/index.js": {
-    "file": "assets/index-Dw0Z3dGQ.js",
+    "file": "assets/index-CvO_SIq9.js",
     "name": "index",
     "src": "module/payment-setting/page/twint-settings/index.js",
     "isDynamicEntry": true,
