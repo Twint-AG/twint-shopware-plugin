@@ -26,7 +26,7 @@ class TwintExtension extends AbstractExtension
             }),
             new TwigFunction('markPlpRendered', function (): void {
                 $this->plpRendered = true;
-            })
+            }),
         ];
     }
 

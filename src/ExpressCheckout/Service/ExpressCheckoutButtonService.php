@@ -20,6 +20,7 @@ use Twint\ExpressCheckout\Util\PaymentMethodUtil;
 class ExpressCheckoutButtonService
 {
     private static ?array $buttons = null;
+
     public function __construct(
         private readonly PaymentMethodUtil $paymentMethodUtil,
         private readonly SettingServiceInterface $settingService,
