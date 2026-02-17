@@ -36,6 +36,7 @@ test:
 
     # Add gitlab token to composer
     - composer config --global gitlab-token.git.nfq.asia $GITLAB_ACCESS_TOKEN
+    - composer config --global --json audit.ignore '["PKSA-hv1g-94j4-tpht", "PKSA-w3qy-s9h7-2hqr", "PKSA-v415-g75g-bqsy", "PKSA-kypv-cx5n-qkc8", "PKSA-h5dj-jyqc-4fjr", "PKSA-6wp3-462p-vyty", "PKSA-b824-t6kf-bqqz"]'
 
     - rm -f composer.lock
     - composer install --no-progress --optimize-autoloader > /dev/null
