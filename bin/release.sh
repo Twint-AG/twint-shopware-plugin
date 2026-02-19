@@ -25,11 +25,11 @@ fi
 FILES=("${base_dir}/composer.json" "${base_dir}/src/Core/Setting/Settings.php")
 
 sed -i -e "s@dev-master@${version}@g" "${FILES[@]}"
-git commit -m "chore(release-management): create release ${version} (direct installation)" "${FILES[@]}"
+git commit --no-gpg-sign -m "chore(release-management): create release ${version} (direct installation)" "${FILES[@]}"
 git tag -a "${version}" -m "chore(release-management): tag ${version} (direct installation)" --no-sign
 
 sed -i -e "s@public const INSTALL_SOURCE = .*;@public const INSTALL_SOURCE = InstallSource::STORE;@g" "${FILES[@]}"
-git commit -m "chore(release-management): create release ${version} (store installation)" "${FILES[@]}"
+git commit --no-gpg-sign -m "chore(release-management): create release ${version} (store installation)" "${FILES[@]}"
 git tag -a "${store_version}" -m "chore(release-management): tag ${version} (store installation)" --no-sign
 
 git archive --format=zip -o "${base_dir}/twint-shopware-plugin-${store_version}.zip" --prefix="TwintPayment/" "${store_version}"
