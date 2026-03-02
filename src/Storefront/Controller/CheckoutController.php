@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Routing\Annotation\Route;
 use Throwable;
@@ -283,7 +284,8 @@ class CheckoutController extends StorefrontController
 
     protected function startProcess(string $paring, bool $disableInput = true)
     {
-        $process = new Process(['php', $this->projectDir . '/bin/console', TwintPollCommand::COMMAND, $paring]);
+        $phpBinary = (new PhpExecutableFinder())->find() ?: 'php';
+        $process = new Process([$phpBinary, $this->projectDir . '/bin/console', TwintPollCommand::COMMAND, $paring]);
 
         $process->setOptions([
             'create_new_console' => true,
