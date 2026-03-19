@@ -29,6 +29,7 @@ use Twint\Core\Factory\ClientBuilder;
 use Twint\Core\Handler\TransactionLog\TransactionLogWriterInterface;
 use Twint\Core\Model\ApiResponse;
 use Twint\Reporting\Service\TransactionReportService;
+use Twint\Sdk\Value\AlphanumericPairingToken;
 use Twint\Sdk\Value\Money;
 use Twint\Sdk\Value\Order;
 use Twint\Sdk\Value\OrderId;
@@ -200,15 +201,17 @@ class PaymentService
         try {
             $client = $this->clientBuilder->build($salesChannelId);
             $device = $client->detectDevice(string()->assert($_SERVER['HTTP_USER_AGENT'] ?? ''));
+            $pairingToken = AlphanumericPairingToken::fromString($token);
+
             if ($device->isAndroid()) {
-                $payLinks['android'] = 'intent://payment#Intent;action=ch.twint.action.TWINT_PAYMENT;scheme=twint;S.code=' . $token . ';S.startingOrigin=EXTERNAL_WEB_BROWSER;S.browser_fallback_url=;end';
+                $payLinks['android'] = $client->getAndroidAppUrl($pairingToken);
             } elseif ($device->isIos()) {
                 $appList = [];
                 $apps = $client->getIosAppSchemes();
                 foreach ($apps as $app) {
                     $appList[] = [
                         'name' => $app->displayName(),
-                        'link' => $app->scheme() . 'applinks/?al_applink_data={"app_action_type":"TWINT_PAYMENT","extras": {"code": "' . $token . '"},"referer_app_link": {"target_url": "", "url": "", "app_name": "EXTERNAL_WEB_BROWSER"}, "version": "6.0"}',
+                        'link' => $client->getIosAppUrl($app, $pairingToken),
                     ];
                 }
                 $payLinks['ios'] = $appList;
