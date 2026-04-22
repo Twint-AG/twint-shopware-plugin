@@ -20,7 +20,7 @@ test:
   stage: check
   parallel:
     matrix:
-      - PHP_VERSION: ["8.1", "8.2", "8.3", "8.4"]
+      - PHP_VERSION: ["8.1", "8.2", "8.3", "8.4", "8.5"]
   script:
     # Update spc (See https://github.com/shivammathur/spc for options)
     - spc -U
@@ -36,7 +36,7 @@ test:
 
     # Add gitlab token to composer
     - composer config --global gitlab-token.git.nfq.asia $GITLAB_ACCESS_TOKEN
-    - composer config --global --json audit.ignore '["PKSA-hv1g-94j4-tpht", "PKSA-w3qy-s9h7-2hqr", "PKSA-v415-g75g-bqsy", "PKSA-kypv-cx5n-qkc8", "PKSA-h5dj-jyqc-4fjr", "PKSA-6wp3-462p-vyty", "PKSA-b824-t6kf-bqqz"]'
+    - if [ "$PHP_VERSION" = "8.1" ]; then composer config --global audit.block-insecure false; fi
 
     - rm -f composer.lock
     - composer install --no-progress --optimize-autoloader > /dev/null

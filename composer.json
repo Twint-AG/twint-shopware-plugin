@@ -23,7 +23,7 @@
     }
   ],
   "require": {
-    "twint-ag/sdk": "^1.6.2",
+    "twint-ag/sdk": "^1.8.0",
     "chillerlan/php-qrcode": "4.3.4",
     "ext-openssl": "*",
     "shopware/core": "^6.5 || ^6.6 || ^6.7",
