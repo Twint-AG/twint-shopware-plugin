@@ -38,17 +38,18 @@ export default class ExpressCheckoutButton extends Plugin {
             return [];
         }
 
+        const allowedFields = ['id', 'referencedId', 'type', 'quantity', 'stackable', 'removable'];
+
         // Create a FormData object from the form
         const formData = new FormData(this.form);
         const item = {};
 
         const lineItemsRegex = /lineItems\[[^\]]+\]\[([^\]]+)\]/;
 
-
         formData.forEach((value, key) => {
             if (key.startsWith('lineItems')) {
                 const match = key.match(lineItemsRegex);
-                if (match && match[1]) {
+                if (match && match[1] && allowedFields.includes(match[1])) {
                     switch (match[1]) {
                         case 'stackable':
                         case 'removable':
