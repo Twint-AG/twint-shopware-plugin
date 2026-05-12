@@ -58,7 +58,7 @@ class CheckoutController extends StorefrontController
     public function expressCheckout(Request $request, SalesChannelContext $context): Response
     {
         $cart = $this->cartService->getCart($context->getToken(), $context);
-        $useCart = $request->request->get('useCart', false);
+        $useCart = (bool) ($request->getPayload()->get('useCart', false));
         if ($cart->getLineItems()->count() >= 1 && !$useCart) {
             $this->addFlash(self::SUCCESS, $this->trans('twintPayment.notice.hasProductInCart'));
             return $this->json([
