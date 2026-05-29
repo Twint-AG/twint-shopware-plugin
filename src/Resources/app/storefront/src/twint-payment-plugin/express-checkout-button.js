@@ -33,43 +33,11 @@ export default class ExpressCheckoutButton extends Plugin {
         this._registerEvents();
     }
 
-    getLineItems(){
-        if(this.options.useCart) {
-            return [];
-        }
+    getFormData() {
+        const formData = (!this.options.useCart && this.form) ? new FormData(this.form) : new FormData();
+        formData.set('useCart', this.options.useCart ? '1' : '0');
 
-        const allowedFields = ['id', 'referencedId', 'type', 'quantity', 'stackable', 'removable'];
-
-        // Create a FormData object from the form
-        const formData = new FormData(this.form);
-        const item = {};
-
-        const lineItemsRegex = /lineItems\[[^\]]+\]\[([^\]]+)\]/;
-
-        formData.forEach((value, key) => {
-            if (key.startsWith('lineItems')) {
-                const match = key.match(lineItemsRegex);
-                if (match && match[1] && allowedFields.includes(match[1])) {
-                    switch (match[1]) {
-                        case 'stackable':
-                        case 'removable':
-                            value = value === '1';
-                            break;
-
-                        case 'quantity':
-                            value = parseInt(value);
-                            break;
-                    }
-
-                    item[match[1]] = value;
-                }
-            }
-        });
-
-        const lineItems = [];
-        lineItems.push(item);
-
-        return lineItems;
+        return formData;
     }
 
     /**
@@ -89,18 +57,20 @@ export default class ExpressCheckoutButton extends Plugin {
     }
 
     onClick(event) {
-        if(this.checking) return ;
+        event.stopPropagation();
+        event.preventDefault();
+
+        if(this.checking) return false;
         this.checking = true;
 
         this.client.abort();
         this.getLoadingPopup().show();
-        this.client.post(window.router['frontend.twint.express-checkout'], JSON.stringify({
-            lineItems: this.getLineItems(),
-            useCart: this.options.useCart
-        }), this.onFinish.bind(this));
+        this.client.post(
+            window.router['frontend.twint.express-checkout'],
+            this.getFormData(),
+            this.onFinish.bind(this)
+        );
 
-        event.stopPropagation();
-        event.preventDefault();
         return false;
     }
 
@@ -134,13 +104,9 @@ export default class ExpressCheckoutButton extends Plugin {
     onAddProductToCart(){
         this.checking = false;
         const requestUrl = window.router['frontend.checkout.line-item.add'];
-        let formData = new FormData();
-        for (const lineItem of this.getLineItems()) {
-            for(const [key, value] of Object.entries(lineItem)){
-                formData.append('lineItems[' + lineItem.id + '][' + key + ']', value);
-            }
-        }
-        formData.append('redirectTo', 'frontend.cart.offcanvas');
+        // Submit the buy form verbatim so nested fields (e.g. payload) are preserved.
+        const formData = new FormData(this.form);
+        formData.set('redirectTo', 'frontend.cart.offcanvas');
         const offCanvasCartInstances = PluginManager.getPluginInstances('OffCanvasCart');
         Iterator.iterate(offCanvasCartInstances, instance => {
             instance.openOffCanvas(requestUrl, formData, () => {
@@ -150,6 +116,7 @@ export default class ExpressCheckoutButton extends Plugin {
     }
 
     onError(responseText) {
+        this.checking = false;
         console.log("Express checkout error: ", responseText);
     }
 

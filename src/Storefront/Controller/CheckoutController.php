@@ -66,15 +66,27 @@ class CheckoutController extends StorefrontController
                 'needAddProductToCart' => true,
             ]);
         }
-        $pairing = $this->checkoutService->pairing($context, $request);
-        return $this->json([
-            'success' => true,
-            'redirectUrl' => '/payment/express/' . $this->cryptoService->hash($pairing->pairingUuid()->__toString()),
-            'content' => $this->getPairingContent(
-                $this->cryptoService->hash((string) $pairing->pairingUuid()),
-                $context
-            ),
-        ]);
+        try {
+            $pairing = $this->checkoutService->pairing($context, $request);
+            return $this->json([
+                'success' => true,
+                'redirectUrl' => '/payment/express/' . $this->cryptoService->hash(
+                    $pairing->pairingUuid()
+                        ->__toString()
+                ),
+                'content' => $this->getPairingContent(
+                    $this->cryptoService->hash((string) $pairing->pairingUuid()),
+                    $context
+                ),
+            ]);
+        } catch (Throwable $e) {
+            $this->logger->error('TWINT express checkout error: ' . $e->getMessage(), [
+                'exception' => $e,
+                'payload' => $request->getContent(),
+            ]);
+
+            throw $e;
+        }
     }
 
     /**
