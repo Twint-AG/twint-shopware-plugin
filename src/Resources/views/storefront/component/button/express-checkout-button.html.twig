@@ -3,7 +3,7 @@
 {% endif %}
 
 {% block twint_express_checkout_button %}
-    <button class="twint-button" data-twint-express-checkout-button
+    <button type="button" class="twint-button" data-twint-express-checkout-button
             data-twint-express-checkout-button-options="{{ { useCart: useCart } | json_encode }}"
             {{ disabled is defined and disabled ? 'disabled' : '' }}
         >
