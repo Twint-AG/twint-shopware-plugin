@@ -54,10 +54,14 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
         $payload = $request->getPayload()
             ->all();
 
-        $useCart = $payload['useCart'] ?? false;
+        $useCart = filter_var($payload['useCart'] ?? false, FILTER_VALIDATE_BOOLEAN);
         $cart = $this->cloneCart($context);
         if (!$useCart) {
-            $cart = $this->cartService->add($cart, $this->getLineItems($payload['lineItems'], $context), $context);
+            $cart = $this->cartService->add(
+                $cart,
+                $this->getLineItems($payload['lineItems'] ?? [], $context),
+                $context
+            );
         }
 
         $methods = $this->getShippingMethods($cart, $context, $request);
@@ -163,6 +167,15 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
     {
         $lineItems = [];
         foreach ($items as $item) {
+            if (isset($item['quantity']) && !is_int($item['quantity'])) {
+                $item['quantity'] = (int) $item['quantity'];
+            }
+            foreach (['stackable', 'removable'] as $boolField) {
+                if (isset($item[$boolField]) && !is_bool($item[$boolField])) {
+                    $item[$boolField] = filter_var($item[$boolField], FILTER_VALIDATE_BOOLEAN);
+                }
+            }
+
             $lineItems[] = $this->itemFactoryRegistry->create($item, $context);
         }
 
