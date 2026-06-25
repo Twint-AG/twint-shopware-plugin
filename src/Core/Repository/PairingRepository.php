@@ -98,6 +98,9 @@ class PairingRepository
         $criteria->addAssociation('customer.addresses');
         $criteria->addAssociation('order');
         $criteria->addAssociation('order.transactions');
+        $criteria->addAssociation('order.transactions.paymentMethod');
+        $criteria->getAssociation('order.transactions')
+            ->addSorting(new FieldSorting('createdAt', FieldSorting::ASCENDING));
 
         return $this->repository->search($criteria, Context::createDefaultContext());
     }
