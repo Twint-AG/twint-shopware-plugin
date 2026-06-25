@@ -17,6 +17,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Twint\Core\DataAbstractionLayer\Entity\Pairing\PairingEntity;
 use Twint\Core\Repository\PairingRepository;
 use Twint\Core\Setting\Settings;
@@ -173,6 +174,16 @@ class OrderService
         $criteria = new Criteria([$orderId]);
         foreach ($associations as $association) {
             $criteria->addAssociation($association);
+        }
+
+        $hasTransactions = array_filter(
+            $associations,
+            static fn (string $association): bool => $association === 'transactions'
+                || str_starts_with($association, 'transactions.')
+        );
+        if ($hasTransactions !== []) {
+            $criteria->getAssociation('transactions')
+                ->addSorting(new FieldSorting('createdAt', FieldSorting::ASCENDING));
         }
 
         if (!$context instanceof Context) {
