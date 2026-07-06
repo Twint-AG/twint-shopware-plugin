@@ -7,6 +7,7 @@ namespace Twint\Core\Service;
 use Doctrine\DBAL\Exception\DriverException;
 use Exception;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
@@ -23,6 +24,8 @@ use Twint\Sdk\Value\Money;
 use Twint\Sdk\Value\Order;
 use Twint\Sdk\Value\OrderId;
 use Twint\Sdk\Value\Uuid;
+use Twint\Util\Method\ExpressPaymentMethod;
+use Twint\Util\Method\RegularPaymentMethod;
 
 class PairingService
 {
@@ -121,12 +124,19 @@ class PairingService
         }
         if ($pairing->getOrderId() && !$pairing->getOrder() instanceof OrderEntity) {
             $order = $this->orderService->getOrder($pairing->getOrderId());
-            /** @var string $transactionId */
-            $transactionId = $order->getTransactions()?->first()?->getId();
         } else {
-            /** @var string $transactionId */
-            $transactionId = $pairing->getOrder()
-                ?->getTransactions()?->first()?->getId();
+            $order = $pairing->getOrder();
+        }
+
+        $transactionId = $order instanceof OrderEntity ? $this->resolveTwintTransactionId($order) : null;
+
+        if ($transactionId === null) {
+            $this->logger->warning(
+                "TWINT pairing {$pairing->getId()} has no TWINT transaction to update on order {$pairing->getOrderId()}"
+            );
+            $this->updateLog($res->getLog(), $pairing);
+
+            return true;
         }
 
         if (!$org->isSuccess() && $tOrder->isSuccessful()) {
@@ -140,6 +150,25 @@ class PairingService
         $this->updateLog($res->getLog(), $pairing);
 
         return true;
+    }
+
+    private function resolveTwintTransactionId(OrderEntity $order): ?string
+    {
+        $transactions = $order->getTransactions();
+        if (!$transactions instanceof OrderTransactionCollection) {
+            return null;
+        }
+
+        $twintNames = [RegularPaymentMethod::TECHNICAL_NAME, ExpressPaymentMethod::TECHNICAL_NAME];
+        $twintTransactions = $transactions->filter(
+            static fn ($transaction): bool => in_array(
+                $transaction->getPaymentMethod()?->getTechnicalName(),
+                $twintNames,
+                true
+            )
+        );
+
+        return $twintTransactions->last()?->getId();
     }
 
     public function cancel(PairingEntity $pairing): void
