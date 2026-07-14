@@ -117,6 +117,25 @@ services:
     networks:
       - web
 
+  # Static team launcher listing all environments (all platforms). Served by
+  # Traefik at home-${DOMAIN_BASE}, behind the same basic auth + TLS.
+  dashboard:
+    image: nginx:alpine
+    container_name: devbox_dashboard
+    restart: unless-stopped
+    volumes:
+      - "./dashboard:/usr/share/nginx/html:ro"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`home-${DOMAIN_BASE}`)"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.tls.certresolver=le"
+      - "traefik.http.middlewares.devbox-auth.basicauth.usersfile=/etc/traefik/auth/htpasswd"
+      - "traefik.http.routers.dashboard.middlewares=devbox-auth"
+      - "traefik.http.services.dashboard.loadbalancer.server.port=80"
+    networks:
+      - web
+
 volumes:
   sw65_html:
   sw65_db:
