@@ -2,9 +2,10 @@ name: devbox
 
 services:
   proxy:
-    # v3.5+ negotiates the Docker API version; v3.1's client forced API 1.24,
-    # which Docker Engine 29+ rejects (min 1.40) — breaking label discovery.
-    image: traefik:v3.5
+    # Traefik v3.7 works with Docker Engine 29 (min API 1.40). Older v3.x
+    # (incl. v3.5) forced/negotiated API 1.24, which Docker 29 rejects — the
+    # Docker provider then can't read labels, so no routers register (404s).
+    image: traefik:v3.7
     container_name: devbox_proxy
     restart: unless-stopped
     command:
