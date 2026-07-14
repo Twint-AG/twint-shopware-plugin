@@ -27,9 +27,9 @@ services:
       - APP_URL=http://sw65.${DOMAIN_BASE}
       - XDEBUG_ENABLED=0
     volumes:
+      - "sw65_html:/var/www/html"
       - "./src/sw65:/var/www/html/custom/plugins/TwintPayment:rw"
       - "sw65_db:/var/lib/mysql"
-      - "sw65_media:/var/www/html/public/media"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.sw65.rule=Host(`sw65.${DOMAIN_BASE}`)"
@@ -46,9 +46,9 @@ services:
       - APP_URL=http://sw66.${DOMAIN_BASE}
       - XDEBUG_ENABLED=0
     volumes:
+      - "sw66_html:/var/www/html"
       - "./src/sw66:/var/www/html/custom/plugins/TwintPayment:rw"
       - "sw66_db:/var/lib/mysql"
-      - "sw66_media:/var/www/html/public/media"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.sw66.rule=Host(`sw66.${DOMAIN_BASE}`)"
@@ -65,9 +65,9 @@ services:
       - APP_URL=http://sw67.${DOMAIN_BASE}
       - XDEBUG_ENABLED=0
     volumes:
+      - "sw67_html:/var/www/html"
       - "./src/sw67:/var/www/html/custom/plugins/TwintPayment:rw"
       - "sw67_db:/var/lib/mysql"
-      - "sw67_media:/var/www/html/public/media"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.sw67.rule=Host(`sw67.${DOMAIN_BASE}`)"
@@ -77,12 +77,12 @@ services:
       - web
 
 volumes:
+  sw65_html:
   sw65_db:
-  sw65_media:
+  sw66_html:
   sw66_db:
-  sw66_media:
+  sw67_html:
   sw67_db:
-  sw67_media:
 
 networks:
   web:
