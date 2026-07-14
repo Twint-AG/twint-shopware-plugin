@@ -19,9 +19,11 @@ bin/deploy.sh [branch|commit]
 To deploy an unmerged commit, push it to a branch and pass the branch name.
 
 ## What it does, for each instance
-1. **Configure Composer**: register the plugin's GitLab repo **and** its private
-   `twint-ag/sdk` dependency (`SDK_REMOTE`) as VCS repositories, and set
-   `gitlab-token` (from `GITLAB_TOKEN`) for both hosts in the instance's `auth.json`.
+1. **Configure Composer**: register the self-hosted GitLab host(s) in
+   `gitlab-domains` (so Composer applies the token to a non-gitlab.com host),
+   register the plugin's GitLab repo **and** its private `twint-ag/sdk`
+   dependency (`SDK_REMOTE`) as VCS repositories, and set `gitlab-token` (from
+   `GITLAB_TOKEN`) for both hosts in the instance's `auth.json`.
 2. **`composer require twint-ag/twint-shopware-plugin:<constraint>`** — Composer
    pulls the plugin **and its dependencies** (`twint-ag/sdk`, `chillerlan/php-qrcode`)
    into that instance's own `vendor/`, resolved for that instance's PHP version.

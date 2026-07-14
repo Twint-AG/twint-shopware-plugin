@@ -21,7 +21,7 @@
 - **Volume-seeding caveat:** a named volume seeds from the image only on first creation. Once `swXX_html` exists, bumping `SWXX_IMAGE` will NOT upgrade that instance's Shopware code — you must remove the instance's volumes to re-seed. Documented in operations/troubleshooting.
 - Plugin delivery is **Composer VCS require**, run inside each container — no host checkout, no bind-mount, no copy. `deploy.sh` registers TWO Composer VCS repositories — the plugin (`GIT_REMOTE`) and its private dependency `twint-ag/sdk` (`SDK_REMOTE`) — then runs `composer require twint-ag/twint-shopware-plugin:<constraint>` per instance, so each instance resolves the plugin and its deps (`twint-ag/sdk` private VCS, `chillerlan/php-qrcode` public) into its own `vendor/` for its own PHP version. All instances run the **same** deployed ref.
 - `deploy.sh` signature is `deploy.sh [ref]` (ref defaults to `master`): maps the ref to a Composer constraint (branch `x` → `dev-x`; 7–40-hex commit `<sha>` → `dev-master#<sha>`) and runs composer require + Shopware install/build on every instance.
-- GitLab auth for Composer: `deploy.sh` runs `composer config --auth gitlab-token.<host> $GITLAB_TOKEN` for BOTH the plugin host (`GIT_REMOTE` up to first `/`) and the SDK host (`SDK_REMOTE` up to first `/`) inside each container (persists in that instance's `auth.json` within the html volume). VCS URLs = `https://$GIT_REMOTE` and `https://$SDK_REMOTE`. The single `GITLAB_TOKEN` must have access to both repos. `SDK_REMOTE` is required — `deploy.sh` fails fast if unset.
+- GitLab auth for Composer: `deploy.sh` first registers the self-hosted host(s) in Composer `gitlab-domains` (REQUIRED for self-hosted GitLab — `gitlab-token` and the GitLab driver default to `gitlab.com` only, so without this the token is ignored and auth fails), then runs `composer config --auth gitlab-token.<host> $GITLAB_TOKEN` for BOTH the plugin host (`GIT_REMOTE` up to first `/`) and the SDK host (`SDK_REMOTE` up to first `/`) inside each container (persists in that instance's `auth.json` within the html volume). VCS URLs = `https://$GIT_REMOTE` and `https://$SDK_REMOTE`. The single `GITLAB_TOKEN` must have access to both repos. `SDK_REMOTE` is required — `deploy.sh` fails fast if unset.
 - `down` must never pass `-v` — volumes (data) survive `down`. Data removal is always an explicit manual action.
 - `GITLAB_TOKEN` must never be committed and must not be left in any checkout's `.git/config` after a deploy completes.
 - `devbox/` is internal tooling: it stays `export-ignore` in `.gitattributes` and in `sync.sh`'s `EXCLUDE_PATHS`, so it never reaches the public GitHub mirror.
@@ -160,7 +160,7 @@ git commit -m "feat(devbox): add config scaffold (.gitignore, .env.example)"
 
 **Interfaces:**
 - Consumes: `DOMAIN_BASE`, `SW65_IMAGE`, `SW66_IMAGE`, `SW67_IMAGE` from `.env`.
-- Produces: services named `proxy`, `sw65`, `sw66`, `sw67`; named volumes `swXX_db`, `swXX_media`; network `web`. All `bin/` scripts address instances by these exact service names.
+- Produces: services named `proxy`, `sw65`, `sw66`, `sw67`; named volumes `swXX_html`, `swXX_db`; network `web`. All `bin/` scripts address instances by these exact service names.
 
 - [ ] **Step 1: Create `devbox/compose.yaml`**
 
@@ -289,7 +289,7 @@ git commit -m "feat(devbox): compose stack (traefik + sw65/sw66/sw67)"
 > **AMENDED after review (see committed `devbox/bin/_lib.sh`, authoritative):** `resolve_targets` no longer prints lines. It runs in the caller's shell, populates a global array `RESOLVED_TARGETS`, and `exit 1`s on invalid/missing input. Callers use it as: `resolve_targets "$x"` then read `"${RESOLVED_TARGETS[@]}"` — never via `$(...)` or `< <(...)`, which would swallow the failure. (Reason: `exit 1` inside a process-substitution subshell is invisible to the parent, so an invalid instance would silently no-op.)
 
 **Interfaces:**
-- Produces (sourced by every other script): variables `DEVBOX_DIR`, `ENV_FILE`, array `INSTANCES=(sw65 sw66 sw67)`; functions `load_env`, `is_instance <name>`, `resolve_targets <all|swXX>` (populates array `RESOLVED_TARGETS` in the caller's shell; `exit 1` on bad input), `git_remote_url` (prints `https://oauth2:$GITLAB_TOKEN@$GIT_REMOTE`), `dc <args...>` (runs `docker compose` pinned to the devbox project).
+- Produces (sourced by every other script): variables `DEVBOX_DIR`, `ENV_FILE`, array `INSTANCES=(sw65 sw66 sw67)`; functions `load_env`, `is_instance <name>`, `resolve_targets <all|swXX>` (populates array `RESOLVED_TARGETS` in the caller's shell; `exit 1` on bad input), `dc <args...>` (runs `docker compose` pinned to the devbox project). (The `git_remote_url` helper shown in the code block below was removed when delivery switched to Composer — see committed `_lib.sh`.)
 
 - [ ] **Step 1: Create `devbox/bin/_lib.sh`**
 
@@ -578,7 +578,14 @@ composer_constraint() {
 deploy_to() {
   local inst="$1" constraint="$2"
 
-  echo "==> [$inst] configuring Composer GitLab repo + token"
+  echo "==> [$inst] configuring Composer GitLab domains + repos + token"
+  # Composer only applies gitlab-token / the GitLab driver to hosts listed in
+  # gitlab-domains (default: gitlab.com). Register the self-hosted host(s).
+  if [ "$SDK_HOST" = "$GITLAB_HOST" ]; then
+    dc exec -T "$inst" composer config gitlab-domains "$GITLAB_HOST"
+  else
+    dc exec -T "$inst" composer config gitlab-domains "$GITLAB_HOST" "$SDK_HOST"
+  fi
   dc exec -T "$inst" composer config repositories.twint vcs "$VCS_URL"
   # --auth writes to the project auth.json (persisted in the html volume); the
   # token value is passed as an argument, not echoed by this script.
@@ -886,12 +893,16 @@ bin/deploy.sh [branch|commit]
 To deploy an unmerged commit, push it to a branch and pass the branch name.
 
 ## What it does, for each instance
-1. **Configure Composer**: register the GitLab repo as a VCS repository and set
-   `gitlab-token` (from `GITLAB_TOKEN`) in the instance's `auth.json`.
+1. **Configure Composer**: register the self-hosted GitLab host(s) in
+   `gitlab-domains` (required so Composer applies the token to a non-gitlab.com
+   host), register the plugin's GitLab repo **and** its private `twint-ag/sdk`
+   dependency (`SDK_REMOTE`) as VCS repositories, and set `gitlab-token` (from
+   `GITLAB_TOKEN`) for both hosts in the instance's `auth.json`.
 2. **`composer require twint-ag/twint-shopware-plugin:<constraint>`** — Composer
-   pulls the plugin **and its dependencies** (`twint-ag/sdk`, `chillerlan/php-qrcode`)
-   into that instance's own `vendor/`, resolved for that instance's PHP version.
-   `shopware/*` requirements are satisfied by the running platform.
+   pulls the plugin **and its dependencies** (`twint-ag/sdk` private VCS,
+   `chillerlan/php-qrcode` public) into that instance's own `vendor/`, resolved
+   for that instance's PHP version. `shopware/*` requirements are satisfied by
+   the running platform.
 3. **Shopware**: `plugin:refresh` → `plugin:install --activate TwintPayment`
    (falls back to `plugin:update` if already installed) → build administration +
    storefront → `cache:clear`.
@@ -1155,7 +1166,7 @@ git commit -m "fix(devbox): on-box acceptance adjustments"
 
 **Placeholder scan** — no "TBD/TODO-implement-later" in steps; the only literal `TODO` is inside `.env.example` telling the operator to insert the real `GIT_REMOTE`, which is intended config guidance, not a plan gap.
 
-**Type/name consistency** — `_lib.sh` exposes `DEVBOX_DIR`, `ENV_FILE`, `INSTANCES`, `load_env`, `is_instance`, `resolve_targets`, `git_remote_url`, `dc`; every consuming script (Tasks 6–9) uses exactly those names. Service names `proxy`/`sw65`/`sw66`/`sw67` and volume names `swXX_db`/`swXX_media` are identical across `compose.yaml`, scripts, and docs. Plugin path `/var/www/html/custom/plugins/TwintPayment` is identical in `compose.yaml` and `deploy.sh`.
+**Type/name consistency (final code)** — `_lib.sh` exposes `DEVBOX_DIR`, `ENV_FILE`, `INSTANCES`, `load_env`, `is_instance`, `resolve_targets` (→ `RESOLVED_TARGETS`), `dc`; every consuming script uses exactly those names. Service names `proxy`/`sw65`/`sw66`/`sw67` and volume names `swXX_html`/`swXX_db` are identical across `compose.yaml`, scripts, and docs. Plugin in-container path `/var/www/html/custom/plugins/TwintPayment` is referenced by `deploy.sh` (Composer installs the plugin there); it is NOT a compose mount. Env vars `DOMAIN_BASE`/`GIT_REMOTE`/`SDK_REMOTE`/`GITLAB_TOKEN`/`SWxx_IMAGE` are consistent across `.env.example`, `compose.yaml`, and scripts.
 
 ## Open config values (operator fills in, not plan gaps)
 - `GIT_REMOTE` real GitLab host/path — placeholder in `.env.example`.
