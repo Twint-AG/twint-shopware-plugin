@@ -91,9 +91,19 @@ deploy_to() {
   dc exec -T "$inst" composer config repositories.sdk vcs "$SDK_URL"
   dc exec -T "$inst" composer config --auth "http-basic.${SDK_HOST}" "$GITLAB_USERNAME" "$GITLAB_TOKEN"
 
-  echo "==> [$inst] composer require ${PLUGIN_PACKAGE}:${CONSTRAINT}"
-  dc exec -T "$inst" composer require "${PLUGIN_PACKAGE}:${CONSTRAINT}" \
-    --no-interaction --no-progress --with-all-dependencies
+  echo "==> [$inst] installing ${PLUGIN_PACKAGE}:${CONSTRAINT} (dist, clean extract)"
+  # Allow the SDK's HTTP-client discovery plugin (blocked by default in composer 2.2+).
+  dc exec -T "$inst" composer config --no-plugins allow-plugins.php-http/discovery true
+  # Point composer.json at the target ref (no install yet), wipe any prior copy,
+  # then install as a DIST archive. --prefer-dist means no .git in vendor, so the
+  # Shopware build writing node_modules/compiled assets into the package dir never
+  # trips composer's "uncommitted changes" check on the next deploy; and
+  # .gitattributes export-ignore trims the archive to the plugin runtime (no
+  # devbox/infra/tests copied recursively into vendor).
+  dc exec -T "$inst" composer require --no-update "${PLUGIN_PACKAGE}:${CONSTRAINT}"
+  dc exec -T "$inst" rm -rf "/var/www/html/vendor/${PLUGIN_PACKAGE}"
+  dc exec -T "$inst" composer update "${PLUGIN_PACKAGE}" \
+    --prefer-dist --with-all-dependencies --no-interaction --no-progress
 
   echo "==> [$inst] plugin refresh"
   dc exec -T "$inst" php bin/console plugin:refresh
