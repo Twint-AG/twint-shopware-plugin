@@ -2,11 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Stand up a `devbox/` toolset that runs Shopware 6.5, 6.6, and 6.7 concurrently on the fresh EC2 dev box (`ssh twint-dev`) behind a Traefik reverse proxy, with persistent per-instance DB + media, and a `deploy.sh` that pulls any GitLab branch/commit of the TWINT plugin into a chosen instance.
+**Goal:** Stand up a `devbox/` toolset that runs Shopware 6.5, 6.6, and 6.7 concurrently on the fresh EC2 dev box (`ssh twint-dev`) behind a Traefik reverse proxy, each instance persisting its full filesystem + DB, and a `deploy.sh [ref]` that installs a chosen GitLab branch/commit of the TWINT plugin — via Composer — onto all three at once.
 
-**Architecture:** One Docker Compose project = one Traefik proxy (`:80`) + three `dockware/dev` all-in-one containers on a shared `web` network. Traefik routes `sw65|sw66|sw67.$DOMAIN_BASE` by Host header to each container's internal port 80. Each instance bind-mounts a deploy-managed git checkout (`devbox/src/swXX`) as the plugin; DB and media are per-instance named volumes. Bash scripts in `devbox/bin/` wrap host bootstrap, compose lifecycle, git-pull deploy, and provisioning.
+**Architecture:** One Docker Compose project = one Traefik proxy (`:80`) + three `dockware/dev` all-in-one containers on a shared `web` network. Traefik routes `swXX-$DOMAIN_BASE` (hyphen-joined) by Host header to each container's internal port 80. Each instance persists two named volumes — `swXX_html` (`/var/www/html`) and `swXX_db` (`/var/lib/mysql`). The plugin is delivered by `deploy.sh` running `composer require` of the GitLab package inside each container (no bind-mount, no host checkout). Bash scripts in `devbox/bin/` wrap host bootstrap, compose lifecycle, Composer deploy, and provisioning.
 
-**Tech Stack:** Docker Engine + Compose v2, Traefik v3, dockware/dev images, Bash, git (HTTPS + token), Shopware CLI (`bin/console`), Composer.
+**Tech Stack:** Docker Engine + Compose v2, Traefik v3, dockware/dev images, Bash, Composer (GitLab VCS + gitlab-token), Shopware CLI (`bin/console`).
 
 **Spec:** `docs/superpowers/specs/2026-07-14-devbox-multi-version-shopware-design.md`
 
@@ -15,7 +15,7 @@
 - Instances and their pinned images: `sw65` → `dockware/dev:6.5.8.0`, `sw66` → `dockware/dev:6.6.7.0`, `sw67` → `dockware/dev:6.7.2.2` (image tags come from `.env`; `6.6.7.0` matches `ci66`).
 - Plugin name is `TwintPayment`; in-container path is `/var/www/html/custom/plugins/TwintPayment`.
 - dockware default DB is used as-is: user `root` / password `root`, database `shopware`.
-- Hostnames derive from `DOMAIN_BASE` (default `twint-dev`): instance `swXX` is served at `swXX.$DOMAIN_BASE`.
+- Hostnames are **hyphen-joined**: instance `swXX` is served at `swXX-$DOMAIN_BASE` (Traefik rule `Host(\`swXX-${DOMAIN_BASE}\`)`, `APP_URL=http://swXX-${DOMAIN_BASE}`). With `DOMAIN_BASE=twint-dev` → `sw65-twint-dev`; with `DOMAIN_BASE=twint.dev.nfq-asia.com` → `sw65-twint.dev.nfq-asia.com`.
 - v1 is **HTTP only** on `:80`. No TLS, no `:443` (Route53 + Let's Encrypt is a documented later step, not built here).
 - Persistence: per-instance named volumes `swXX_html` → `/var/www/html` (full Shopware filesystem, so all config/state/media survive recreates) and `swXX_db` → `/var/lib/mysql`. Media (`public/media`) lives inside the html volume — no separate media volume.
 - **Volume-seeding caveat:** a named volume seeds from the image only on first creation. Once `swXX_html` exists, bumping `SWXX_IMAGE` will NOT upgrade that instance's Shopware code — you must remove the instance's volumes to re-seed. Documented in operations/troubleshooting.
@@ -102,9 +102,8 @@ git commit -m "chore(sync): exclude devbox/ + infra/ from public GitHub mirror"
 - [ ] **Step 1: Create `devbox/.gitignore`**
 
 ```gitignore
-# Host-specific, deploy-managed — never commit
+# Host-specific — never commit
 /.env
-/src/
 ```
 
 - [ ] **Step 2: Create `devbox/.env.example`**
@@ -114,14 +113,14 @@ git commit -m "chore(sync): exclude devbox/ + infra/ from public GitHub mirror"
 # Copy to `.env` (gitignored) and fill in. Compose auto-reads .env; the
 # bin/ scripts source it too (via _lib.sh).
 
-# Base hostname for instance subdomains.
-#   Instances are served at sw65.$DOMAIN_BASE, sw66.$DOMAIN_BASE, sw67.$DOMAIN_BASE
-#   Local testing: keep 'twint-dev' and add matching /etc/hosts entries on your laptop.
-#   Later (Route53): set to a real domain, e.g. dev.twint.example
+# Base domain. Instances are served at swXX-$DOMAIN_BASE (hyphen-joined):
+#   sw65-$DOMAIN_BASE, sw66-$DOMAIN_BASE, sw67-$DOMAIN_BASE
+#   Local testing: keep 'twint-dev' -> sw65-twint-dev etc.; add /etc/hosts entries.
+#   Real domain (Route53): e.g. twint.dev.nfq-asia.com -> sw65-twint.dev.nfq-asia.com
 DOMAIN_BASE=twint-dev
 
 # GitLab plugin repo as host+path WITHOUT scheme.
-#   Used as: https://oauth2:$GITLAB_TOKEN@$GIT_REMOTE
+#   deploy.sh registers it as a Composer VCS repo and derives the GitLab host.
 #   TODO: replace with the real GitLab host/path.
 GIT_REMOTE=gitlab.example.com/twint-ag/twint-shopware-plugin.git
 
@@ -653,7 +652,7 @@ git commit -m "feat(devbox): Composer-based plugin deploy to all instances"
 
 **Interfaces:**
 - Consumes: `_lib.sh` (`load_env`, `resolve_targets`, `dc`), `.env` (`DOMAIN_BASE`).
-- `provision.sh [all|swXX]` sets each instance's sales-channel domain to `swXX.$DOMAIN_BASE`. Idempotent.
+- `provision.sh [all|swXX]` sets each instance's sales-channel domain to `swXX-$DOMAIN_BASE`. Idempotent.
 
 - [ ] **Step 1: Create `devbox/bin/provision.sh`**
 
@@ -668,7 +667,7 @@ load_env
 
 resolve_targets "${1:-all}"
 for inst in "${RESOLVED_TARGETS[@]}"; do
-  host="${inst}.${DOMAIN_BASE}"
+  host="${inst}-${DOMAIN_BASE}"
   echo "==> [$inst] set sales-channel domain -> http://$host"
   dc exec -T "$inst" php bin/console sales-channel:update:domain "$host"
 done
@@ -786,14 +785,14 @@ bin/provision.sh all             # set sales-channel domains
 bin/deploy.sh master             # composer-install the plugin on all three
 
 # on your laptop, once — /etc/hosts:
-#   <ec2-ip> sw65.twint-dev sw66.twint-dev sw67.twint-dev
+#   <ec2-ip> sw65-twint-dev sw66-twint-dev sw67-twint-dev
 
 # iterate — deploy any branch/commit to all instances:
 bin/deploy.sh my-feature-branch
 bin/deploy.sh <commit-hash>
 ```
 
-Then open `http://sw65.twint-dev`, `http://sw66.twint-dev`, `http://sw67.twint-dev`.
+Then open `http://sw65-twint-dev`, `http://sw66-twint-dev`, `http://sw67-twint-dev`.
 
 ## Docs
 
@@ -845,9 +844,9 @@ bin/deploy.sh master     # composer require + install/activate + build on all in
 ## 4. Laptop DNS (local testing)
 Add to your laptop's `/etc/hosts` (get `<ec2-ip>` from AWS):
 ```
-<ec2-ip> sw65.twint-dev sw66.twint-dev sw67.twint-dev
+<ec2-ip> sw65-twint-dev sw66-twint-dev sw67-twint-dev
 ```
-Open `http://sw66.twint-dev`, etc. For the real-domain path see
+Open `http://sw66-twint-dev`, etc. For the real-domain path see
 [dns-tls.md](dns-tls.md).
 ````
 
@@ -948,14 +947,17 @@ ssh -L 8080:localhost:8080 twint-dev    # then open http://localhost:8080
 # DNS & TLS
 
 ## Now — local /etc/hosts (HTTP only)
-`DOMAIN_BASE=twint-dev`. On each developer's laptop, add to `/etc/hosts`:
+`DOMAIN_BASE=twint-dev`. Hostnames are hyphen-joined (`sw65-twint-dev`). On each
+developer's laptop, add to `/etc/hosts`:
 ```
-<ec2-ip> sw65.twint-dev sw66.twint-dev sw67.twint-dev
+<ec2-ip> sw65-twint-dev sw66-twint-dev sw67-twint-dev
 ```
 No TLS; access over `http://`.
 
 ## Later — Route53 + Let's Encrypt
-1. **DNS:** create a wildcard record `*.<domain>` → EC2 IP in Route53.
+1. **DNS:** create a wildcard record for the parent of the instance label →
+   EC2 IP in Route53. With `DOMAIN_BASE=twint.dev.nfq-asia.com` the hosts are
+   `sw65-twint.dev.nfq-asia.com`, so the wildcard is `*.dev.nfq-asia.com`.
 2. **Config:** set `DOMAIN_BASE=<domain>` in `.env`; re-run
    `bin/provision.sh all` so sales-channel domains follow.
 3. **TLS in `compose.yaml`** (proxy service): add a `websecure` entrypoint on
@@ -985,7 +987,7 @@ No change to shop services, volumes, or the bin/ scripts is required.
 | Symptom | Likely cause | Fix |
 |---------|--------------|-----|
 | Storefront links/redirects point to `localhost` or wrong host | sales-channel domain not set | `bin/provision.sh <instance>` |
-| Traefik 404 for `swXX.$DOMAIN_BASE` | hostname doesn't resolve, or label/`DOMAIN_BASE` mismatch | check laptop `/etc/hosts`; `docker compose config \| grep Host`; dashboard at `:8080` |
+| Traefik 404 for `swXX-$DOMAIN_BASE` | hostname doesn't resolve, or label/`DOMAIN_BASE` mismatch | check laptop `/etc/hosts`; `docker compose config \| grep Host`; dashboard at `:8080` |
 | Traefik 502 | instance still booting or Apache down | `bin/logs.sh <instance>`; wait for dockware to finish init |
 | `bind: address already in use` on `:80` | something else owns port 80 on the host | stop it, or change the proxy's published port |
 | `composer require` fails auth / 404 for the plugin | bad/expired `GITLAB_TOKEN`, wrong `GIT_REMOTE`, or token missing `read_api` | fix `.env`; GitLab VCS needs `read_repository` + `read_api` |
@@ -1077,9 +1079,10 @@ Expected: for each instance, `composer require` of the plugin succeeds, `plugin:
 
 Run (from laptop):
 ```bash
-for h in sw65 sw66 sw67; do echo -n "$h: "; curl -s -o /dev/null -w '%{http_code}\n' http://$h.twint-dev/; done
+BASE=$(grep '^DOMAIN_BASE=' devbox/.env | cut -d= -f2)
+for h in sw65 sw66 sw67; do echo -n "$h: "; curl -s -o /dev/null -w '%{http_code}\n' "http://$h-$BASE/"; done
 ```
-Expected: three `200` (or `30x` to the storefront) responses — **success criterion: all three load concurrently**. Open one admin (`http://sw66.twint-dev/admin`) and confirm the TWINT plugin shows as active — **success criterion: plugin installed/activated/built**.
+Expected: three `200` (or `30x` to the storefront) responses — **success criterion: all three load concurrently**. Open one admin (`http://sw66-$BASE/admin`) and confirm the TWINT plugin shows as active — **success criterion: plugin installed/activated/built**.
 
 - [ ] **Step 5: Verify a specific commit deploys to all instances**
 
