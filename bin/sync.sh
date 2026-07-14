@@ -11,7 +11,7 @@ RELEASE_BOT_EMAIL="plugin@twint.ch"
 # Internal deployment / infra tooling that must never reach the public GitHub
 # mirror. `git push` ignores .gitattributes export-ignore, so these paths are
 # stripped from the pushed tree with a scrub commit before pushing.
-EXCLUDE_PATHS=(devbox infra)
+EXCLUDE_PATHS=(devbox infra docs/superpowers)
 
 echo "Syncing release ${CI_COMMIT_TAG}"
 mkdir -p ~/.ssh
