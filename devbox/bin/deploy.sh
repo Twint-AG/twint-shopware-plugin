@@ -1,24 +1,40 @@
 #!/usr/bin/env bash
-# Deploy the TWINT plugin to ALL instances via Composer, at the ref that the
-# host clone is CURRENTLY checked out on. No ref argument — check out the branch
-# you want first, then run this. This makes it impossible to install a ref other
-# than what is checked out.
+# Deploy the TWINT plugin to ALL instances via Composer, always at the ref the
+# host clone is checked out on — so the checkout and the installed ref can never
+# diverge.
 #
 # Usage:
-#   git checkout <branch> && git pull      # pick what to deploy
-#   devbox/bin/deploy.sh
+#   devbox/bin/deploy.sh              # deploy the currently checked-out branch
+#   devbox/bin/deploy.sh <branch>     # checkout <branch> on the host, then deploy it
+#
+# NOTE: the ref you deploy must itself contain devbox/ (this tooling lives in the
+# plugin repo). Deploying a ref without devbox/ would remove this script on
+# checkout. Deploy your feature branch, or master once devbox/ is merged.
 set -euo pipefail
 SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Self-update: pull the latest of the current branch, then re-exec the fresh copy
-# (so the host always runs the newest tooling for this branch). Runs once.
-# Skips gracefully if not in a git repo; opt out with DEVBOX_NO_SELF_UPDATE=1.
-if [ -z "${DEVBOX_SELF_UPDATED:-}" ] && [ -z "${DEVBOX_NO_SELF_UPDATE:-}" ] \
+# First pass: bring the host clone to the ref to deploy, then re-exec once.
+#   - with a ref arg: fetch + checkout that ref (reset to origin for a branch)
+#   - without:        pull --ff-only the current branch
+# Opt out of any git work with DEVBOX_NO_SELF_UPDATE=1.
+if [ -z "${DEVBOX_READY:-}" ] && [ -z "${DEVBOX_NO_SELF_UPDATE:-}" ] \
    && git -C "$SELF_DIR" rev-parse --git-dir >/dev/null 2>&1; then
-  echo "==> updating devbox tooling (git pull --ff-only)"
-  GIT_TERMINAL_PROMPT=0 git -C "$SELF_DIR" pull --ff-only \
-    || echo "WARNING: git pull failed; continuing with current checkout" >&2
-  exec env DEVBOX_SELF_UPDATED=1 "$0" "$@"
+  export GIT_TERMINAL_PROMPT=0
+  if [ -n "${1:-}" ]; then
+    echo "==> checking out '$1' on the host clone"
+    git -C "$SELF_DIR" fetch --all --prune
+    if git -C "$SELF_DIR" rev-parse --verify --quiet "origin/$1" >/dev/null; then
+      git -C "$SELF_DIR" checkout -B "$1" "origin/$1"
+      git -C "$SELF_DIR" reset --hard "origin/$1"
+    else
+      git -C "$SELF_DIR" checkout "$1"   # tag or commit (detached)
+    fi
+  else
+    echo "==> updating current branch (git pull --ff-only)"
+    git -C "$SELF_DIR" pull --ff-only \
+      || echo "WARNING: git pull failed; continuing with current checkout" >&2
+  fi
+  exec env DEVBOX_READY=1 "$0"           # re-exec the (possibly updated) script
 fi
 
 . "$SELF_DIR/_lib.sh"
