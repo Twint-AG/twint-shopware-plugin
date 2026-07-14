@@ -1,0 +1,89 @@
+name: devbox
+
+services:
+  proxy:
+    image: traefik:v3.1
+    container_name: devbox_proxy
+    restart: unless-stopped
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+    ports:
+      - "80:80"
+      - "127.0.0.1:8080:8080"   # dashboard, localhost only (reach via SSH tunnel)
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - web
+
+  sw65:
+    image: ${SW65_IMAGE}
+    container_name: sw65
+    restart: unless-stopped
+    environment:
+      - APP_URL=http://sw65.${DOMAIN_BASE}
+      - XDEBUG_ENABLED=0
+    volumes:
+      - "./src/sw65:/var/www/html/custom/plugins/TwintPayment:rw"
+      - "sw65_db:/var/lib/mysql"
+      - "sw65_media:/var/www/html/public/media"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sw65.rule=Host(`sw65.${DOMAIN_BASE}`)"
+      - "traefik.http.routers.sw65.entrypoints=web"
+      - "traefik.http.services.sw65.loadbalancer.server.port=80"
+    networks:
+      - web
+
+  sw66:
+    image: ${SW66_IMAGE}
+    container_name: sw66
+    restart: unless-stopped
+    environment:
+      - APP_URL=http://sw66.${DOMAIN_BASE}
+      - XDEBUG_ENABLED=0
+    volumes:
+      - "./src/sw66:/var/www/html/custom/plugins/TwintPayment:rw"
+      - "sw66_db:/var/lib/mysql"
+      - "sw66_media:/var/www/html/public/media"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sw66.rule=Host(`sw66.${DOMAIN_BASE}`)"
+      - "traefik.http.routers.sw66.entrypoints=web"
+      - "traefik.http.services.sw66.loadbalancer.server.port=80"
+    networks:
+      - web
+
+  sw67:
+    image: ${SW67_IMAGE}
+    container_name: sw67
+    restart: unless-stopped
+    environment:
+      - APP_URL=http://sw67.${DOMAIN_BASE}
+      - XDEBUG_ENABLED=0
+    volumes:
+      - "./src/sw67:/var/www/html/custom/plugins/TwintPayment:rw"
+      - "sw67_db:/var/lib/mysql"
+      - "sw67_media:/var/www/html/public/media"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sw67.rule=Host(`sw67.${DOMAIN_BASE}`)"
+      - "traefik.http.routers.sw67.entrypoints=web"
+      - "traefik.http.services.sw67.loadbalancer.server.port=80"
+    networks:
+      - web
+
+volumes:
+  sw65_db:
+  sw65_media:
+  sw66_db:
+  sw66_media:
+  sw67_db:
+  sw67_media:
+
+networks:
+  web:
+    external: false
