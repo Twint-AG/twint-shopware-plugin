@@ -20,7 +20,8 @@ cp .env.example .env
 Set:
 - `DOMAIN_BASE` — keep `twint-dev` for local `/etc/hosts` testing.
 - `GIT_REMOTE` — GitLab host+path of the plugin repo (no scheme).
-- `GITLAB_TOKEN` — a deploy token / PAT with `read_repository` + `read_api` (Composer needs `read_api` for GitLab VCS).
+- `SDK_REMOTE` — GitLab host+path of the private `twint-ag/sdk` dependency (no scheme). Required — deploy fails fast without it.
+- `GITLAB_TOKEN` — a deploy token / PAT with `read_repository` + `read_api` (Composer needs `read_api` for GitLab VCS). Must have access to both the plugin repo and the SDK repo.
 - `SW65_IMAGE` / `SW66_IMAGE` / `SW67_IMAGE` — pinned dockware tags (defaults provided).
 
 ## 3. Start + provision + deploy
