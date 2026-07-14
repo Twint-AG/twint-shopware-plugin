@@ -2,16 +2,21 @@
 
 ## Lifecycle
 ```bash
-bin/up.sh [all|swXX]     # start
+bin/up.sh [all|swXX]     # (re)generate the Traefik htpasswd, then start
 bin/down.sh [all|swXX]   # stop — DATA IS PRESERVED (never uses -v)
 bin/logs.sh [all|swXX]   # follow logs
 bin/shell.sh <swXX>      # bash inside an instance
 ```
+`up.sh` always regenerates `devbox/auth/htpasswd` from `BASIC_AUTH_USER` /
+`BASIC_AUTH_PASSWORD` in `.env` before starting the proxy, so changing those
+values and re-running `bin/up.sh` rotates the basic-auth credentials for all
+instances.
 
 ## Data safety
 - Each instance persists its **full state** in two named volumes: `swXX_html`
-  (`/var/www/html` — Shopware code, config, installed plugin, uploaded media)
-  and `swXX_db` (`/var/lib/mysql`).
+  (`/var/www/html` — Shopware code, config, the Composer-installed plugin, and
+  uploaded media all live here) and `swXX_db` (`/var/lib/mysql`). There is no
+  separate media volume.
 - `bin/down.sh` stops containers but **keeps** volumes. `up.sh` again restores state.
 - Data is destroyed only by an explicit manual action:
   ```bash
@@ -31,7 +36,13 @@ bin/up.sh swXX && bin/provision.sh swXX && bin/deploy.sh
 ```
 
 ## Traefik dashboard
-Bound to `127.0.0.1:8080` on the box. View it via an SSH tunnel:
+Bound to `127.0.0.1:8080` on the box only (not reachable from the internet).
+View it via an SSH tunnel:
 ```bash
 ssh -L 8080:localhost:8080 twint-dev    # then open http://localhost:8080
 ```
+
+## See also
+- [deploy.md](deploy.md) — installing/updating the plugin
+- [troubleshooting.md](troubleshooting.md) — common failures
+- [architecture.md](architecture.md) — why the stack is shaped this way
