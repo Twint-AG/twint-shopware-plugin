@@ -24,14 +24,14 @@ services:
     container_name: sw65
     restart: unless-stopped
     environment:
-      - APP_URL=http://sw65.${DOMAIN_BASE}
+      - APP_URL=http://sw65-${DOMAIN_BASE}
       - XDEBUG_ENABLED=0
     volumes:
       - "sw65_html:/var/www/html"
       - "sw65_db:/var/lib/mysql"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.sw65.rule=Host(`sw65.${DOMAIN_BASE}`)"
+      - "traefik.http.routers.sw65.rule=Host(`sw65-${DOMAIN_BASE}`)"
       - "traefik.http.routers.sw65.entrypoints=web"
       - "traefik.http.services.sw65.loadbalancer.server.port=80"
     networks:
@@ -42,14 +42,14 @@ services:
     container_name: sw66
     restart: unless-stopped
     environment:
-      - APP_URL=http://sw66.${DOMAIN_BASE}
+      - APP_URL=http://sw66-${DOMAIN_BASE}
       - XDEBUG_ENABLED=0
     volumes:
       - "sw66_html:/var/www/html"
       - "sw66_db:/var/lib/mysql"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.sw66.rule=Host(`sw66.${DOMAIN_BASE}`)"
+      - "traefik.http.routers.sw66.rule=Host(`sw66-${DOMAIN_BASE}`)"
       - "traefik.http.routers.sw66.entrypoints=web"
       - "traefik.http.services.sw66.loadbalancer.server.port=80"
     networks:
@@ -60,14 +60,14 @@ services:
     container_name: sw67
     restart: unless-stopped
     environment:
-      - APP_URL=http://sw67.${DOMAIN_BASE}
+      - APP_URL=http://sw67-${DOMAIN_BASE}
       - XDEBUG_ENABLED=0
     volumes:
       - "sw67_html:/var/www/html"
       - "sw67_db:/var/lib/mysql"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.sw67.rule=Host(`sw67.${DOMAIN_BASE}`)"
+      - "traefik.http.routers.sw67.rule=Host(`sw67-${DOMAIN_BASE}`)"
       - "traefik.http.routers.sw67.entrypoints=web"
       - "traefik.http.services.sw67.loadbalancer.server.port=80"
     networks:
