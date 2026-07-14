@@ -78,7 +78,9 @@
   .env-tag.prod { color: var(--good); border-color: color-mix(in srgb, var(--good) 45%, var(--border)); }
   .name { font-size: 1.06rem; font-weight: 640; letter-spacing: -.01em; }
   .meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: -4px; }
-  .ver { font-family: var(--mono); font-size: .78rem; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+  .pill { display: inline-flex; align-items: baseline; gap: 5px; font-family: var(--mono); font-size: .72rem; color: var(--text-dim); background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 2px 7px; font-variant-numeric: tabular-nums; }
+  .pill b { color: var(--text-faint); font-weight: 600; font-family: var(--sans); font-size: .62rem; text-transform: uppercase; letter-spacing: .04em; }
+  .role { font-size: .6rem; font-weight: 650; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 3px 8px; }
   .host { font-family: var(--mono); font-size: .74rem; color: var(--text-faint); word-break: break-all; }
   .lock { font-size: .72rem; color: var(--text-faint); display: inline-flex; align-items: center; gap: 4px; }
   .actions { display: flex; gap: 8px; margin-top: auto; }
@@ -128,21 +130,36 @@
   // platform: "shopware" | "woocommerce" | "magento"
   // env: "dev" | "staging" | "prod"   ·   admin/note optional   ·   url "" = placeholder
   const ENVIRONMENTS = [
-    { name: "sw65", platform: "shopware", version: "6.5.8.17", env: "dev",
-      url: "https://sw65-twint.dev.nfq-asia.com", admin: "https://sw65-twint.dev.nfq-asia.com/admin", note: "basic auth" },
-    { name: "sw66", platform: "shopware", version: "6.6.7.0", env: "dev",
-      url: "https://sw66-twint.dev.nfq-asia.com", admin: "https://sw66-twint.dev.nfq-asia.com/admin", note: "basic auth" },
-    { name: "sw67", platform: "shopware", version: "6.7.2.2", env: "dev",
-      url: "https://sw67-twint.dev.nfq-asia.com", admin: "https://sw67-twint.dev.nfq-asia.com/admin", note: "basic auth" },
-    { name: "wc1", platform: "woocommerce", env: "dev", url: "https://wc1-twint.dev.nfq-asia.com", admin: "https://wc1-twint.dev.nfq-asia.com/wp-admin" },
-    { name: "wc2", platform: "woocommerce", env: "dev", url: "https://wc2-twint.dev.nfq-asia.com", admin: "https://wc2-twint.dev.nfq-asia.com/wp-admin" },
-    { name: "wc3", platform: "woocommerce", env: "dev", url: "https://wc3-twint.dev.nfq-asia.com", admin: "https://wc3-twint.dev.nfq-asia.com/wp-admin" },
+    { name: "sw65", platform: "shopware", env: "dev", note: "basic auth",
+      stack: [{ k: "Shopware", v: "6.5.8.17" }],
+      url: "https://sw65-twint.dev.nfq-asia.com", admin: "https://sw65-twint.dev.nfq-asia.com/admin" },
+    { name: "sw66", platform: "shopware", env: "dev", note: "basic auth",
+      stack: [{ k: "Shopware", v: "6.6.7.0" }],
+      url: "https://sw66-twint.dev.nfq-asia.com", admin: "https://sw66-twint.dev.nfq-asia.com/admin" },
+    { name: "sw67", platform: "shopware", env: "dev", note: "basic auth",
+      stack: [{ k: "Shopware", v: "6.7.2.2" }],
+      url: "https://sw67-twint.dev.nfq-asia.com", admin: "https://sw67-twint.dev.nfq-asia.com/admin" },
 
-    { name: "m245", platform: "magento", env: "dev", url: "https://m245-twint.dev.nfq-asia.com", admin: "https://m245-twint.dev.nfq-asia.com/admin" },
-    { name: "m246", platform: "magento", env: "dev", url: "https://m246-twint.dev.nfq-asia.com", admin: "https://m246-twint.dev.nfq-asia.com/admin" },
-    { name: "m247", platform: "magento", env: "dev", url: "https://m247-twint.dev.nfq-asia.com", admin: "https://m247-twint.dev.nfq-asia.com/admin" },
-    { name: "m248", platform: "magento", env: "dev", url: "https://m248-twint.dev.nfq-asia.com", admin: "https://m248-twint.dev.nfq-asia.com/admin" },
-    { name: "m249", platform: "magento", env: "dev", url: "https://m249-twint.dev.nfq-asia.com", admin: "https://m249-twint.dev.nfq-asia.com/admin" },
+    { name: "wc1", platform: "woocommerce", env: "dev", label: "oldest", note: "basic auth",
+      stack: [{ k: "WP", v: "5.9" }, { k: "PHP", v: "8.1" }, { k: "Woo", v: "6.0" }],
+      url: "https://wc1-twint.dev.nfq-asia.com", admin: "https://wc1-twint.dev.nfq-asia.com/wp-admin" },
+    { name: "wc2", platform: "woocommerce", env: "dev", label: "current", note: "basic auth",
+      stack: [{ k: "WP", v: "6.x" }, { k: "PHP", v: "8.3" }, { k: "Woo", v: "9.x" }],
+      url: "https://wc2-twint.dev.nfq-asia.com", admin: "https://wc2-twint.dev.nfq-asia.com/wp-admin" },
+    { name: "wc3", platform: "woocommerce", env: "dev", label: "latest", note: "basic auth",
+      stack: [{ k: "WP", v: "latest" }, { k: "PHP", v: "8.4" }, { k: "Woo", v: "latest" }],
+      url: "https://wc3-twint.dev.nfq-asia.com", admin: "https://wc3-twint.dev.nfq-asia.com/wp-admin" },
+
+    { name: "m245", platform: "magento", env: "dev", note: "basic auth", stack: [{ k: "Magento", v: "2.4.5" }, { k: "PHP", v: "8.1" }],
+      url: "https://m245-twint.dev.nfq-asia.com", admin: "https://m245-twint.dev.nfq-asia.com/admin" },
+    { name: "m246", platform: "magento", env: "dev", note: "basic auth", stack: [{ k: "Magento", v: "2.4.6" }, { k: "PHP", v: "8.2" }],
+      url: "https://m246-twint.dev.nfq-asia.com", admin: "https://m246-twint.dev.nfq-asia.com/admin" },
+    { name: "m247", platform: "magento", env: "dev", note: "basic auth", stack: [{ k: "Magento", v: "2.4.7" }, { k: "PHP", v: "8.3" }],
+      url: "https://m247-twint.dev.nfq-asia.com", admin: "https://m247-twint.dev.nfq-asia.com/admin" },
+    { name: "m248", platform: "magento", env: "dev", note: "basic auth", stack: [{ k: "Magento", v: "2.4.8" }, { k: "PHP", v: "8.4" }],
+      url: "https://m248-twint.dev.nfq-asia.com", admin: "https://m248-twint.dev.nfq-asia.com/admin" },
+    { name: "m249", platform: "magento", env: "dev", note: "basic auth", stack: [{ k: "Magento", v: "2.4.9" }, { k: "PHP", v: "8.4" }],
+      url: "https://m249-twint.dev.nfq-asia.com", admin: "https://m249-twint.dev.nfq-asia.com/admin" },
   ];
   // ────────────────────────────────────────────────────────────────────────────
 
@@ -177,7 +194,8 @@
         <div>
           <div class="name">${esc(e.name)}</div>
           <div class="meta">
-            ${e.version ? `<span class="ver">v${esc(e.version)}</span>` : ""}
+            ${e.label ? `<span class="role">${esc(e.label)}</span>` : ""}
+            ${(e.stack || (e.version ? [{ v: e.version }] : [])).map(s => `<span class="pill">${s.k ? `<b>${esc(s.k)}</b>` : ""}${esc(s.v)}</span>`).join("")}
             ${e.note ? `<span class="lock">🔒 ${esc(e.note)}</span>` : ""}
           </div>
           <div class="host">${esc(hostOf(e.url))}</div>
