@@ -1,32 +1,39 @@
 #!/usr/bin/env bash
-# Deploy a git ref of the TWINT plugin to ALL instances via Composer.
-# Usage: deploy.sh [branch|commit]   (ref defaults to master)
+# Deploy the TWINT plugin to ALL instances via Composer, at the ref that the
+# host clone is CURRENTLY checked out on. No ref argument — check out the branch
+# you want first, then run this. This makes it impossible to install a ref other
+# than what is checked out.
+#
+# Usage:
+#   git checkout <branch> && git pull      # pick what to deploy
+#   devbox/bin/deploy.sh
 set -euo pipefail
 SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Self-update: pull the latest devbox tooling from git before deploying, so the
-# host always runs the newest scripts. Runs once, then re-execs the fresh copy.
+# Self-update: pull the latest of the current branch, then re-exec the fresh copy
+# (so the host always runs the newest tooling for this branch). Runs once.
 # Skips gracefully if not in a git repo; opt out with DEVBOX_NO_SELF_UPDATE=1.
 if [ -z "${DEVBOX_SELF_UPDATED:-}" ] && [ -z "${DEVBOX_NO_SELF_UPDATE:-}" ] \
    && git -C "$SELF_DIR" rev-parse --git-dir >/dev/null 2>&1; then
   echo "==> updating devbox tooling (git pull --ff-only)"
   GIT_TERMINAL_PROMPT=0 git -C "$SELF_DIR" pull --ff-only \
-    || echo "WARNING: git pull failed; continuing with current scripts" >&2
+    || echo "WARNING: git pull failed; continuing with current checkout" >&2
   exec env DEVBOX_SELF_UPDATED=1 "$0" "$@"
 fi
 
 . "$SELF_DIR/_lib.sh"
 load_env
 
-REF="${1:-master}"
-
-# Per-deploy log: tee everything below to a timestamped file + the console, so
-# each deploy's full process is recorded. Logs live in devbox/logs/ (gitignored).
-LOG_DIR="$DEVBOX_DIR/logs"
-mkdir -p "$LOG_DIR"
-LOG_FILE="$LOG_DIR/deploy-$(date +%Y%m%d-%H%M%S)-${REF//\//-}.log"
-exec > >(tee -a "$LOG_FILE") 2>&1
-echo "==> deploy started $(date -Is) | ref=$REF | log=$LOG_FILE"
+# The branch the host clone is on IS what gets deployed. Composer installs the
+# matching dev-<branch> from GitLab, so checkout and install can never diverge.
+BRANCH="$(git -C "$SELF_DIR" rev-parse --abbrev-ref HEAD)"
+if [ "$BRANCH" = "HEAD" ]; then
+  REPO_ROOT="$(git -C "$SELF_DIR" rev-parse --show-toplevel)"
+  echo "ERROR: clone is in detached HEAD (no branch to deploy)." >&2
+  echo "       Check out a branch first:  git -C $REPO_ROOT checkout <branch>" >&2
+  exit 1
+fi
+CONSTRAINT="dev-${BRANCH}"
 
 PLUGIN="TwintPayment"
 PLUGIN_PACKAGE="twint-ag/twint-shopware-plugin"
@@ -40,28 +47,23 @@ norm_remote() {
   r="${r#https://}"; r="${r#http://}"; r="${r#git@}"; r="${r/://}"
   printf '%s' "$r"
 }
-
 GIT_NP="$(norm_remote "$GIT_REMOTE")"
 GITLAB_HOST="${GIT_NP%%/*}"            # e.g. git.nfq.asia
-VCS_URL="https://${GIT_NP}"            # e.g. https://git.nfq.asia/twint-ag/twint-shopware-plugin.git
+VCS_URL="https://${GIT_NP}"
 SDK_NP="$(norm_remote "$SDK_REMOTE")"
-SDK_HOST="${SDK_NP%%/*}"               # e.g. git.nfq.asia
-SDK_URL="https://${SDK_NP}"            # e.g. https://git.nfq.asia/twint-ag/sdk.git
+SDK_HOST="${SDK_NP%%/*}"
+SDK_URL="https://${SDK_NP}"
 
-# Map a friendly ref to a Composer constraint:
-#   7-40 hex chars -> treated as a commit: dev-master#<sha>
-#   anything else  -> treated as a branch: dev-<branch>
-composer_constraint() {
-  local ref="$1"
-  if printf '%s' "$ref" | grep -Eq '^[0-9a-f]{7,40}$'; then
-    echo "dev-master#${ref}"
-  else
-    echo "dev-${ref}"
-  fi
-}
+# Per-deploy log: tee everything below to a timestamped file + the console, so
+# each deploy's full process is recorded. Logs live in devbox/logs/ (gitignored).
+LOG_DIR="$DEVBOX_DIR/logs"
+mkdir -p "$LOG_DIR"
+LOG_FILE="$LOG_DIR/deploy-$(date +%Y%m%d-%H%M%S)-${BRANCH//\//-}.log"
+exec > >(tee -a "$LOG_FILE") 2>&1
+echo "==> deploy started $(date -Is) | branch=$BRANCH | constraint=$CONSTRAINT | log=$LOG_FILE"
 
 deploy_to() {
-  local inst="$1" constraint="$2"
+  local inst="$1"
 
   echo "==> [$inst] configuring Composer VCS repos + http-basic auth"
   # Self-hosted GitLab: plain VCS repo + http-basic (username + token) so Composer
@@ -73,8 +75,8 @@ deploy_to() {
   dc exec -T "$inst" composer config repositories.sdk vcs "$SDK_URL"
   dc exec -T "$inst" composer config --auth "http-basic.${SDK_HOST}" "$GITLAB_USERNAME" "$GITLAB_TOKEN"
 
-  echo "==> [$inst] composer require ${PLUGIN_PACKAGE}:${constraint}"
-  dc exec -T "$inst" composer require "${PLUGIN_PACKAGE}:${constraint}" \
+  echo "==> [$inst] composer require ${PLUGIN_PACKAGE}:${CONSTRAINT}"
+  dc exec -T "$inst" composer require "${PLUGIN_PACKAGE}:${CONSTRAINT}" \
     --no-interaction --no-progress --with-all-dependencies
 
   echo "==> [$inst] plugin refresh"
@@ -92,10 +94,9 @@ deploy_to() {
   dc exec -T "$inst" php bin/console cache:clear
 }
 
-CONSTRAINT="$(composer_constraint "$REF")"
 echo "==> deploying ${PLUGIN_PACKAGE}:${CONSTRAINT} to all instances"
 for inst in "${INSTANCES[@]}"; do
-  deploy_to "$inst" "$CONSTRAINT"
+  deploy_to "$inst"
   echo "==> [$inst] done"
 done
 echo "==> all instances on ${CONSTRAINT}"
