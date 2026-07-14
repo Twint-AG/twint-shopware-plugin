@@ -19,9 +19,9 @@
 - v1 is **HTTP only** on `:80`. No TLS, no `:443` (Route53 + Let's Encrypt is a documented later step, not built here).
 - Persistence: per-instance named volumes `swXX_html` → `/var/www/html` (full Shopware filesystem, so all config/state/media survive recreates) and `swXX_db` → `/var/lib/mysql`. Media (`public/media`) lives inside the html volume — no separate media volume.
 - **Volume-seeding caveat:** a named volume seeds from the image only on first creation. Once `swXX_html` exists, bumping `SWXX_IMAGE` will NOT upgrade that instance's Shopware code — you must remove the instance's volumes to re-seed. Documented in operations/troubleshooting.
-- Plugin delivery is **Composer VCS require**, run inside each container — no host checkout, no bind-mount, no copy. `deploy.sh` registers the GitLab repo as a Composer VCS repository and runs `composer require twint-ag/twint-shopware-plugin:<constraint>` per instance, so each instance resolves the plugin and its deps (`twint-ag/sdk`, `chillerlan/php-qrcode`) into its own `vendor/` for its own PHP version. All instances run the **same** deployed ref.
+- Plugin delivery is **Composer VCS require**, run inside each container — no host checkout, no bind-mount, no copy. `deploy.sh` registers TWO Composer VCS repositories — the plugin (`GIT_REMOTE`) and its private dependency `twint-ag/sdk` (`SDK_REMOTE`) — then runs `composer require twint-ag/twint-shopware-plugin:<constraint>` per instance, so each instance resolves the plugin and its deps (`twint-ag/sdk` private VCS, `chillerlan/php-qrcode` public) into its own `vendor/` for its own PHP version. All instances run the **same** deployed ref.
 - `deploy.sh` signature is `deploy.sh [ref]` (ref defaults to `master`): maps the ref to a Composer constraint (branch `x` → `dev-x`; 7–40-hex commit `<sha>` → `dev-master#<sha>`) and runs composer require + Shopware install/build on every instance.
-- GitLab auth for Composer: `deploy.sh` runs `composer config --auth gitlab-token.<host> $GITLAB_TOKEN` inside each container (persists in that instance's `auth.json` within the html volume). `<host>` = `GIT_REMOTE` up to the first `/`; the VCS repo URL = `https://$GIT_REMOTE`.
+- GitLab auth for Composer: `deploy.sh` runs `composer config --auth gitlab-token.<host> $GITLAB_TOKEN` for BOTH the plugin host (`GIT_REMOTE` up to first `/`) and the SDK host (`SDK_REMOTE` up to first `/`) inside each container (persists in that instance's `auth.json` within the html volume). VCS URLs = `https://$GIT_REMOTE` and `https://$SDK_REMOTE`. The single `GITLAB_TOKEN` must have access to both repos. `SDK_REMOTE` is required — `deploy.sh` fails fast if unset.
 - `down` must never pass `-v` — volumes (data) survive `down`. Data removal is always an explicit manual action.
 - `GITLAB_TOKEN` must never be committed and must not be left in any checkout's `.git/config` after a deploy completes.
 - `devbox/` is internal tooling: it stays `export-ignore` in `.gitattributes` and in `sync.sh`'s `EXCLUDE_PATHS`, so it never reaches the public GitHub mirror.
@@ -97,7 +97,7 @@ git commit -m "chore(sync): exclude devbox/ + infra/ from public GitHub mirror"
 - Create: `devbox/.env.example`
 
 **Interfaces:**
-- Produces: the env variables every script and `compose.yaml` consume — `DOMAIN_BASE`, `GIT_REMOTE`, `GITLAB_TOKEN`, `SW65_IMAGE`, `SW66_IMAGE`, `SW67_IMAGE`.
+- Produces: the env variables every script and `compose.yaml` consume — `DOMAIN_BASE`, `GIT_REMOTE`, `SDK_REMOTE`, `GITLAB_TOKEN`, `SW65_IMAGE`, `SW66_IMAGE`, `SW67_IMAGE`.
 
 - [ ] **Step 1: Create `devbox/.gitignore`**
 
@@ -121,8 +121,11 @@ DOMAIN_BASE=twint-dev
 
 # GitLab plugin repo as host+path WITHOUT scheme.
 #   deploy.sh registers it as a Composer VCS repo and derives the GitLab host.
-#   TODO: replace with the real GitLab host/path.
-GIT_REMOTE=gitlab.example.com/twint-ag/twint-shopware-plugin.git
+GIT_REMOTE=git.nfq.asia/twint-ag/twint-shopware-plugin.git
+
+# Private VCS dependency of the plugin (twint-ag/sdk), host+path WITHOUT scheme.
+#   Registered as a second Composer VCS repo; uses the same GITLAB_TOKEN. Required.
+SDK_REMOTE=git.nfq.asia/twint-ag/sdk.git
 
 # GitLab read token (deploy token or PAT with read_repository scope).
 #   Keep secret. .env is gitignored; never commit a real value.
@@ -536,7 +539,7 @@ git commit -m "feat(devbox): up/down lifecycle scripts"
 - Create: `devbox/bin/deploy.sh`
 
 **Interfaces:**
-- Consumes: `_lib.sh` (`load_env`, `INSTANCES`, `dc`), and `.env` (`GIT_REMOTE`, `GITLAB_TOKEN`).
+- Consumes: `_lib.sh` (`load_env`, `INSTANCES`, `dc`), and `.env` (`GIT_REMOTE`, `SDK_REMOTE`, `GITLAB_TOKEN`).
 - `deploy.sh [ref]`, `ref` defaults to `master`. Maps the ref to a Composer constraint, then for EVERY instance: configures the GitLab VCS repo + token, `composer require`s the plugin, and runs the Shopware install/build sequence. No host checkout; no per-instance target (all instances get the same ref).
 
 - [ ] **Step 1: Create `devbox/bin/deploy.sh`**
@@ -552,8 +555,13 @@ load_env
 REF="${1:-master}"
 PLUGIN="TwintPayment"
 PLUGIN_PACKAGE="twint-ag/twint-shopware-plugin"
-GITLAB_HOST="${GIT_REMOTE%%/*}"        # e.g. gitlab.example.com
-VCS_URL="https://${GIT_REMOTE}"        # e.g. https://gitlab.example.com/twint-ag/twint-shopware-plugin.git
+GITLAB_HOST="${GIT_REMOTE%%/*}"        # e.g. git.nfq.asia
+VCS_URL="https://${GIT_REMOTE}"        # e.g. https://git.nfq.asia/twint-ag/twint-shopware-plugin.git
+
+# Private VCS dependency of the plugin (twint-ag/sdk). Same GitLab access/token.
+SDK_REMOTE="${SDK_REMOTE:?SDK_REMOTE not set in .env (host+path of the private twint-ag/sdk repo)}"
+SDK_HOST="${SDK_REMOTE%%/*}"           # e.g. git.nfq.asia
+SDK_URL="https://${SDK_REMOTE}"        # e.g. https://git.nfq.asia/twint-ag/sdk.git
 
 # Map a friendly ref to a Composer constraint:
 #   7-40 hex chars -> treated as a commit: dev-master#<sha>
@@ -575,6 +583,10 @@ deploy_to() {
   # --auth writes to the project auth.json (persisted in the html volume); the
   # token value is passed as an argument, not echoed by this script.
   dc exec -T "$inst" composer config --auth "gitlab-token.${GITLAB_HOST}" "$GITLAB_TOKEN"
+
+  # Register the plugin's private VCS dependency so Composer can resolve it.
+  dc exec -T "$inst" composer config repositories.sdk vcs "$SDK_URL"
+  dc exec -T "$inst" composer config --auth "gitlab-token.${SDK_HOST}" "$GITLAB_TOKEN"
 
   echo "==> [$inst] composer require ${PLUGIN_PACKAGE}:${constraint}"
   dc exec -T "$inst" composer require "${PLUGIN_PACKAGE}:${constraint}" \
