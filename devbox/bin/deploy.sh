@@ -19,6 +19,15 @@ fi
 load_env
 
 REF="${1:-master}"
+
+# Per-deploy log: tee everything below to a timestamped file + the console, so
+# each deploy's full process is recorded. Logs live in devbox/logs/ (gitignored).
+LOG_DIR="$DEVBOX_DIR/logs"
+mkdir -p "$LOG_DIR"
+LOG_FILE="$LOG_DIR/deploy-$(date +%Y%m%d-%H%M%S)-${REF//\//-}.log"
+exec > >(tee -a "$LOG_FILE") 2>&1
+echo "==> deploy started $(date -Is) | ref=$REF | log=$LOG_FILE"
+
 PLUGIN="TwintPayment"
 PLUGIN_PACKAGE="twint-ag/twint-shopware-plugin"
 GITLAB_USERNAME="${GITLAB_USERNAME:?GITLAB_USERNAME not set in .env}"
@@ -90,3 +99,4 @@ for inst in "${INSTANCES[@]}"; do
   echo "==> [$inst] done"
 done
 echo "==> all instances on ${CONSTRAINT}"
+echo "==> deploy finished $(date -Is) | log=$LOG_FILE"

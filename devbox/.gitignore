@@ -1,2 +1,3 @@
 # Host-specific — never commit
 /.env
+/logs/
