@@ -84,8 +84,8 @@ deploy_to() {
   # Set this instance's APP_URL to its hostname (dockware bakes http://localhost).
   # Symfony reads APP_URL from the OS env (set in compose), but keep the container
   # .env file consistent so anything reading it directly sees the correct URL.
-  echo "==> [$inst] setting APP_URL=http://${inst}-${DOMAIN_BASE}"
-  dc exec -T "$inst" bash -lc "sed -i 's#^APP_URL=.*#APP_URL=http://${inst}-${DOMAIN_BASE}#' /var/www/html/.env"
+  echo "==> [$inst] setting APP_URL=https://${inst}-${DOMAIN_BASE}"
+  dc exec -T "$inst" bash -lc "sed -i 's#^APP_URL=.*#APP_URL=https://${inst}-${DOMAIN_BASE}#' /var/www/html/.env"
 
   echo "==> [$inst] configuring Composer VCS repos + http-basic auth"
   # Self-hosted GitLab: plain VCS repo + http-basic (username + token) so Composer
