@@ -5,6 +5,10 @@ services:
     image: traefik:v3.1
     container_name: devbox_proxy
     restart: unless-stopped
+    # Docker Engine 29+ rejects API < 1.40; Traefik v3.1's client defaults to 1.24.
+    # Pin a supported version so the Docker provider can read container labels.
+    environment:
+      - DOCKER_API_VERSION=1.44
     command:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
