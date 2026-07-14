@@ -28,7 +28,7 @@ services:
       - XDEBUG_ENABLED=0
     volumes:
       - "sw65_html:/var/www/html"
-      - "./src/sw65:/var/www/html/custom/plugins/TwintPayment:rw"
+      - "./src:/var/www/html/custom/plugins/TwintPayment:rw"
       - "sw65_db:/var/lib/mysql"
     labels:
       - "traefik.enable=true"
@@ -47,7 +47,7 @@ services:
       - XDEBUG_ENABLED=0
     volumes:
       - "sw66_html:/var/www/html"
-      - "./src/sw66:/var/www/html/custom/plugins/TwintPayment:rw"
+      - "./src:/var/www/html/custom/plugins/TwintPayment:rw"
       - "sw66_db:/var/lib/mysql"
     labels:
       - "traefik.enable=true"
@@ -66,7 +66,7 @@ services:
       - XDEBUG_ENABLED=0
     volumes:
       - "sw67_html:/var/www/html"
-      - "./src/sw67:/var/www/html/custom/plugins/TwintPayment:rw"
+      - "./src:/var/www/html/custom/plugins/TwintPayment:rw"
       - "sw67_db:/var/lib/mysql"
     labels:
       - "traefik.enable=true"
