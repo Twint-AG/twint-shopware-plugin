@@ -20,8 +20,7 @@ ssh-keyscan "${RELEASE_HOST}" >> ~/.ssh/known_hosts
 
 # Remove the excluded paths from the index. --ignore-unmatch keeps this a no-op
 # for paths that don't exist at this commit, so the script never fails on them.
-git -c user.name="${RELEASE_BOT_NAME}" -c user.email="${RELEASE_BOT_EMAIL}" \
-    rm -r --cached --quiet --ignore-unmatch "${EXCLUDE_PATHS[@]}"
+git rm -r --cached --quiet --ignore-unmatch "${EXCLUDE_PATHS[@]}"
 
 # Record the removal as a scrub commit on top of the release commit. Skip the
 # commit when nothing was staged (excluded paths absent), leaving HEAD as-is.
@@ -33,7 +32,8 @@ fi
 
 # Point the release tag at the scrubbed commit so the published tag matches the
 # 'latest' branch. This only affects the GitHub mirror; the origin tag is untouched.
-git tag -f -a "${CI_COMMIT_TAG}" -m "release ${CI_COMMIT_TAG}" --no-sign
+git -c user.name="${RELEASE_BOT_NAME}" -c user.email="${RELEASE_BOT_EMAIL}" \
+    tag -f -a "${CI_COMMIT_TAG}" -m "release ${CI_COMMIT_TAG}" --no-sign
 
 GIT_SSH_COMMAND="ssh -i ${TWINT_GITHUB_DEPLOY_KEY}" \
   git push --force "${RELEASE_REPOSITORY}" \
