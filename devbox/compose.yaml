@@ -40,6 +40,12 @@ services:
       - "traefik.http.services.sw65.loadbalancer.server.port=80"
       - "traefik.http.middlewares.devbox-auth.basicauth.usersfile=/etc/traefik/auth/htpasswd"
       - "traefik.http.routers.sw65.middlewares=devbox-auth"
+      # /api (JWT) and /store-api (access-key) authenticate themselves — bypass
+      # basic auth via a higher-priority router (same backend, no middleware).
+      - "traefik.http.routers.sw65-api.rule=Host(`sw65-${DOMAIN_BASE}`) && (PathPrefix(`/api`) || PathPrefix(`/store-api`))"
+      - "traefik.http.routers.sw65-api.entrypoints=web"
+      - "traefik.http.routers.sw65-api.service=sw65"
+      - "traefik.http.routers.sw65-api.priority=100"
     networks:
       - web
 
@@ -60,6 +66,12 @@ services:
       - "traefik.http.services.sw66.loadbalancer.server.port=80"
       - "traefik.http.middlewares.devbox-auth.basicauth.usersfile=/etc/traefik/auth/htpasswd"
       - "traefik.http.routers.sw66.middlewares=devbox-auth"
+      # /api (JWT) and /store-api (access-key) authenticate themselves — bypass
+      # basic auth via a higher-priority router (same backend, no middleware).
+      - "traefik.http.routers.sw66-api.rule=Host(`sw66-${DOMAIN_BASE}`) && (PathPrefix(`/api`) || PathPrefix(`/store-api`))"
+      - "traefik.http.routers.sw66-api.entrypoints=web"
+      - "traefik.http.routers.sw66-api.service=sw66"
+      - "traefik.http.routers.sw66-api.priority=100"
     networks:
       - web
 
@@ -80,6 +92,12 @@ services:
       - "traefik.http.services.sw67.loadbalancer.server.port=80"
       - "traefik.http.middlewares.devbox-auth.basicauth.usersfile=/etc/traefik/auth/htpasswd"
       - "traefik.http.routers.sw67.middlewares=devbox-auth"
+      # /api (JWT) and /store-api (access-key) authenticate themselves — bypass
+      # basic auth via a higher-priority router (same backend, no middleware).
+      - "traefik.http.routers.sw67-api.rule=Host(`sw67-${DOMAIN_BASE}`) && (PathPrefix(`/api`) || PathPrefix(`/store-api`))"
+      - "traefik.http.routers.sw67-api.entrypoints=web"
+      - "traefik.http.routers.sw67-api.service=sw67"
+      - "traefik.http.routers.sw67-api.priority=100"
     networks:
       - web
 
