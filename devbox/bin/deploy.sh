@@ -81,6 +81,12 @@ echo "==> deploy started $(date -Is) | branch=$BRANCH | constraint=$CONSTRAINT |
 deploy_to() {
   local inst="$1"
 
+  # Set this instance's APP_URL to its hostname (dockware bakes http://localhost).
+  # Symfony reads APP_URL from the OS env (set in compose), but keep the container
+  # .env file consistent so anything reading it directly sees the correct URL.
+  echo "==> [$inst] setting APP_URL=http://${inst}-${DOMAIN_BASE}"
+  dc exec -T "$inst" bash -lc "sed -i 's#^APP_URL=.*#APP_URL=http://${inst}-${DOMAIN_BASE}#' /var/www/html/.env"
+
   echo "==> [$inst] configuring Composer VCS repos + http-basic auth"
   # Self-hosted GitLab: plain VCS repo + http-basic (username + token) so Composer
   # resolves via git over HTTPS (read_repository), no API scope needed. --auth
@@ -129,6 +135,11 @@ deploy_to() {
     dc exec -T "$inst" php bin/console plugin:update "$PLUGIN"
   fi
 
+  # dockware 6.5.x build-administration.sh installs admin deps with --production,
+  # which omits the devDependencies the webpack build needs (patch-package,
+  # ts-morph, webpack plugins) -> build fails. Drop --production so it installs
+  # full deps. Harmless no-op on images whose scripts don't use --production.
+  dc exec -T "$inst" bash -lc "sed -i 's/npm install --prefer-offline --production/npm install --prefer-offline/g' bin/build-administration.sh bin/build-storefront.sh"
   echo "==> [$inst] build administration + storefront"
   dc exec -T "$inst" bash -lc 'bin/build-administration.sh && bin/build-storefront.sh'
 
