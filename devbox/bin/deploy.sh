@@ -2,7 +2,20 @@
 # Deploy a git ref of the TWINT plugin to ALL instances via Composer.
 # Usage: deploy.sh [branch|commit]   (ref defaults to master)
 set -euo pipefail
-. "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
+SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Self-update: pull the latest devbox tooling from git before deploying, so the
+# host always runs the newest scripts. Runs once, then re-execs the fresh copy.
+# Skips gracefully if not in a git repo; opt out with DEVBOX_NO_SELF_UPDATE=1.
+if [ -z "${DEVBOX_SELF_UPDATED:-}" ] && [ -z "${DEVBOX_NO_SELF_UPDATE:-}" ] \
+   && git -C "$SELF_DIR" rev-parse --git-dir >/dev/null 2>&1; then
+  echo "==> updating devbox tooling (git pull --ff-only)"
+  GIT_TERMINAL_PROMPT=0 git -C "$SELF_DIR" pull --ff-only \
+    || echo "WARNING: git pull failed; continuing with current scripts" >&2
+  exec env DEVBOX_SELF_UPDATED=1 "$0" "$@"
+fi
+
+. "$SELF_DIR/_lib.sh"
 load_env
 
 REF="${1:-master}"
