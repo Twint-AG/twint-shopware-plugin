@@ -31,19 +31,23 @@ is_instance() {
   return 1
 }
 
-# Expand a target ("all" or a single instance) to a newline list of instances.
+# Validate a target ("all" or one instance) and populate the RESOLVED_TARGETS
+# array in the CALLER's shell. Exits non-zero on invalid/missing input.
+# Call it directly (`resolve_targets "$x"`), then read "${RESOLVED_TARGETS[@]}".
+# Do NOT wrap it in $(...) or <(...) — a subshell would swallow the exit.
 resolve_targets() {
   local target="${1:-}"
+  RESOLVED_TARGETS=()
   if [ -z "$target" ]; then
     echo "ERROR: missing instance (one of: ${INSTANCES[*]} all)" >&2
     exit 1
   fi
   if [ "$target" = "all" ]; then
-    printf '%s\n' "${INSTANCES[@]}"
+    RESOLVED_TARGETS=("${INSTANCES[@]}")
     return 0
   fi
   if is_instance "$target"; then
-    echo "$target"
+    RESOLVED_TARGETS=("$target")
     return 0
   fi
   echo "ERROR: unknown instance '$target' (expected: ${INSTANCES[*]} all)" >&2
