@@ -8,13 +8,23 @@ load_env
 REF="${1:-master}"
 PLUGIN="TwintPayment"
 PLUGIN_PACKAGE="twint-ag/twint-shopware-plugin"
-GITLAB_HOST="${GIT_REMOTE%%/*}"        # e.g. git.nfq.asia
-VCS_URL="https://${GIT_REMOTE}"        # e.g. https://git.nfq.asia/twint-ag/twint-shopware-plugin.git
-
-# Private VCS dependency of the plugin (twint-ag/sdk). Same GitLab access/token.
+GITLAB_USERNAME="${GITLAB_USERNAME:?GITLAB_USERNAME not set in .env}"
 SDK_REMOTE="${SDK_REMOTE:?SDK_REMOTE not set in .env (host+path of the private twint-ag/sdk repo)}"
-SDK_HOST="${SDK_REMOTE%%/*}"           # e.g. git.nfq.asia
-SDK_URL="https://${SDK_REMOTE}"        # e.g. https://git.nfq.asia/twint-ag/sdk.git
+
+# Normalize a remote to scheme-less host/path. Accepts any of:
+#   git@host:group/repo.git (SSH)   host/group/repo.git   https://host/group/repo.git
+norm_remote() {
+  local r="$1"
+  r="${r#https://}"; r="${r#http://}"; r="${r#git@}"; r="${r/://}"
+  printf '%s' "$r"
+}
+
+GIT_NP="$(norm_remote "$GIT_REMOTE")"
+GITLAB_HOST="${GIT_NP%%/*}"            # e.g. git.nfq.asia
+VCS_URL="https://${GIT_NP}"            # e.g. https://git.nfq.asia/twint-ag/twint-shopware-plugin.git
+SDK_NP="$(norm_remote "$SDK_REMOTE")"
+SDK_HOST="${SDK_NP%%/*}"               # e.g. git.nfq.asia
+SDK_URL="https://${SDK_NP}"            # e.g. https://git.nfq.asia/twint-ag/sdk.git
 
 # Map a friendly ref to a Composer constraint:
 #   7-40 hex chars -> treated as a commit: dev-master#<sha>
@@ -31,22 +41,15 @@ composer_constraint() {
 deploy_to() {
   local inst="$1" constraint="$2"
 
-  echo "==> [$inst] configuring Composer GitLab domains + repos + token"
-  # Composer only applies gitlab-token / the GitLab driver to hosts listed in
-  # gitlab-domains (default: gitlab.com). Register the self-hosted host(s).
-  if [ "$SDK_HOST" = "$GITLAB_HOST" ]; then
-    dc exec -T "$inst" composer config gitlab-domains "$GITLAB_HOST"
-  else
-    dc exec -T "$inst" composer config gitlab-domains "$GITLAB_HOST" "$SDK_HOST"
-  fi
+  echo "==> [$inst] configuring Composer VCS repos + http-basic auth"
+  # Self-hosted GitLab: plain VCS repo + http-basic (username + token) so Composer
+  # resolves via git over HTTPS (read_repository), no API scope needed. --auth
+  # writes to the project auth.json (in the html volume); the token is passed as
+  # an argument, never echoed by this script.
   dc exec -T "$inst" composer config repositories.twint vcs "$VCS_URL"
-  # --auth writes to the project auth.json (persisted in the html volume); the
-  # token value is passed as an argument, not echoed by this script.
-  dc exec -T "$inst" composer config --auth "gitlab-token.${GITLAB_HOST}" "$GITLAB_TOKEN"
-
-  # Register the plugin's private VCS dependency so Composer can resolve it.
+  dc exec -T "$inst" composer config --auth "http-basic.${GITLAB_HOST}" "$GITLAB_USERNAME" "$GITLAB_TOKEN"
   dc exec -T "$inst" composer config repositories.sdk vcs "$SDK_URL"
-  dc exec -T "$inst" composer config --auth "gitlab-token.${SDK_HOST}" "$GITLAB_TOKEN"
+  dc exec -T "$inst" composer config --auth "http-basic.${SDK_HOST}" "$GITLAB_USERNAME" "$GITLAB_TOKEN"
 
   echo "==> [$inst] composer require ${PLUGIN_PACKAGE}:${constraint}"
   dc exec -T "$inst" composer require "${PLUGIN_PACKAGE}:${constraint}" \
