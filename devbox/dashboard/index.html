@@ -134,9 +134,15 @@
       url: "https://sw66-twint.dev.nfq-asia.com", admin: "https://sw66-twint.dev.nfq-asia.com/admin", note: "basic auth" },
     { name: "sw67", platform: "shopware", version: "6.7.2.2", env: "dev",
       url: "https://sw67-twint.dev.nfq-asia.com", admin: "https://sw67-twint.dev.nfq-asia.com/admin", note: "basic auth" },
-    // ── add the remaining environments below (name · platform · env · url [· admin] [· version] [· note]) ──
-    // { name: "woo-dev",     platform: "woocommerce", version: "8.x", env: "dev",     url: "https://…", admin: "https://…/wp-admin" },
-    // { name: "magento-dev", platform: "magento",     version: "2.4", env: "dev",     url: "https://…", admin: "https://…/admin" },
+    { name: "wc1", platform: "woocommerce", env: "dev", url: "https://wc1-twint.dev.nfq-asia.com", admin: "https://wc1-twint.dev.nfq-asia.com/wp-admin" },
+    { name: "wc2", platform: "woocommerce", env: "dev", url: "https://wc2-twint.dev.nfq-asia.com", admin: "https://wc2-twint.dev.nfq-asia.com/wp-admin" },
+    { name: "wc3", platform: "woocommerce", env: "dev", url: "https://wc3-twint.dev.nfq-asia.com", admin: "https://wc3-twint.dev.nfq-asia.com/wp-admin" },
+
+    { name: "m245", platform: "magento", env: "dev", url: "https://m245-twint.dev.nfq-asia.com", admin: "https://m245-twint.dev.nfq-asia.com/admin" },
+    { name: "m246", platform: "magento", env: "dev", url: "https://m246-twint.dev.nfq-asia.com", admin: "https://m246-twint.dev.nfq-asia.com/admin" },
+    { name: "m247", platform: "magento", env: "dev", url: "https://m247-twint.dev.nfq-asia.com", admin: "https://m247-twint.dev.nfq-asia.com/admin" },
+    { name: "m248", platform: "magento", env: "dev", url: "https://m248-twint.dev.nfq-asia.com", admin: "https://m248-twint.dev.nfq-asia.com/admin" },
+    { name: "m249", platform: "magento", env: "dev", url: "https://m249-twint.dev.nfq-asia.com", admin: "https://m249-twint.dev.nfq-asia.com/admin" },
   ];
   // ────────────────────────────────────────────────────────────────────────────
 
@@ -214,7 +220,7 @@
 
   function buildFilters() {
     const total = ENVIRONMENTS.filter(e => e.url).length;
-    document.getElementById("totalCount").textContent = 12;
+    document.getElementById("totalCount").textContent = total;
     const counts = { all: total };
     PLATFORMS.forEach(p => counts[p.id] = ENVIRONMENTS.filter(e => e.url && e.platform === p.id).length);
     const chips = [{ id: "all", label: "All" }, ...PLATFORMS];
