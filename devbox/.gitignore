@@ -1,0 +1,3 @@
+# Host-specific, deploy-managed — never commit
+/.env
+/src/
