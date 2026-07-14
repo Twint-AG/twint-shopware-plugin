@@ -127,13 +127,20 @@ deploy_to() {
     fi
   '
 
-  echo "==> [$inst] plugin refresh"
-  dc exec -T "$inst" php bin/console plugin:refresh
+  # Clear cache first so Shopware sees the freshly-installed plugin code/version
+  # (otherwise the version relabel below can lag a deploy behind).
+  echo "==> [$inst] clear cache (pick up new plugin version)"
+  dc exec -T "$inst" php bin/console cache:clear -q || true
 
-  echo "==> [$inst] install/activate (or update if already installed)"
-  if ! dc exec -T "$inst" php bin/console plugin:install --activate "$PLUGIN"; then
-    dc exec -T "$inst" php bin/console plugin:update "$PLUGIN"
-  fi
+  # Reconcile plugin state idempotently: install+activate if new; always update
+  # (relabels version to the deployed ref + runs migrations); ensure active.
+  # || true absorbs benign "already installed/active" notices — real failures
+  # still show in the deploy log.
+  echo "==> [$inst] refresh + install + update + activate"
+  dc exec -T "$inst" php bin/console plugin:refresh
+  dc exec -T "$inst" php bin/console plugin:install --activate "$PLUGIN" || true
+  dc exec -T "$inst" php bin/console plugin:update "$PLUGIN" || true
+  dc exec -T "$inst" php bin/console plugin:activate "$PLUGIN" || true
 
   # dockware 6.5.x build-administration.sh installs admin deps with --production,
   # which omits the devDependencies the webpack build needs (patch-package,
