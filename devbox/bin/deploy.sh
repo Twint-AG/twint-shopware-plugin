@@ -31,7 +31,14 @@ composer_constraint() {
 deploy_to() {
   local inst="$1" constraint="$2"
 
-  echo "==> [$inst] configuring Composer GitLab repo + token"
+  echo "==> [$inst] configuring Composer GitLab domains + repos + token"
+  # Composer only applies gitlab-token / the GitLab driver to hosts listed in
+  # gitlab-domains (default: gitlab.com). Register the self-hosted host(s).
+  if [ "$SDK_HOST" = "$GITLAB_HOST" ]; then
+    dc exec -T "$inst" composer config gitlab-domains "$GITLAB_HOST"
+  else
+    dc exec -T "$inst" composer config gitlab-domains "$GITLAB_HOST" "$SDK_HOST"
+  fi
   dc exec -T "$inst" composer config repositories.twint vcs "$VCS_URL"
   # --auth writes to the project auth.json (persisted in the html volume); the
   # token value is passed as an argument, not echoed by this script.

@@ -13,7 +13,7 @@ branch/commit of the plugin — via Composer — onto all three instances.
 ```bash
 # on twint-dev (fresh host), once:
 bin/bootstrap.sh                 # install Docker + compose + git, then re-login
-cp .env.example .env             # set DOMAIN_BASE, GIT_REMOTE, GITLAB_TOKEN
+cp .env.example .env             # set DOMAIN_BASE, GIT_REMOTE, SDK_REMOTE, GITLAB_TOKEN
 bin/up.sh                        # start traefik + all three instances
 bin/provision.sh all             # set sales-channel domains
 bin/deploy.sh master             # composer-install the plugin on all three

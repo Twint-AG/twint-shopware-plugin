@@ -27,7 +27,7 @@ Set:
 ## 3. Start + provision + deploy
 ```bash
 bin/up.sh                # traefik + sw65 + sw66 + sw67
-bin/provision.sh all     # sales-channel domains -> swXX.$DOMAIN_BASE
+bin/provision.sh all     # sales-channel domains -> swXX-$DOMAIN_BASE
 bin/deploy.sh master     # composer require + install/activate + build on all instances
 ```
 
