@@ -1,9 +1,9 @@
 # Architecture
 
 ```
-                          ┌─ Host(sw65.$DOMAIN_BASE) → sw65 :80  (dockware 6.5.8.0)
-Browser ─:80→ Traefik ────┼─ Host(sw66.$DOMAIN_BASE) → sw66 :80  (dockware 6.6.7.0)
-                          └─ Host(sw67.$DOMAIN_BASE) → sw67 :80  (dockware 6.7.2.2)
+                          ┌─ Host(sw65-$DOMAIN_BASE) → sw65 :80  (dockware 6.5.8.0)
+Browser ─:80→ Traefik ────┼─ Host(sw66-$DOMAIN_BASE) → sw66 :80  (dockware 6.6.7.0)
+                          └─ Host(sw67-$DOMAIN_BASE) → sw67 :80  (dockware 6.7.2.2)
 ```
 
 ## Why these choices
