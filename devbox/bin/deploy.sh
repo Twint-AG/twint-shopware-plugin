@@ -105,6 +105,22 @@ deploy_to() {
   dc exec -T "$inst" composer update "${PLUGIN_PACKAGE}" \
     --prefer-dist --with-all-dependencies --no-interaction --no-progress
 
+  # With a read_repository-only token there is no GitLab API dist, so composer
+  # clones the whole repo into vendor, ignoring .gitattributes export-ignore.
+  # Trim the installed copy to match export-ignore (+ drop .git) so the vendor
+  # plugin does not recursively carry devbox/infra/tests/etc.
+  echo "==> [$inst] trimming vendor plugin to export-ignore (no recursive devbox/infra)"
+  dc exec -T "$inst" bash -lc '
+    p=/var/www/html/vendor/twint-ag/twint-shopware-plugin
+    cd "$p" || exit 0
+    rm -rf .git
+    if [ -f .gitattributes ]; then
+      while read -r path rest; do
+        case "$rest" in *export-ignore*) rm -rf $path ;; esac
+      done < .gitattributes
+    fi
+  '
+
   echo "==> [$inst] plugin refresh"
   dc exec -T "$inst" php bin/console plugin:refresh
 
