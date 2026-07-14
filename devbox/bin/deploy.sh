@@ -8,8 +8,13 @@ load_env
 REF="${1:-master}"
 PLUGIN="TwintPayment"
 PLUGIN_PACKAGE="twint-ag/twint-shopware-plugin"
-GITLAB_HOST="${GIT_REMOTE%%/*}"        # e.g. gitlab.example.com
-VCS_URL="https://${GIT_REMOTE}"        # e.g. https://gitlab.example.com/twint-ag/twint-shopware-plugin.git
+GITLAB_HOST="${GIT_REMOTE%%/*}"        # e.g. git.nfq.asia
+VCS_URL="https://${GIT_REMOTE}"        # e.g. https://git.nfq.asia/twint-ag/twint-shopware-plugin.git
+
+# Private VCS dependency of the plugin (twint-ag/sdk). Same GitLab access/token.
+SDK_REMOTE="${SDK_REMOTE:?SDK_REMOTE not set in .env (host+path of the private twint-ag/sdk repo)}"
+SDK_HOST="${SDK_REMOTE%%/*}"           # e.g. git.nfq.asia
+SDK_URL="https://${SDK_REMOTE}"        # e.g. https://git.nfq.asia/twint-ag/sdk.git
 
 # Map a friendly ref to a Composer constraint:
 #   7-40 hex chars -> treated as a commit: dev-master#<sha>
@@ -31,6 +36,10 @@ deploy_to() {
   # --auth writes to the project auth.json (persisted in the html volume); the
   # token value is passed as an argument, not echoed by this script.
   dc exec -T "$inst" composer config --auth "gitlab-token.${GITLAB_HOST}" "$GITLAB_TOKEN"
+
+  # Register the plugin's private VCS dependency so Composer can resolve it.
+  dc exec -T "$inst" composer config repositories.sdk vcs "$SDK_URL"
+  dc exec -T "$inst" composer config --auth "gitlab-token.${SDK_HOST}" "$GITLAB_TOKEN"
 
   echo "==> [$inst] composer require ${PLUGIN_PACKAGE}:${constraint}"
   dc exec -T "$inst" composer require "${PLUGIN_PACKAGE}:${constraint}" \
