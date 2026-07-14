@@ -54,12 +54,7 @@ resolve_targets() {
   exit 1
 }
 
-# Authenticated GitLab URL. Never echo this to logs.
-git_remote_url() {
-  printf 'https://oauth2:%s@%s' "$GITLAB_TOKEN" "$GIT_REMOTE"
-}
-
-# docker compose pinned to the devbox project (so ./src/... resolves correctly).
+# docker compose pinned to the devbox project.
 dc() {
   docker compose --project-directory "$DEVBOX_DIR" -f "$DEVBOX_DIR/compose.yaml" "$@"
 }
