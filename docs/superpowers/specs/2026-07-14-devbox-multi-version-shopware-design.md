@@ -1,7 +1,31 @@
 # Devbox: Multi-version Shopware dev box — Design
 
 **Date:** 2026-07-14
-**Status:** Approved — proceeding to implementation plan
+**Status:** Approved — in implementation (see amendments below)
+
+## Amendments during implementation (2026-07-14)
+
+The following decisions changed after the design was approved; the implementation
+plan (`docs/superpowers/plans/2026-07-14-devbox-multi-version-shopware.md`) and the
+committed `devbox/` code reflect these, which supersede the matching sections below:
+
+1. **Persistence → full filesystem.** Persist the entire `/var/www/html` per
+   instance (`swXX_html` volume) plus `swXX_db`, instead of DB + media only.
+   Media lives inside the html volume. Caveat: a seeded volume pins that
+   instance's Shopware code to its first image; bumping the tag needs a volume
+   reset (documented in `devbox/docs/operations.md`).
+2. **Single deployed ref for all instances.** Instances no longer hold
+   independent refs. The goal is validating one plugin version across
+   6.5/6.6/6.7 at once, so `deploy.sh [ref]` applies the same ref to all three.
+3. **Plugin delivery → Composer VCS require.** No host `./src` checkout, no
+   bind-mount, no copy. `deploy.sh` runs `composer require twint-ag/twint-shopware-plugin:<constraint>`
+   inside each container (GitLab VCS repo + `gitlab-token`), so each instance
+   resolves the plugin + deps into its own `vendor/` for its own PHP version.
+   Ref → constraint: branch `x` → `dev-x`; commit `<sha>` → `dev-master#<sha>`.
+4. **`resolve_targets` hardened** to populate a caller array and fail loudly on
+   invalid input (a review finding).
+
+The sections below are the original design and are retained for history.
 **Topic:** Run multiple Shopware versions (6.5 / 6.6 / 6.7) concurrently on the EC2 dev box (`ssh twint-dev`) via Docker Compose, with persistent data + media and fast plugin deploy scripts.
 
 ## Problem

@@ -17,7 +17,11 @@
 - dockware default DB is used as-is: user `root` / password `root`, database `shopware`.
 - Hostnames derive from `DOMAIN_BASE` (default `twint-dev`): instance `swXX` is served at `swXX.$DOMAIN_BASE`.
 - v1 is **HTTP only** on `:80`. No TLS, no `:443` (Route53 + Let's Encrypt is a documented later step, not built here).
-- Persistence is **DB + media only** via per-instance named volumes. Container code/assets are not persisted.
+- Persistence: per-instance named volumes `swXX_html` → `/var/www/html` (full Shopware filesystem, so all config/state/media survive recreates) and `swXX_db` → `/var/lib/mysql`. Media (`public/media`) lives inside the html volume — no separate media volume.
+- **Volume-seeding caveat:** a named volume seeds from the image only on first creation. Once `swXX_html` exists, bumping `SWXX_IMAGE` will NOT upgrade that instance's Shopware code — you must remove the instance's volumes to re-seed. Documented in operations/troubleshooting.
+- Plugin delivery is **Composer VCS require**, run inside each container — no host checkout, no bind-mount, no copy. `deploy.sh` registers the GitLab repo as a Composer VCS repository and runs `composer require twint-ag/twint-shopware-plugin:<constraint>` per instance, so each instance resolves the plugin and its deps (`twint-ag/sdk`, `chillerlan/php-qrcode`) into its own `vendor/` for its own PHP version. All instances run the **same** deployed ref.
+- `deploy.sh` signature is `deploy.sh [ref]` (ref defaults to `master`): maps the ref to a Composer constraint (branch `x` → `dev-x`; 7–40-hex commit `<sha>` → `dev-master#<sha>`) and runs composer require + Shopware install/build on every instance.
+- GitLab auth for Composer: `deploy.sh` runs `composer config --auth gitlab-token.<host> $GITLAB_TOKEN` inside each container (persists in that instance's `auth.json` within the html volume). `<host>` = `GIT_REMOTE` up to the first `/`; the VCS repo URL = `https://$GIT_REMOTE`.
 - `down` must never pass `-v` — volumes (data) survive `down`. Data removal is always an explicit manual action.
 - `GITLAB_TOKEN` must never be committed and must not be left in any checkout's `.git/config` after a deploy completes.
 - `devbox/` is internal tooling: it stays `export-ignore` in `.gitattributes` and in `sync.sh`'s `EXCLUDE_PATHS`, so it never reaches the public GitHub mirror.
@@ -32,9 +36,9 @@
 .gitattributes                         # MODIFY: add `devbox/ export-ignore` (done in Task 1)
 bin/sync.sh                            # MODIFY: EXCLUDE_PATHS scrub (done in Task 1)
 devbox/
-  .gitignore                           # Task 2
+  .gitignore                           # Task 2 (ignores /.env)
   .env.example                         # Task 2
-  compose.yaml                         # Task 3
+  compose.yaml                         # Task 3 — per-instance sw*_html + sw*_db volumes, no plugin mount
   bin/
     _lib.sh                            # Task 4 — sourced by all other scripts
     bootstrap.sh                       # Task 5
@@ -146,6 +150,8 @@ git commit -m "feat(devbox): add config scaffold (.gitignore, .env.example)"
 ---
 
 ### Task 3: `compose.yaml` — Traefik proxy + three dockware instances
+
+> **AMENDED after implementation (see committed `devbox/compose.yaml`, authoritative):** per-instance volumes are now `swXX_html:/var/www/html` (full filesystem persistence) + `swXX_db:/var/lib/mysql`. There is **no** plugin bind-mount and **no** `swXX_media` volume (media lives inside the html volume; the plugin is copied in by `deploy.sh`). The YAML block below shows the original DB+media+mount design and is retained for history only — do not implement it verbatim.
 
 **Files:**
 - Create: `devbox/compose.yaml`
@@ -278,8 +284,10 @@ git commit -m "feat(devbox): compose stack (traefik + sw65/sw66/sw67)"
 **Files:**
 - Create: `devbox/bin/_lib.sh`
 
+> **AMENDED after review (see committed `devbox/bin/_lib.sh`, authoritative):** `resolve_targets` no longer prints lines. It runs in the caller's shell, populates a global array `RESOLVED_TARGETS`, and `exit 1`s on invalid/missing input. Callers use it as: `resolve_targets "$x"` then read `"${RESOLVED_TARGETS[@]}"` — never via `$(...)` or `< <(...)`, which would swallow the failure. (Reason: `exit 1` inside a process-substitution subshell is invisible to the parent, so an invalid instance would silently no-op.)
+
 **Interfaces:**
-- Produces (sourced by every other script): variables `DEVBOX_DIR`, `ENV_FILE`, array `INSTANCES=(sw65 sw66 sw67)`; functions `load_env`, `is_instance <name>`, `resolve_targets <all|swXX>` (prints one instance name per line), `git_remote_url` (prints `https://oauth2:$GITLAB_TOKEN@$GIT_REMOTE`), `dc <args...>` (runs `docker compose` pinned to the devbox project).
+- Produces (sourced by every other script): variables `DEVBOX_DIR`, `ENV_FILE`, array `INSTANCES=(sw65 sw66 sw67)`; functions `load_env`, `is_instance <name>`, `resolve_targets <all|swXX>` (populates array `RESOLVED_TARGETS` in the caller's shell; `exit 1` on bad input), `git_remote_url` (prints `https://oauth2:$GITLAB_TOKEN@$GIT_REMOTE`), `dc <args...>` (runs `docker compose` pinned to the devbox project).
 
 - [ ] **Step 1: Create `devbox/bin/_lib.sh`**
 
@@ -460,8 +468,8 @@ git commit -m "feat(devbox): host bootstrap for Docker on Ubuntu"
 - Create: `devbox/bin/down.sh`
 
 **Interfaces:**
-- Consumes: `_lib.sh` (`DEVBOX_DIR`, `INSTANCES`, `load_env`, `resolve_targets`, `dc`).
-- `up.sh [all|swXX]` pre-creates `src/swXX` dirs (user-owned) then `dc up -d`. `down.sh [all|swXX]` stops without deleting volumes (never `-v`).
+- Consumes: `_lib.sh` (`load_env`, `resolve_targets` → `RESOLVED_TARGETS`, `dc`).
+- `up.sh [all|swXX]` runs `dc up -d` (whole stack, or proxy + one instance). `down.sh [all|swXX]` stops without deleting volumes (never `-v`). No host `src` dir is needed — the plugin is delivered by Composer inside the containers.
 
 - [ ] **Step 1: Create `devbox/bin/up.sh`**
 
@@ -472,18 +480,12 @@ set -euo pipefail
 . "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
 load_env
 
-# Pre-create checkout dirs so Docker doesn't create them root-owned,
-# which would break git clone / composer running as a non-root user.
-for i in "${INSTANCES[@]}"; do
-  mkdir -p "$DEVBOX_DIR/src/$i"
-done
-
 target="${1:-all}"
 if [ "$target" = "all" ]; then
   dc up -d
 else
-  mapfile -t svc < <(resolve_targets "$target")
-  dc up -d proxy "${svc[@]}"
+  resolve_targets "$target"
+  dc up -d proxy "${RESOLVED_TARGETS[@]}"
 fi
 
 dc ps
@@ -503,9 +505,9 @@ target="${1:-all}"
 if [ "$target" = "all" ]; then
   dc down
 else
-  mapfile -t svc < <(resolve_targets "$target")
-  dc stop "${svc[@]}"
-  dc rm -f "${svc[@]}"
+  resolve_targets "$target"
+  dc stop "${RESOLVED_TARGETS[@]}"
+  dc rm -f "${RESOLVED_TARGETS[@]}"
 fi
 ```
 
@@ -535,65 +537,49 @@ git commit -m "feat(devbox): up/down lifecycle scripts"
 - Create: `devbox/bin/deploy.sh`
 
 **Interfaces:**
-- Consumes: `_lib.sh` (`DEVBOX_DIR`, `load_env`, `resolve_targets`, `git_remote_url`, `dc`), and `.env` (`GIT_REMOTE`, `GITLAB_TOKEN`).
-- `deploy.sh <all|swXX> [ref]`, `ref` defaults to `master`. Detects branch vs commit, syncs `src/swXX`, runs composer + Shopware scripts in the container, scrubs the token from the checkout's git config afterward.
+- Consumes: `_lib.sh` (`load_env`, `INSTANCES`, `dc`), and `.env` (`GIT_REMOTE`, `GITLAB_TOKEN`).
+- `deploy.sh [ref]`, `ref` defaults to `master`. Maps the ref to a Composer constraint, then for EVERY instance: configures the GitLab VCS repo + token, `composer require`s the plugin, and runs the Shopware install/build sequence. No host checkout; no per-instance target (all instances get the same ref).
 
 - [ ] **Step 1: Create `devbox/bin/deploy.sh`**
 
 ```bash
 #!/usr/bin/env bash
-# Deploy a git ref of the TWINT plugin into one/all instances.
-# Usage: deploy.sh <all|sw65|sw66|sw67> [branch|commit]   (ref defaults to master)
+# Deploy a git ref of the TWINT plugin to ALL instances via Composer.
+# Usage: deploy.sh [branch|commit]   (ref defaults to master)
 set -euo pipefail
 . "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
 load_env
 
-TARGET="${1:-}"
-REF="${2:-master}"
+REF="${1:-master}"
 PLUGIN="TwintPayment"
-PLUGIN_PATH="/var/www/html/custom/plugins/${PLUGIN}"
+PLUGIN_PACKAGE="twint-ag/twint-shopware-plugin"
+GITLAB_HOST="${GIT_REMOTE%%/*}"        # e.g. gitlab.example.com
+VCS_URL="https://${GIT_REMOTE}"        # e.g. https://gitlab.example.com/twint-ag/twint-shopware-plugin.git
 
-mapfile -t targets < <(resolve_targets "$TARGET")
-
-sync_git() {
-  local inst="$1" ref="$2"
-  local dir="$DEVBOX_DIR/src/$inst"
-  local authed clean
-  authed="$(git_remote_url)"
-  clean="https://$GIT_REMOTE"
-
-  if [ ! -d "$dir/.git" ]; then
-    echo "==> [$inst] cloning $GIT_REMOTE"
-    git clone "$authed" "$dir"
-  fi
-
-  echo "==> [$inst] fetching"
-  git -C "$dir" remote set-url origin "$authed"
-  git -C "$dir" fetch --all --prune
-
-  if git -C "$dir" rev-parse --verify --quiet "origin/$ref" >/dev/null; then
-    echo "==> [$inst] checkout branch: $ref"
-    git -C "$dir" checkout -B "$ref" "origin/$ref"
-    git -C "$dir" reset --hard "origin/$ref"
-  elif git -C "$dir" rev-parse --verify --quiet "${ref}^{commit}" >/dev/null; then
-    echo "==> [$inst] checkout commit: $ref"
-    git -C "$dir" checkout --detach "$ref"
+# Map a friendly ref to a Composer constraint:
+#   7-40 hex chars -> treated as a commit: dev-master#<sha>
+#   anything else  -> treated as a branch: dev-<branch>
+composer_constraint() {
+  local ref="$1"
+  if printf '%s' "$ref" | grep -Eq '^[0-9a-f]{7,40}$'; then
+    echo "dev-master#${ref}"
   else
-    # Restore clean remote before failing so no token lingers.
-    git -C "$dir" remote set-url origin "$clean" || true
-    echo "ERROR: [$inst] ref '$ref' is neither a remote branch nor a known commit" >&2
-    exit 1
+    echo "dev-${ref}"
   fi
-
-  # Scrub the token from on-disk git config.
-  git -C "$dir" remote set-url origin "$clean"
 }
 
-deploy_plugin() {
-  local inst="$1"
+deploy_to() {
+  local inst="$1" constraint="$2"
 
-  echo "==> [$inst] composer install"
-  dc exec -T "$inst" composer install -d "$PLUGIN_PATH" --no-interaction --no-progress
+  echo "==> [$inst] configuring Composer GitLab repo + token"
+  dc exec -T "$inst" composer config repositories.twint vcs "$VCS_URL"
+  # --auth writes to the project auth.json (persisted in the html volume); the
+  # token value is passed as an argument, not echoed by this script.
+  dc exec -T "$inst" composer config --auth "gitlab-token.${GITLAB_HOST}" "$GITLAB_TOKEN"
+
+  echo "==> [$inst] composer require ${PLUGIN_PACKAGE}:${constraint}"
+  dc exec -T "$inst" composer require "${PLUGIN_PACKAGE}:${constraint}" \
+    --no-interaction --no-progress --with-all-dependencies
 
   echo "==> [$inst] plugin refresh"
   dc exec -T "$inst" php bin/console plugin:refresh
@@ -610,11 +596,13 @@ deploy_plugin() {
   dc exec -T "$inst" php bin/console cache:clear
 }
 
-for inst in "${targets[@]}"; do
-  sync_git "$inst" "$REF"
-  deploy_plugin "$inst"
-  echo "==> [$inst] deployed ref '$REF'"
+CONSTRAINT="$(composer_constraint "$REF")"
+echo "==> deploying ${PLUGIN_PACKAGE}:${CONSTRAINT} to all instances"
+for inst in "${INSTANCES[@]}"; do
+  deploy_to "$inst" "$CONSTRAINT"
+  echo "==> [$inst] done"
 done
+echo "==> all instances on ${CONSTRAINT}"
 ```
 
 - [ ] **Step 2: Syntax check**
@@ -622,20 +610,39 @@ done
 Run: `bash -n devbox/bin/deploy.sh && echo OK`
 Expected: `OK`
 
-- [ ] **Step 3: Guard check — token is scrubbed and never echoed**
+- [ ] **Step 3: Verify ref→constraint mapping (pure function, no Docker needed)**
 
-Run: `grep -n 'git_remote_url\|set-url origin "\$clean"\|echo.*GITLAB_TOKEN' devbox/bin/deploy.sh`
-Expected: shows the `git_remote_url` use and the two `set-url origin "$clean"` scrub lines; NO line that echoes `$GITLAB_TOKEN`.
+Run:
+```bash
+bash -c '
+  set -euo pipefail
+  composer_constraint() { local ref="$1"; if printf "%s" "$ref" | grep -Eq "^[0-9a-f]{7,40}$"; then echo "dev-master#${ref}"; else echo "dev-${ref}"; fi; }
+  echo "master       -> $(composer_constraint master)"
+  echo "feature/x    -> $(composer_constraint feature/x)"
+  echo "e8737e40     -> $(composer_constraint e8737e40)"
+'
+```
+Expected:
+```
+master       -> dev-master
+feature/x    -> dev-feature/x
+e8737e40     -> dev-master#e8737e40
+```
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 4: Guard check — token passed as arg, never echoed**
+
+Run: `grep -n 'echo.*GITLAB_TOKEN\|echo.*\$GITLAB_TOKEN' devbox/bin/deploy.sh || echo "token never echoed: good"`
+Expected: `token never echoed: good`
+
+- [ ] **Step 5: Commit**
 
 ```bash
 chmod +x devbox/bin/deploy.sh
 git add devbox/bin/deploy.sh
-git commit -m "feat(devbox): git-pull plugin deploy script"
+git commit -m "feat(devbox): Composer-based plugin deploy to all instances"
 ```
 
-> Implementation note for the on-box pass (Task 11): the branch-vs-`plugin:update` fallback in `deploy_plugin` and the dockware paths (`bin/build-administration.sh`, `bin/build-storefront.sh`) are the two spots most likely to need a small per-version tweak. Verify them on `twint-dev` and adjust in this file if a version differs.
+> Implementation note for the on-box pass (Task 11): these are the spots most likely to need a per-version tweak — (a) `composer require` succeeding against the running Shopware (the plugin's `shopware/*` requires must resolve to the installed platform, and `twint-ag/sdk` must be reachable); (b) whether Shopware detects the composer-managed plugin via `plugin:refresh` under the name `TwintPayment`; (c) the `plugin:install` vs `plugin:update` fallback; (d) the dockware build-script paths. Verify on `twint-dev` and adjust here if a version differs. The `dev-master#<sha>` mapping assumes the commit is reachable from `master`; document deploying an unmerged commit by pushing it to a branch and passing the branch name.
 
 ---
 
@@ -659,8 +666,8 @@ set -euo pipefail
 . "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
 load_env
 
-mapfile -t targets < <(resolve_targets "${1:-all}")
-for inst in "${targets[@]}"; do
+resolve_targets "${1:-all}"
+for inst in "${RESOLVED_TARGETS[@]}"; do
   host="${inst}.${DOMAIN_BASE}"
   echo "==> [$inst] set sales-channel domain -> http://$host"
   dc exec -T "$inst" php bin/console sales-channel:update:domain "$host"
@@ -707,8 +714,8 @@ target="${1:-all}"
 if [ "$target" = "all" ]; then
   dc logs -f
 else
-  mapfile -t svc < <(resolve_targets "$target")
-  dc logs -f "${svc[@]}"
+  resolve_targets "$target"
+  dc logs -f "${RESOLVED_TARGETS[@]}"
 fi
 ```
 
@@ -762,11 +769,11 @@ git commit -m "feat(devbox): logs + shell utility scripts"
 
 Runs Shopware **6.5, 6.6, and 6.7 side by side** on the `twint-dev` EC2 box
 behind a Traefik reverse proxy, so the TWINT plugin can be validated against
-every supported version at once. Deploys pull any GitLab branch or commit into
-a chosen instance.
+every supported version at once. `deploy.sh` installs a chosen GitLab
+branch/commit of the plugin — via Composer — onto all three instances.
 
 > This folder is internal tooling. It is excluded from the public GitHub mirror
-> (`.gitattributes` + `bin/sync.sh`). Do not commit `.env` or `src/`.
+> (`.gitattributes` + `bin/sync.sh`). Do not commit `.env`.
 
 ## Quickstart
 
@@ -776,14 +783,14 @@ bin/bootstrap.sh                 # install Docker + compose + git, then re-login
 cp .env.example .env             # set DOMAIN_BASE, GIT_REMOTE, GITLAB_TOKEN
 bin/up.sh                        # start traefik + all three instances
 bin/provision.sh all             # set sales-channel domains
-bin/deploy.sh all master         # deploy the plugin to all three
+bin/deploy.sh master             # composer-install the plugin on all three
 
 # on your laptop, once — /etc/hosts:
 #   <ec2-ip> sw65.twint-dev sw66.twint-dev sw67.twint-dev
 
-# iterate:
-bin/deploy.sh sw66 my-feature-branch
-bin/deploy.sh sw67 <commit-hash>
+# iterate — deploy any branch/commit to all instances:
+bin/deploy.sh my-feature-branch
+bin/deploy.sh <commit-hash>
 ```
 
 Then open `http://sw65.twint-dev`, `http://sw66.twint-dev`, `http://sw67.twint-dev`.
@@ -793,7 +800,7 @@ Then open `http://sw65.twint-dev`, `http://sw66.twint-dev`, `http://sw67.twint-d
 | Doc | What's inside |
 |-----|---------------|
 | [docs/setup.md](docs/setup.md) | Fresh-host bootstrap and first run |
-| [docs/deploy.md](docs/deploy.md) | `deploy.sh` in depth: refs, per-instance, what runs |
+| [docs/deploy.md](docs/deploy.md) | `deploy.sh` in depth: refs → Composer constraints, what runs |
 | [docs/operations.md](docs/operations.md) | Day-to-day up/down/logs/shell + data safety |
 | [docs/dns-tls.md](docs/dns-tls.md) | `/etc/hosts` now → Route53 + TLS later |
 | [docs/troubleshooting.md](docs/troubleshooting.md) | Common failures and fixes |
@@ -825,14 +832,14 @@ cp .env.example .env
 Set:
 - `DOMAIN_BASE` — keep `twint-dev` for local `/etc/hosts` testing.
 - `GIT_REMOTE` — GitLab host+path of the plugin repo (no scheme).
-- `GITLAB_TOKEN` — a deploy token / PAT with `read_repository`.
+- `GITLAB_TOKEN` — a deploy token / PAT with `read_repository` + `read_api` (Composer needs `read_api` for GitLab VCS).
 - `SW65_IMAGE` / `SW66_IMAGE` / `SW67_IMAGE` — pinned dockware tags (defaults provided).
 
 ## 3. Start + provision + deploy
 ```bash
 bin/up.sh                # traefik + sw65 + sw66 + sw67
 bin/provision.sh all     # sales-channel domains -> swXX.$DOMAIN_BASE
-bin/deploy.sh all master # clone + composer + install/activate + build
+bin/deploy.sh master     # composer require + install/activate + build on all instances
 ```
 
 ## 4. Laptop DNS (local testing)
@@ -850,34 +857,47 @@ Open `http://sw66.twint-dev`, etc. For the real-domain path see
 # Deploying the plugin
 
 ```
-bin/deploy.sh <all|sw65|sw66|sw67> [branch|commit]
+bin/deploy.sh [branch|commit]
 ```
-`ref` defaults to `master`.
+`ref` defaults to `master`. The plugin is installed on **all three instances**
+(same ref everywhere) — the point is to validate one plugin version across
+6.5/6.6/6.7 at once.
 
-## What it does, per instance
-1. **Sync git** into `src/<instance>/` — clone on first run, then `fetch`, then
-   check out the ref. A branch is reset hard to `origin/<branch>`; a commit hash
-   is checked out detached. The GitLab token is used only during fetch and is
-   scrubbed from `src/<instance>/.git/config` afterward.
-2. **`composer install`** inside the container (so PHP-version-correct deps land
-   in the mounted checkout's `vendor/`).
+## Ref → Composer constraint
+`deploy.sh` maps the ref you pass to a Composer version constraint:
+
+| You pass | Composer constraint | Meaning |
+|----------|---------------------|---------|
+| `master` (default) | `dev-master` | tip of master |
+| `feature/x` | `dev-feature/x` | tip of that branch |
+| `e8737e40` (7–40 hex) | `dev-master#e8737e40` | that commit (must be reachable from master) |
+
+To deploy an unmerged commit, push it to a branch and pass the branch name.
+
+## What it does, for each instance
+1. **Configure Composer**: register the GitLab repo as a VCS repository and set
+   `gitlab-token` (from `GITLAB_TOKEN`) in the instance's `auth.json`.
+2. **`composer require twint-ag/twint-shopware-plugin:<constraint>`** — Composer
+   pulls the plugin **and its dependencies** (`twint-ag/sdk`, `chillerlan/php-qrcode`)
+   into that instance's own `vendor/`, resolved for that instance's PHP version.
+   `shopware/*` requirements are satisfied by the running platform.
 3. **Shopware**: `plugin:refresh` → `plugin:install --activate TwintPayment`
    (falls back to `plugin:update` if already installed) → build administration +
    storefront → `cache:clear`.
 
-Because `src/<instance>` is bind-mounted, no container restart is needed.
+Each instance has its own isolated copy (own `vendor/`, own build), persisted in
+its `swXX_html` volume. No bind-mount, no host checkout.
 
 ## Examples
 ```bash
-bin/deploy.sh all master                 # everyone on master
-bin/deploy.sh sw66 feature/express-x     # 6.6 on a feature branch
-bin/deploy.sh sw67 e8737e40              # 6.7 pinned to a commit
-bin/deploy.sh sw65                       # 6.5 back to master (default)
+bin/deploy.sh master               # all three on master
+bin/deploy.sh feature/express-x    # all three on a feature branch
+bin/deploy.sh e8737e40             # all three on a specific commit
 ```
-Each instance keeps its own ref — deploying sw66 does not touch sw65/sw67.
 
 ## Idempotency
-Re-running `deploy.sh` on an already-deployed instance updates rather than errors.
+Re-running `deploy.sh` on already-deployed instances updates rather than errors
+(Composer updates the constraint; `plugin:update` runs if already installed).
 ````
 
 - [ ] **Step 4: Create `devbox/docs/operations.md`**
@@ -887,21 +907,33 @@ Re-running `deploy.sh` on an already-deployed instance updates rather than error
 
 ## Lifecycle
 ```bash
-bin/up.sh [all|swXX]     # start (creates src/ dirs first)
+bin/up.sh [all|swXX]     # start
 bin/down.sh [all|swXX]   # stop — DATA IS PRESERVED (never uses -v)
 bin/logs.sh [all|swXX]   # follow logs
 bin/shell.sh <swXX>      # bash inside an instance
 ```
 
 ## Data safety
-- DB and media live in per-instance named volumes (`swXX_db`, `swXX_media`).
+- Each instance persists its **full state** in two named volumes: `swXX_html`
+  (`/var/www/html` — Shopware code, config, installed plugin, uploaded media)
+  and `swXX_db` (`/var/lib/mysql`).
 - `bin/down.sh` stops containers but **keeps** volumes. `up.sh` again restores state.
 - Data is destroyed only by an explicit manual action:
   ```bash
-  docker volume rm devbox_sw66_db devbox_sw66_media   # wipe 6.6 only
+  docker volume rm devbox_sw66_html devbox_sw66_db   # wipe 6.6 only
   ```
-- To reset one instance from scratch: `docker volume rm devbox_swXX_db devbox_swXX_media`
-  then `bin/up.sh swXX && bin/provision.sh swXX && bin/deploy.sh swXX`.
+- To reset one instance from scratch: `docker volume rm devbox_swXX_html devbox_swXX_db`
+  then `bin/up.sh swXX && bin/provision.sh swXX && bin/deploy.sh`.
+
+## Upgrading a Shopware version (important)
+A named volume seeds from the image **only on first creation**. Once `swXX_html`
+exists, bumping `SWXX_IMAGE` in `.env` will **not** upgrade that instance — it
+keeps the old code from the volume. To actually move to a new dockware tag:
+```bash
+bin/down.sh swXX
+docker volume rm devbox_swXX_html devbox_swXX_db   # discard old code + data
+bin/up.sh swXX && bin/provision.sh swXX && bin/deploy.sh
+```
 
 ## Traefik dashboard
 Bound to `127.0.0.1:8080` on the box. View it via an SSH tunnel:
@@ -956,10 +988,12 @@ No change to shop services, volumes, or the bin/ scripts is required.
 | Traefik 404 for `swXX.$DOMAIN_BASE` | hostname doesn't resolve, or label/`DOMAIN_BASE` mismatch | check laptop `/etc/hosts`; `docker compose config \| grep Host`; dashboard at `:8080` |
 | Traefik 502 | instance still booting or Apache down | `bin/logs.sh <instance>`; wait for dockware to finish init |
 | `bind: address already in use` on `:80` | something else owns port 80 on the host | stop it, or change the proxy's published port |
-| `git clone`/`composer` permission denied in `src/swXX` | dir created root-owned before `up.sh` | `sudo chown -R $USER src/`; ensure `up.sh` ran first |
-| `fatal: Authentication failed` on deploy | bad/expired `GITLAB_TOKEN` or wrong `GIT_REMOTE` | fix `.env`; token needs `read_repository` |
-| plugin not visible after deploy | build or refresh failed mid-run | re-run `bin/deploy.sh <instance>`; check `bin/logs.sh` |
-| DB empty after recreate | volume was removed (`docker volume rm` / `down -v`) | expected; re-provision + re-deploy |
+| `composer require` fails auth / 404 for the plugin | bad/expired `GITLAB_TOKEN`, wrong `GIT_REMOTE`, or token missing `read_api` | fix `.env`; GitLab VCS needs `read_repository` + `read_api` |
+| `composer require` can't find `twint-ag/sdk` | the SDK isn't reachable (packagist / GitLab registry) with this token | ensure the SDK source is configured/reachable in the container |
+| plugin not visible after deploy | `plugin:refresh` didn't detect the composer-managed plugin, or build failed | `bin/shell.sh <inst>` then `php bin/console plugin:list`; re-run `bin/deploy.sh` |
+| Bumped `SWXX_IMAGE` but Shopware version unchanged | `swXX_html` volume was seeded from the old image and persists | remove the instance's volumes and re-deploy (see operations.md → Upgrading) |
+| Client IP shows as the proxy's container IP | no `TRUSTED_PROXIES` set for Shopware behind Traefik | set trusted proxies if IP-based logic matters (not needed for basic v1 HTTP use) |
+| DB/media empty after recreate | volume was removed (`docker volume rm` / `down -v`) | expected; re-provision + re-deploy |
 ````
 
 - [ ] **Step 7: Create `devbox/docs/architecture.md`**
@@ -982,17 +1016,22 @@ Browser ─:80→ Traefik ────┼─ Host(sw66.$DOMAIN_BASE) → sw66 :8
 - **dockware/dev all-in-one** — Apache + MySQL + Shopware in one container per
   version. Simplest thing to route and to run `bin/console` against; matches the
   legacy demo setup.
-- **Named volumes for DB + media** — on first `up`, an empty volume mounted over
-  a populated image path makes Docker copy the image's data in, so dockware's
-  pre-installed DB is seeded and then persists. Core code/assets are not
-  persisted (regenerated by `deploy.sh`), keeping recreates cheap.
-- **Git-checkout mount (`src/swXX`)** — deploys come from a pushed GitLab ref,
-  not the developer's working tree, so each instance can sit on a different
-  branch/commit and deploys are reproducible.
+- **Full-filesystem persistence per instance (`swXX_html` + `swXX_db`)** — on
+  first `up`, an empty named volume mounted over a populated image path makes
+  Docker copy the image's data in, so dockware's pre-installed Shopware (code +
+  DB) is seeded and then persists across recreates. All config, installed
+  plugins, uploaded media (inside `/var/www/html/public/media`), and DB survive.
+  Trade-off: a seeded volume pins that instance's Shopware code to the image it
+  first saw — see operations.md → Upgrading.
+- **Composer VCS delivery** — `deploy.sh` runs `composer require` of the plugin
+  from the GitLab repo inside each container. Each instance resolves the plugin
+  and its deps into its own `vendor/` for its own PHP version, fully isolated;
+  all instances run the same deployed ref. Deploys are reproducible from a
+  pushed GitLab ref, not a developer's working tree.
 
 ## Files
-- `compose.yaml` — proxy + three instances, volumes, network.
-- `bin/_lib.sh` — env loading, instance map, compose wrapper, git URL builder.
+- `compose.yaml` — proxy + three instances, `swXX_html`/`swXX_db` volumes, network.
+- `bin/_lib.sh` — env loading, instance map (`resolve_targets` → `RESOLVED_TARGETS`), compose wrapper.
 - `bin/{bootstrap,up,down,deploy,provision,logs,shell}.sh` — see README table.
 ````
 
@@ -1031,8 +1070,8 @@ Expected: `dc ps` shows `devbox_proxy`, `sw65`, `sw66`, `sw67` all `Up`. No port
 
 - [ ] **Step 3: Provision + deploy all**
 
-Run: `devbox/bin/provision.sh all && devbox/bin/deploy.sh all master`
-Expected: each instance clones, `composer install` succeeds, plugin installs+activates, admin+storefront build, cache clears — no errors.
+Run: `devbox/bin/provision.sh all && devbox/bin/deploy.sh master`
+Expected: for each instance, `composer require` of the plugin succeeds, `plugin:install --activate` runs, admin+storefront build, cache clears — no errors. (Watch for the flagged risks: `composer require` resolving against the platform, `twint-ag/sdk` reachability, `plugin:refresh` detecting the composer-managed plugin.)
 
 - [ ] **Step 4: Verify three instances serve concurrently**
 
@@ -1042,25 +1081,30 @@ for h in sw65 sw66 sw67; do echo -n "$h: "; curl -s -o /dev/null -w '%{http_code
 ```
 Expected: three `200` (or `30x` to the storefront) responses — **success criterion: all three load concurrently**. Open one admin (`http://sw66.twint-dev/admin`) and confirm the TWINT plugin shows as active — **success criterion: plugin installed/activated/built**.
 
-- [ ] **Step 5: Verify per-instance refs**
+- [ ] **Step 5: Verify a specific commit deploys to all instances**
 
-Run: `devbox/bin/deploy.sh sw67 <some-known-commit-hash>`
-Expected: sw67 checks out that commit; `git -C devbox/src/sw67 rev-parse HEAD` matches; sw65/sw66 unchanged (`git -C devbox/src/sw66 rev-parse --abbrev-ref HEAD` still `master`) — **success criteria: per-instance branch + commit deploys**.
+Run: `devbox/bin/deploy.sh <some-known-commit-hash>` (a commit reachable from master).
+Then on each instance confirm the installed plugin matches:
+```bash
+for i in sw65 sw66 sw67; do echo "== $i =="; devbox/bin/shell.sh "$i" -c 'php bin/console plugin:list | grep -i twint'; done
+```
+Expected: all three show the TWINT plugin present/active — **success criterion: commit deploy to all instances**. (`shell.sh` opens interactive bash; for a scripted check use `docker compose exec <i> php bin/console plugin:list`.)
 
 - [ ] **Step 6: Verify idempotent re-deploy**
 
-Run: `devbox/bin/deploy.sh sw66 master` a second time.
-Expected: completes without error (updates rather than failing on already-installed) — **success criterion: idempotent re-deploy**.
+Run: `devbox/bin/deploy.sh master` a second time.
+Expected: completes without error on all instances (Composer update + `plugin:update`, not a hard failure on already-installed) — **success criterion: idempotent re-deploy**.
 
 - [ ] **Step 7: Verify persistence**
 
-Run: upload a product image via sw66 admin (creates media), then `devbox/bin/down.sh && devbox/bin/up.sh`.
-Expected: after restart, sw66 is still installed and the uploaded media is still present — **success criterion: DB + media survive down/up**.
+Run: upload a product image via sw66 admin (creates media under `/var/www/html`), then `devbox/bin/down.sh && devbox/bin/up.sh`.
+Expected: after restart, sw66 is still installed, its config intact, and the uploaded media still present — **success criterion: full state (DB + html) survives down/up via `swXX_html` + `swXX_db`**.
 
-- [ ] **Step 8: Verify token not persisted**
+- [ ] **Step 8: Verify token not leaked into tracked files**
 
-Run: `grep -r 'oauth2:' devbox/src/*/.git/config || echo "no token in checkouts: good"`
-Expected: `no token in checkouts: good` — **constraint: token never left in checkout config**.
+Run (from repo root): `git grep -I "$(grep GITLAB_TOKEN devbox/.env | cut -d= -f2)" -- . || echo "token not in tracked files: good"`
+Also confirm `git status` shows `devbox/.env` is untracked/ignored.
+Expected: `token not in tracked files: good`, `.env` ignored — **constraint: token never committed**. (The token intentionally lives in each instance's container `auth.json`, which is inside the non-tracked `swXX_html` volume — that is by design, not a leak.)
 
 - [ ] **Step 9: Commit any on-box fixes**
 
@@ -1078,16 +1122,16 @@ git commit -m "fix(devbox): on-box acceptance adjustments"
 - Access/routing (Traefik, subdomains, no shop host ports) → Task 3, verified Task 11 Step 4.
 - DNS `/etc/hosts` now, Route53 later → `.env` `DOMAIN_BASE` (Task 2), docs/dns-tls.md (Task 10).
 - Container base dockware all-in-one → Task 3.
-- Plugin deploy via git ref (branch default master / commit) → Task 7.
-- Checkout model fixed per-instance dir, fetch-in-place → Task 7 `sync_git`.
-- GitLab auth HTTPS+token, scrubbed from config → Task 4 `git_remote_url` + Task 7 scrub, verified Task 11 Step 8.
+- Plugin deploy via git ref (branch default master / commit), same ref on all instances → Task 7 (Composer VCS require + ref→constraint mapping).
+- Plugin delivery = Composer VCS require inside each container (no host checkout / mount / copy) → Task 7 `deploy_to`.
+- GitLab auth for Composer (`gitlab-token`, token passed as arg not echoed) → Task 7; not committed → verified Task 11 Step 8.
 - Versions 6.5/6.6/6.7 pinned → Global Constraints + Task 2 `.env.example` + Task 3.
-- Persistence DB + media per instance, first-run volume seeding → Task 3 volumes, docs Task 10, verified Task 11 Step 7.
+- Persistence: full `/var/www/html` (`swXX_html`) + DB (`swXX_db`) per instance, first-run volume seeding, version-pin caveat → Task 3 volumes, docs Task 10 (operations/architecture), verified Task 11 Step 7.
 - Location new `devbox/`, legacy `infra/` untouched → all tasks scoped to `devbox/`; Task 1 only edits `.gitattributes`/`sync.sh`.
 - Host bootstrap fresh Ubuntu → Task 5.
-- `src/swXX` dir pre-creation / ownership gotcha → Task 6 `up.sh`.
 - `.env` sourcing in scripts → Task 4 `load_env`.
-- deploy.sh composer (absolute `-d`), refresh/install/build/cache → Task 7.
+- `resolve_targets` fails loudly (array-out, no subshell) → Task 4 (amended), consumed by Tasks 6/8/9.
+- deploy.sh: composer require → refresh/install/build/cache on all instances → Task 7.
 - provision.sh sales-channel domain → Task 8.
 - logs/shell utilities → Task 9.
 - Documentation set (README + 6 docs) → Task 10.
