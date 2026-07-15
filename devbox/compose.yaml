@@ -40,6 +40,8 @@ services:
     environment:
       - APP_URL=https://sw65-${DOMAIN_BASE}
       - XDEBUG_ENABLED=0
+      # Route all outgoing mail to the Mailpit catcher (see mailpit service).
+      - MAILER_DSN=smtp://mailpit:1025
     volumes:
       - "sw65_html:/var/www/html"
       - "sw65_db:/var/lib/mysql"
@@ -68,6 +70,7 @@ services:
     environment:
       - APP_URL=https://sw66-${DOMAIN_BASE}
       - XDEBUG_ENABLED=0
+      - MAILER_DSN=smtp://mailpit:1025
     volumes:
       - "sw66_html:/var/www/html"
       - "sw66_db:/var/lib/mysql"
@@ -96,6 +99,7 @@ services:
     environment:
       - APP_URL=https://sw67-${DOMAIN_BASE}
       - XDEBUG_ENABLED=0
+      - MAILER_DSN=smtp://mailpit:1025
     volumes:
       - "sw67_html:/var/www/html"
       - "sw67_db:/var/lib/mysql"
@@ -136,6 +140,34 @@ services:
     networks:
       - web
 
+  # Mail catcher for this box. Shopware (sw65/66/67) sends here via MAILER_DSN;
+  # WooCommerce (wc1/2/3, woo-internal network) will send here too once its
+  # mailer is wired (Phase 2). SMTP :1025 stays internal; the web UI :8025 is
+  # exposed only through Traefik at mail2-${DOMAIN_BASE}, behind basic auth.
+  # The Magento box (twint-dev-2) keeps its own separate Mailpit.
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: devbox_mailpit
+    restart: unless-stopped
+    environment:
+      - MP_DATABASE=/data/mailpit.db      # persist caught mail across restarts
+      - MP_MAX_MESSAGES=5000
+    volumes:
+      - "mailpit_data:/data"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mail.rule=Host(`mail2-${DOMAIN_BASE}`)"
+      - "traefik.http.routers.mail.entrypoints=websecure"
+      - "traefik.http.routers.mail.tls.certresolver=le"
+      - "traefik.http.middlewares.devbox-auth.basicauth.usersfile=/etc/traefik/auth/htpasswd"
+      - "traefik.http.routers.mail.middlewares=devbox-auth"
+      - "traefik.http.services.mail.loadbalancer.server.port=8025"
+    networks:
+      web:
+        aliases: [mailpit]
+      woo-internal:
+        aliases: [mailpit]
+
 volumes:
   sw65_html:
   sw65_db:
@@ -144,7 +176,12 @@ volumes:
   sw67_html:
   sw67_db:
   letsencrypt:
+  mailpit_data:
 
 networks:
   web:
     external: false
+  # Owned by the WooCommerce devbox compose (twint-woocommerce-extension); we
+  # attach Mailpit to it so wc1/2/3 can reach mailpit:1025 (Phase 2 wiring).
+  woo-internal:
+    external: true

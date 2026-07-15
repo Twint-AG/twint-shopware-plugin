@@ -104,7 +104,7 @@
       <span class="mark">🧭</span>
       <div>
         <h1>Environments</h1>
-        <div class="sub"><b id="shownCount">0</b> of <b id="totalCount">12</b> sites · Shopware · WooCommerce · Magento</div>
+        <div class="sub"><b id="shownCount">0</b> of <b id="totalCount">12</b> sites · Shopware · WooCommerce · Magento · Mailpit</div>
       </div>
     </div>
     <div class="toolbar">
@@ -160,6 +160,12 @@
       url: "https://m249-twint.dev.nfq-asia.com", admin: "https://m249-twint.dev.nfq-asia.com/admin" },
     { name: "h247", platform: "magento", env: "dev", note: "basic auth", stack: [{ k: "Magento", v: "2.4.7" }, { k: "PHP", v: "8.3" }, { k: "Hyvä", v: "latest" }],
       url: "https://h247-twint.dev.nfq-asia.com", admin: "https://h247-twint.dev.nfq-asia.com/admin" },
+
+    // Tools — not shops, excluded from the site count. Mail catchers (Mailpit).
+    { name: "mailpit-sw", platform: "tools", env: "dev", note: "basic auth", stack: [{ k: "Mailpit", v: "Shopware + Woo" }],
+      url: "https://mail2-twint.dev.nfq-asia.com" },
+    { name: "mailpit-magento", platform: "tools", env: "dev", note: "basic auth", stack: [{ k: "Mailpit", v: "Magento" }],
+      url: "https://mail-twint.dev.nfq-asia.com" },
   ];
   // ────────────────────────────────────────────────────────────────────────────
 
@@ -167,7 +173,10 @@
     { id: "shopware",    label: "Shopware",    css: "--sw" },
     { id: "woocommerce", label: "WooCommerce", css: "--woo" },
     { id: "magento",     label: "Magento",     css: "--mag" },
+    { id: "tools",       label: "Tools",       css: "--accent" },
   ];
+  // Shops only (excludes tools like mail catchers) — drives the "sites" count.
+  const isShop = e => e.platform !== "tools";
   const pf = id => PLATFORMS.find(p => p.id === id) || { label: id, css: "--accent" };
   const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
   const hostOf = u => { try { return new URL(u).host; } catch { return u; } };
@@ -233,11 +242,11 @@
         </div>${body}
       </section>`;
     }).join("");
-    document.getElementById("shownCount").textContent = ENVIRONMENTS.filter(e => e.url && matches(e)).length;
+    document.getElementById("shownCount").textContent = ENVIRONMENTS.filter(e => e.url && isShop(e) && matches(e)).length;
   }
 
   function buildFilters() {
-    const total = ENVIRONMENTS.filter(e => e.url).length;
+    const total = ENVIRONMENTS.filter(e => e.url && isShop(e)).length;
     document.getElementById("totalCount").textContent = total;
     const counts = { all: total };
     PLATFORMS.forEach(p => counts[p.id] = ENVIRONMENTS.filter(e => e.url && e.platform === p.id).length);
