@@ -4,14 +4,26 @@
 # diverge.
 #
 # Usage:
-#   devbox/bin/deploy.sh              # deploy the currently checked-out branch
-#   devbox/bin/deploy.sh <branch>     # checkout <branch> on the host, then deploy it
+#   devbox/bin/deploy.sh                     # deploy the currently checked-out branch (sequential)
+#   devbox/bin/deploy.sh <branch>            # checkout <branch> on the host, then deploy it
+#   devbox/bin/deploy.sh --parallel [branch] # deploy all instances concurrently (all at once)
 #
 # NOTE: the ref you deploy must itself contain devbox/ (this tooling lives in the
 # plugin repo). Deploying a ref without devbox/ would remove this script on
 # checkout. Deploy your feature branch, or master once devbox/ is merged.
 set -euo pipefail
 SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Optional leading flag: --parallel / -p deploys every instance concurrently
+# (all at once) instead of one-by-one, each to its own log, with a single
+# sequential retry for any that fail (guards against a transient OOM during the
+# 3x build burst on the no-swap box). Shift it off so the branch arg ($1) still
+# works, and export it so it survives the re-exec below. Absent = sequential.
+PARALLEL="${PARALLEL:-}"
+case "${1:-}" in
+  --parallel|-p) PARALLEL=1; shift ;;
+esac
+export PARALLEL
 
 # First pass: bring the host clone to the ref to deploy, then re-exec once.
 #   - with a ref arg: fetch + checkout that ref (reset to origin for a branch)
@@ -154,10 +166,53 @@ deploy_to() {
   dc exec -T "$inst" php bin/console cache:clear
 }
 
-echo "==> deploying ${PLUGIN_PACKAGE}:${CONSTRAINT} to all instances"
-for inst in "${INSTANCES[@]}"; do
-  deploy_to "$inst"
-  echo "==> [$inst] done"
-done
+echo "==> deploying ${PLUGIN_PACKAGE}:${CONSTRAINT} to all instances${PARALLEL:+ (parallel, all at once)}"
+if [ -z "$PARALLEL" ]; then
+  # Sequential (default): one instance at a time; full output stays in the main log.
+  for inst in "${INSTANCES[@]}"; do
+    deploy_to "$inst"
+    echo "==> [$inst] done"
+  done
+else
+  # Parallel: launch every instance at once. Each job writes to its OWN log so
+  # their output doesn't interleave into an unreadable mess; then wait on each
+  # and collect exit codes. Indexed arrays (not associative) for portability.
+  ts="$(date +%Y%m%d-%H%M%S)"
+  pids=(); insts=(); ilogs=()
+  for inst in "${INSTANCES[@]}"; do
+    ilog="$LOG_DIR/deploy-${ts}-${BRANCH//\//-}-${inst}.log"
+    ( deploy_to "$inst" ) >"$ilog" 2>&1 &
+    pids+=("$!"); insts+=("$inst"); ilogs+=("$ilog")
+    echo "==> [$inst] started (pid $!) -> $ilog"
+  done
+  failed=()
+  for i in "${!pids[@]}"; do
+    if wait "${pids[$i]}"; then
+      echo "==> [${insts[$i]}] OK"
+    else
+      echo "==> [${insts[$i]}] FAILED (see ${ilogs[$i]})"
+      failed+=("${insts[$i]}")
+    fi
+  done
+  # One sequential retry for any failures — e.g. a transient OOM during the 3x
+  # build burst; retried alone, the box has full RAM/CPU headroom again.
+  stillfailed=()
+  if [ "${#failed[@]}" -gt 0 ]; then
+    echo "==> retrying failed instance(s) sequentially: ${failed[*]}"
+    for inst in "${failed[@]}"; do
+      ilog="$LOG_DIR/deploy-${ts}-${BRANCH//\//-}-${inst}-retry.log"
+      if ( deploy_to "$inst" ) >"$ilog" 2>&1; then
+        echo "==> [$inst] OK on retry"
+      else
+        echo "==> [$inst] STILL FAILED (see $ilog)"
+        stillfailed+=("$inst")
+      fi
+    done
+  fi
+  if [ "${#stillfailed[@]}" -gt 0 ]; then
+    echo "==> deploy FAILED for: ${stillfailed[*]}  (branch=$BRANCH, log=$LOG_FILE)" >&2
+    exit 1
+  fi
+fi
 echo "==> all instances on ${CONSTRAINT}"
 echo "==> deploy finished $(date -Is) | log=$LOG_FILE"
