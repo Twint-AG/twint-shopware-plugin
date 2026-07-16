@@ -26,6 +26,15 @@ YAML'
   # update:domain keeps the existing scheme; force https for the storefront domain.
   dc exec -T "$inst" bash -lc "mysql -h127.0.0.1 -uroot -proot shopware -e \"UPDATE sales_channel_domain SET url=CONCAT('https://',SUBSTRING_INDEX(url,'://',-1)) WHERE url LIKE 'http://%';\""
 
+  # Force dev mail routing to the Mailpit catcher. A non-empty
+  # core.mailerSettings.emailAgent ('local'/'smtp') makes Shopware IGNORE
+  # MAILER_DSN and send via sendmail/an external SMTP instead — which happens
+  # when an instance's DB is imported from a prod/staging dump (carrying the
+  # real SMTP creds). Clearing it makes Shopware fall back to MAILER_DSN
+  # (=smtp://mailpit:1025, set in compose.yaml), so all mail is captured.
+  echo "==> [$inst] force mailer -> Mailpit (clear core.mailerSettings.emailAgent)"
+  dc exec -T "$inst" php bin/console system:config:set core.mailerSettings.emailAgent ""
+
   echo "==> [$inst] cache:clear"
   dc exec -T "$inst" php bin/console cache:clear -q
 done
