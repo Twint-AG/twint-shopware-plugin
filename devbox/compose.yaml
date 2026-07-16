@@ -156,6 +156,10 @@ services:
       - "mailpit_data:/data"
     labels:
       - "traefik.enable=true"
+      # Mailpit is on two networks (web + woo-internal); without this Traefik may
+      # pick the woo-internal IP, which it can't route to (it only sits on web) —
+      # the router then times out (504). Pin Traefik to the web network's IP.
+      - "traefik.docker.network=devbox_web"
       - "traefik.http.routers.mail.rule=Host(`mail2-${DOMAIN_BASE}`)"
       - "traefik.http.routers.mail.entrypoints=websecure"
       - "traefik.http.routers.mail.tls.certresolver=le"
