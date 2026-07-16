@@ -26,14 +26,23 @@ YAML'
   # update:domain keeps the existing scheme; force https for the storefront domain.
   dc exec -T "$inst" bash -lc "mysql -h127.0.0.1 -uroot -proot shopware -e \"UPDATE sales_channel_domain SET url=CONCAT('https://',SUBSTRING_INDEX(url,'://',-1)) WHERE url LIKE 'http://%';\""
 
-  # Force dev mail routing to the Mailpit catcher. A non-empty
-  # core.mailerSettings.emailAgent ('local'/'smtp') makes Shopware IGNORE
-  # MAILER_DSN and send via sendmail/an external SMTP instead — which happens
-  # when an instance's DB is imported from a prod/staging dump (carrying the
-  # real SMTP creds). Clearing it makes Shopware fall back to MAILER_DSN
-  # (=smtp://mailpit:1025, set in compose.yaml), so all mail is captured.
-  echo "==> [$inst] force mailer -> Mailpit (clear core.mailerSettings.emailAgent)"
+  # Force ALL Shopware mail to the shared Mailpit catcher. Two independent
+  # things route mail away from it on a fresh/imported instance:
+  #
+  # 1. core.mailerSettings.emailAgent: a non-empty value ('local'/'smtp') makes
+  #    Shopware IGNORE MAILER_DSN and send via sendmail/an external SMTP — this
+  #    appears when an instance's DB is imported from a prod/staging dump. Clear
+  #    it so Shopware falls back to MAILER_DSN.
+  #
+  # 2. MAILER_DSN in the container .env: php-fpm defaults to clear_env=yes, so
+  #    web/admin requests do NOT inherit the MAILER_DSN we set in compose.yaml —
+  #    they read the baked .env instead, which dockware ships as
+  #    smtp://127.0.0.1:1025 (dockware's OWN in-container MailCatcher). So CLI
+  #    mail reaches our Mailpit but storefront/admin mail silently lands in
+  #    dockware's local catcher. Rewrite .env to point at the shared mailpit.
+  echo "==> [$inst] force mailer -> Mailpit (clear emailAgent + point .env MAILER_DSN at mailpit)"
   dc exec -T "$inst" php bin/console system:config:set core.mailerSettings.emailAgent ""
+  dc exec -T "$inst" bash -lc "sed -i 's#^MAILER_DSN=.*#MAILER_DSN=smtp://mailpit:1025#' /var/www/html/.env"
 
   echo "==> [$inst] cache:clear"
   dc exec -T "$inst" php bin/console cache:clear -q
