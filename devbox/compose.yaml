@@ -60,6 +60,14 @@ services:
       - "traefik.http.routers.sw65-api.tls.certresolver=le"
       - "traefik.http.routers.sw65-api.service=sw65"
       - "traefik.http.routers.sw65-api.priority=100"
+      # Trusted (VPN/office) IPs skip basic auth entirely: higher-priority router,
+      # same backend, no auth middleware. TRUSTED_IP_CIDR comes from .env; the
+      # harmless 127.0.0.1/32 default never matches an external client.
+      - "traefik.http.routers.sw65-vpn.rule=Host(`sw65-${DOMAIN_BASE}`) && ClientIP(`${TRUSTED_IP_CIDR:-127.0.0.1/32}`)"
+      - "traefik.http.routers.sw65-vpn.entrypoints=websecure"
+      - "traefik.http.routers.sw65-vpn.tls.certresolver=le"
+      - "traefik.http.routers.sw65-vpn.service=sw65"
+      - "traefik.http.routers.sw65-vpn.priority=200"
     networks:
       - web
 
@@ -89,6 +97,11 @@ services:
       - "traefik.http.routers.sw66-api.tls.certresolver=le"
       - "traefik.http.routers.sw66-api.service=sw66"
       - "traefik.http.routers.sw66-api.priority=100"
+      - "traefik.http.routers.sw66-vpn.rule=Host(`sw66-${DOMAIN_BASE}`) && ClientIP(`${TRUSTED_IP_CIDR:-127.0.0.1/32}`)"
+      - "traefik.http.routers.sw66-vpn.entrypoints=websecure"
+      - "traefik.http.routers.sw66-vpn.tls.certresolver=le"
+      - "traefik.http.routers.sw66-vpn.service=sw66"
+      - "traefik.http.routers.sw66-vpn.priority=200"
     networks:
       - web
 
@@ -118,6 +131,11 @@ services:
       - "traefik.http.routers.sw67-api.tls.certresolver=le"
       - "traefik.http.routers.sw67-api.service=sw67"
       - "traefik.http.routers.sw67-api.priority=100"
+      - "traefik.http.routers.sw67-vpn.rule=Host(`sw67-${DOMAIN_BASE}`) && ClientIP(`${TRUSTED_IP_CIDR:-127.0.0.1/32}`)"
+      - "traefik.http.routers.sw67-vpn.entrypoints=websecure"
+      - "traefik.http.routers.sw67-vpn.tls.certresolver=le"
+      - "traefik.http.routers.sw67-vpn.service=sw67"
+      - "traefik.http.routers.sw67-vpn.priority=200"
     networks:
       - web
 
@@ -137,6 +155,11 @@ services:
       - "traefik.http.middlewares.devbox-auth.basicauth.usersfile=/etc/traefik/auth/htpasswd"
       - "traefik.http.routers.dashboard.middlewares=devbox-auth"
       - "traefik.http.services.dashboard.loadbalancer.server.port=80"
+      - "traefik.http.routers.dashboard-vpn.rule=Host(`home-${DOMAIN_BASE}`) && ClientIP(`${TRUSTED_IP_CIDR:-127.0.0.1/32}`)"
+      - "traefik.http.routers.dashboard-vpn.entrypoints=websecure"
+      - "traefik.http.routers.dashboard-vpn.tls.certresolver=le"
+      - "traefik.http.routers.dashboard-vpn.service=dashboard"
+      - "traefik.http.routers.dashboard-vpn.priority=200"
     networks:
       - web
 
@@ -166,6 +189,11 @@ services:
       - "traefik.http.middlewares.devbox-auth.basicauth.usersfile=/etc/traefik/auth/htpasswd"
       - "traefik.http.routers.mail.middlewares=devbox-auth"
       - "traefik.http.services.mail.loadbalancer.server.port=8025"
+      - "traefik.http.routers.mail-vpn.rule=Host(`mail2-${DOMAIN_BASE}`) && ClientIP(`${TRUSTED_IP_CIDR:-127.0.0.1/32}`)"
+      - "traefik.http.routers.mail-vpn.entrypoints=websecure"
+      - "traefik.http.routers.mail-vpn.tls.certresolver=le"
+      - "traefik.http.routers.mail-vpn.service=mail"
+      - "traefik.http.routers.mail-vpn.priority=200"
     networks:
       web:
         aliases: [mailpit]
