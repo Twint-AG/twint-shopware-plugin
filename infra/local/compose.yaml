@@ -14,14 +14,18 @@ x-sw-dns: &sw-dns
   - "1.1.1.1"
   - "8.8.8.8"
 
-# Ports are identical across versions (only ONE runs at a time — no clash).
+# The shop is reached via the Caddy proxy on :443 (it proxies `shop:80` over the
+# internal network — no host publish needed for that). These convenience ports use
+# EPHEMERAL host ports (bare container port = Docker picks a free host port) so they
+# never clash with other stacks on this machine. Find the assigned port with e.g.
+# `docker compose port sw66 3306` / `... 8025`.
 x-sw-ports: &sw-ports
-  - "80:80"       # apache http (proxy reaches this internally too)
-  - "3306:3306"   # mariadb
-  - "8888:8888"   # watch administration
-  - "9998:9998"   # watch storefront proxy
-  - "9999:9999"   # watch storefront
-  - "8125:8025"   # mailpit UI on host :8125 (avoids clashes with other stacks' :8025)
+  - "80"          # apache http (direct)
+  - "3306"        # mariadb
+  - "8888"        # watch administration
+  - "9998"        # watch storefront proxy
+  - "9999"        # watch storefront
+  - "8025"        # mailpit UI
 
 services:
   sw65:
