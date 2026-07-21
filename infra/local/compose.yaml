@@ -1,0 +1,101 @@
+name: twint-sw-local
+
+# Shared env for all three Shopware versions. COMPOSER_AUTH is only meaningful on
+# dev branches that pin the private SDK (git.nfq.asia); empty creds = harmless.
+x-sw-env: &sw-env
+  XDEBUG_ENABLED: 0
+  APP_URL: https://shopware.twint.local
+  TRUSTED_PROXIES: "0.0.0.0/0"
+  COMPOSER_AUTH: '{"http-basic":{"git.nfq.asia":{"username":"${GITLAB_USERNAME:-}","password":"${GITLAB_TOKEN:-}"}}}'
+
+# Ports are identical across versions (only ONE runs at a time — no clash).
+x-sw-ports: &sw-ports
+  - "80:80"       # apache http (proxy reaches this internally too)
+  - "3306:3306"   # mariadb
+  - "8888:8888"   # watch administration
+  - "9998:9998"   # watch storefront proxy
+  - "9999:9999"   # watch storefront
+  - "8025:8025"   # mailpit UI
+
+services:
+  sw65:
+    profiles: ["sw65"]
+    container_name: sw65
+    image: dockware/dev:6.5.8.0
+    restart: unless-stopped
+    networks:
+      web:
+        aliases: [shop]
+    ports: *sw-ports
+    environment:
+      <<: *sw-env
+      PHP_VERSION: "8.2"
+    volumes:
+      - "sw65_html:/var/www/html"
+      - "sw65_db:/var/lib/mysql"
+      - "../../:/var/www/html/custom/plugins/TwintPayment:rw"
+      # container-local vendor (host has none / a different PHP)
+      - "/var/www/html/custom/plugins/TwintPayment/vendor"
+
+  sw66:
+    profiles: ["sw66"]
+    container_name: sw66
+    image: dockware/dev:6.6.7.0
+    restart: unless-stopped
+    networks:
+      web:
+        aliases: [shop]
+    ports: *sw-ports
+    environment:
+      <<: *sw-env
+      PHP_VERSION: "8.2"
+    volumes:
+      - "sw66_html:/var/www/html"
+      - "sw66_db:/var/lib/mysql"
+      - "../../:/var/www/html/custom/plugins/TwintPayment:rw"
+      - "/var/www/html/custom/plugins/TwintPayment/vendor"
+
+  sw67:
+    profiles: ["sw67"]
+    container_name: sw67
+    image: dockware/dev:6.7.2.2
+    restart: unless-stopped
+    networks:
+      web:
+        aliases: [shop]
+    ports: *sw-ports
+    environment:
+      <<: *sw-env
+      PHP_VERSION: "8.3"
+    volumes:
+      - "sw67_html:/var/www/html"
+      - "sw67_db:/var/lib/mysql"
+      - "../../:/var/www/html/custom/plugins/TwintPayment:rw"
+      - "/var/www/html/custom/plugins/TwintPayment/vendor"
+
+  # TLS termination: https://shopware.twint.local -> whichever version is up
+  # (all three share the network alias `shop`). Starts with any version profile.
+  proxy:
+    profiles: ["sw65", "sw66", "sw67"]
+    container_name: sw-proxy
+    image: caddy:2-alpine
+    restart: unless-stopped
+    networks:
+      - web
+    ports:
+      - "443:443"
+    volumes:
+      - "./proxy/Caddyfile:/etc/caddy/Caddyfile:ro"
+      - "./certs:/certs:ro"
+
+volumes:
+  sw65_html: {}
+  sw65_db: {}
+  sw66_html: {}
+  sw66_db: {}
+  sw67_html: {}
+  sw67_db: {}
+
+networks:
+  web:
+    driver: bridge
