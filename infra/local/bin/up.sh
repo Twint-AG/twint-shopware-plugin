@@ -14,6 +14,9 @@ case "$V" in
 esac
 SVC="sw${V}"
 
+echo "== stopping any other running version (pick-one) =="
+docker compose --profile sw65 --profile sw66 --profile sw67 stop
+
 echo "== starting ${SVC} + proxy =="
 docker compose --profile "$SVC" up -d
 

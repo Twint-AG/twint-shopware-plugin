@@ -16,9 +16,16 @@ fi
 
 echo "== [2/6] plugin refresh + install/activate =="
 php bin/console plugin:refresh
-php bin/console plugin:install --activate --clearCache "${PLUGIN}" 2>/dev/null \
-  || php bin/console plugin:activate "${PLUGIN}" 2>/dev/null \
-  || echo "   already installed + active"
+php bin/console plugin:install --activate --clearCache "${PLUGIN}" \
+  || php bin/console plugin:activate "${PLUGIN}" \
+  || true
+# Assert the plugin is actually installed AND active — else fail loudly.
+active=$(mysql -uroot -proot shopware -N -e \
+  "SELECT active FROM plugin WHERE name='${PLUGIN}'" 2>/dev/null || echo "")
+if [ "$active" != "1" ]; then
+  echo "!! ${PLUGIN} is not installed+active after install — aborting provision" >&2
+  exit 1
+fi
 
 echo "== [3/6] build admin + storefront assets =="
 php bin/console bundle:dump
