@@ -1,3 +1,0 @@
-swag_extension_store:
-    resource: ../../Controller/*Controller.php
-    type: attribute

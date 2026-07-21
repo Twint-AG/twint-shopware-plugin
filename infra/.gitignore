@@ -1,0 +1,6 @@
+# Local secrets + generated artifacts — never commit.
+local/.env
+local/certs/*
+!local/certs/.gitkeep
+ci/logs/*
+!ci/logs/.gitkeep
