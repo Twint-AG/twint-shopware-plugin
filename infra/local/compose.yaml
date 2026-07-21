@@ -8,6 +8,12 @@ x-sw-env: &sw-env
   TRUSTED_PROXIES: "0.0.0.0/0"
   COMPOSER_AUTH: '{"http-basic":{"git.nfq.asia":{"username":"${GITLAB_USERNAME:-}","password":"${GITLAB_TOKEN:-}"}}}'
 
+# Explicit resolvers so containers never inherit a stale/VPN nameserver from the
+# host (a broken resolv.conf breaks Shopware's composer-require plugin install).
+x-sw-dns: &sw-dns
+  - "1.1.1.1"
+  - "8.8.8.8"
+
 # Ports are identical across versions (only ONE runs at a time — no clash).
 x-sw-ports: &sw-ports
   - "80:80"       # apache http (proxy reaches this internally too)
@@ -23,6 +29,7 @@ services:
     container_name: sw65
     image: dockware/dev:6.5.8.0
     restart: unless-stopped
+    dns: *sw-dns
     networks:
       web:
         aliases: [shop]
@@ -42,6 +49,7 @@ services:
     container_name: sw66
     image: dockware/dev:6.6.7.0
     restart: unless-stopped
+    dns: *sw-dns
     networks:
       web:
         aliases: [shop]
@@ -60,6 +68,7 @@ services:
     container_name: sw67
     image: dockware/dev:6.7.2.2
     restart: unless-stopped
+    dns: *sw-dns
     networks:
       web:
         aliases: [shop]
