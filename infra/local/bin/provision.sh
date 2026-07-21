@@ -20,7 +20,7 @@ php bin/console plugin:install --activate --clearCache "${PLUGIN}" \
   || php bin/console plugin:activate "${PLUGIN}" \
   || true
 # Assert the plugin is actually installed AND active — else fail loudly.
-active=$(mysql -uroot -proot shopware -N -e \
+active=$(mysql -h127.0.0.1 -uroot -proot shopware -N -e \
   "SELECT active FROM plugin WHERE name='${PLUGIN}'" 2>/dev/null || echo "")
 if [ "$active" != "1" ]; then
   echo "!! ${PLUGIN} is not installed+active after install — aborting provision" >&2
@@ -34,7 +34,7 @@ if [ -f bin/build-storefront.sh ]; then bash bin/build-storefront.sh; fi
 php bin/console assets:install
 
 echo "== [4/6] shop config: CHF currency / CH country / payment / domain =="
-mysql -uroot -proot shopware <<'SQL'
+mysql -h127.0.0.1 -uroot -proot shopware <<'SQL'
 -- Ensure CHF currency exists (Shopware usually seeds it; create if absent).
 INSERT INTO currency (id, iso_code, factor, symbol, position, item_rounding, total_rounding, created_at)
 SELECT UNHEX('B7D2554B0CE847CD82F3AC7738289246'), 'CHF', 1, 'CHF', 1,
