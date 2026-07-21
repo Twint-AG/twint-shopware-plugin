@@ -7,6 +7,19 @@ PLUGIN_DIR="/var/www/html/custom/plugins/${PLUGIN}"
 HOST="https://shopware.twint.local"
 cd /var/www/html
 
+# Force APP_URL to the https host so admin/storefront asset URLs are generated as
+# https. The site is served via the TLS proxy; dockware's PHP-FPM does not pick up
+# the container's APP_URL env var and otherwise falls back to .env's
+# http://localhost -> assets load over http on an https page (mixed content) -> the
+# admin renders a blank page. Also trust the proxy so X-Forwarded-Proto is honored.
+echo "== [0/6] force APP_URL=${HOST} in .env =="
+if grep -q '^APP_URL=' .env; then
+  sed -i "s#^APP_URL=.*#APP_URL=${HOST}#" .env
+else
+  echo "APP_URL=${HOST}" >> .env
+fi
+grep -q '^TRUSTED_PROXIES=' .env || echo 'TRUSTED_PROXIES=0.0.0.0/0' >> .env
+
 echo "== [1/6] composer install (plugin deps) =="
 if [ ! -d "${PLUGIN_DIR}/vendor" ] || [ "${PLUGIN_DIR}/composer.json" -nt "${PLUGIN_DIR}/vendor" ]; then
   composer install -d "${PLUGIN_DIR}" --no-interaction --no-progress
