@@ -1,0 +1,17 @@
+# Local TLS termination so the shop is https://shopware.twint.local (no port) —
+# which TWINT accepts as a callback URL. Cert is mkcert (browser-trusted); Caddy
+# does not attempt ACME. `shop` is a network alias shared by sw65/sw66/sw67, so
+# this proxies whichever version is currently up.
+{
+	auto_https off
+	admin off
+}
+
+shopware.twint.local:443 {
+	tls /certs/shopware.twint.local.pem /certs/shopware.twint.local-key.pem
+	reverse_proxy shop:80 {
+		header_up Host {host}
+		header_up X-Forwarded-Proto https
+		header_up X-Forwarded-Host {host}
+	}
+}
