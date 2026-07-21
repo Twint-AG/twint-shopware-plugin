@@ -33,8 +33,12 @@ Facts that shaped the design:
 - Plugin supports `shopware/core: ^6.5 || ^6.6 || ^6.7`.
 - Plugin technical name: **`TwintPayment`** (`shopware-plugin-class:
   Twint\TwintPayment`).
-- SDK `twint-ag/sdk: ^1.8.0` is **public (packagist)** — local `composer install`
-  needs **no** private git auth / VPN (simpler than woo).
+- SDK `twint-ag/sdk`: the **stable** version is public (packagist), but **dev
+  branches pin the SDK from private `git.nfq.asia`** (same as woo). So on a dev
+  branch, `composer install` (both local provisioning and local-CI) needs a
+  `GITLAB_TOKEN` + VPN; stable branches need neither. Auth is passed as
+  `COMPOSER_AUTH` / `gitlab-token.git.nfq.asia`, applied **only when the token is
+  set** (harmless no-op otherwise).
 - GitLab `test` job (`.gitlab-ci.yml`): image `shivammathur/node:jammy`, matrix
   PHP **8.1–8.5**, steps `spc -U` → `spc --php-version X --extensions "…"` →
   `composer install --optimize-autoloader` → `vendor/bin/ecs` →
@@ -63,7 +67,7 @@ infra/
   local/
     compose.yaml
     .env.example
-    .env                  # gitignored
+    .env                  # gitignored (GITLAB_USERNAME/GITLAB_TOKEN for dev SDK, etc.)
     proxy/Caddyfile
     certs/                # gitignored: mkcert output; .gitkeep + .gitignore
     bin/
@@ -97,7 +101,8 @@ infra/
     recursive bind (same trick as current `local-67`).
   - env: `PHP_VERSION` per version (6.5→`8.2`, 6.6→`8.2`, 6.7→`8.3`),
     `XDEBUG_ENABLED=0`, `APP_URL=https://shopware.twint.local`, trusted-proxy set
-    so Shopware honours `X-Forwarded-Proto`.
+    so Shopware honours `X-Forwarded-Proto`, and `COMPOSER_AUTH` built from
+    `GITLAB_USERNAME`/`GITLAB_TOKEN` (for dev-branch private SDK; empty = ignored).
   - published ports (dockware): 80, 8888 (watch admin), 9998/9999 (watch
     storefront), 3306 (mysql), 8025 (mailpit). No conflicts — one up at a time.
 - Service `proxy` (`caddy:2-alpine`): `profiles: ["sw65","sw66","sw67"]` so it
@@ -146,8 +151,9 @@ browser-trusted, TWINT-acceptable, constant across version switches.
 
 Run as the dockware web user, `cd /var/www/html`:
 
-1. `composer install` in `custom/plugins/TwintPayment` (pulls public
-   `twint-ag/sdk`) — skip if `vendor/` present and lock unchanged.
+1. `composer install` in `custom/plugins/TwintPayment` (pulls `twint-ag/sdk`;
+   dev-branch private SDK auth via `COMPOSER_AUTH` from env, applied only if set)
+   — skip if `vendor/` present and lock unchanged.
 2. `bin/console plugin:refresh`
 3. `bin/console plugin:install --activate --clearCache TwintPayment`
 4. Build assets: `bin/build-administration.sh` + `bin/build-storefront.sh`
@@ -180,9 +186,9 @@ matrix PHP **8.1–8.5** in parallel. Per version:
 2. `spc -U`
 3. `spc --php-version "$V" --extensions "mbstring, curl, dom, fileinfo, gd, iconv,
    intl, json, xml, pdo, phar, zip, sodium, pdo_mysql, bcmath, soap"`
-4. optional: `composer config --global gitlab-token.git.nfq.asia "$GITLAB_TOKEN"`
-   only if `GITLAB_TOKEN` set (read from `infra/local/.env`; repo currently has no
-   private repo, so normally a no-op).
+4. `composer config --global gitlab-token.git.nfq.asia "$GITLAB_TOKEN"` only if
+   `GITLAB_TOKEN` set (read from `infra/local/.env`) — required on dev branches
+   pinning the private SDK, no-op on stable branches.
 5. `rm -f composer.lock && composer install --no-progress --optimize-autoloader`
 6. `vendor/bin/ecs`
 7. `vendor/bin/rector process src --dry-run`
