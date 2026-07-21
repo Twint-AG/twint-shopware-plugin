@@ -21,7 +21,7 @@ x-sw-ports: &sw-ports
   - "8888:8888"   # watch administration
   - "9998:9998"   # watch storefront proxy
   - "9999:9999"   # watch storefront
-  - "8025:8025"   # mailpit UI
+  - "8125:8025"   # mailpit UI on host :8125 (avoids clashes with other stacks' :8025)
 
 services:
   sw65:
