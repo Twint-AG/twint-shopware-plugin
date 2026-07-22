@@ -117,6 +117,7 @@
             <argument type="service" id="order.repository"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
             <argument type="service" id="Doctrine\DBAL\Connection"/>
+            <argument type="service" id="twint_pairing.repository"/>
         </service>
 
         <service id="Twint\Command\TwintPollCommand">

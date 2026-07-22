@@ -27,11 +27,12 @@ use Twint\Sdk\Value\PairingStatus;
 class PairingRepository
 {
     public function __construct(
-        private EntityRepository $repository,
+        private EntityRepository $viewRepository,
         private AbstractCartPersister $cartPersister,
         private EntityRepository $orderRepository,
         private CartService $cartService,
-        private Connection $db
+        private Connection $db,
+        private EntityRepository $tableRepository
     ) {
     }
 
@@ -43,7 +44,7 @@ class PairingRepository
         $criteria->addAssociation('customer');
         $criteria->addAssociation('customer.addresses');
 
-        $pairing = $this->repository->search($criteria, $context)
+        $pairing = $this->viewRepository->search($criteria, $context)
             ->first();
 
         if (($pairing instanceof PairingEntity) === false) {
@@ -102,14 +103,14 @@ class PairingRepository
         $criteria->getAssociation('order.transactions')
             ->addSorting(new FieldSorting('createdAt', FieldSorting::ASCENDING));
 
-        return $this->repository->search($criteria, Context::createDefaultContext());
+        return $this->viewRepository->search($criteria, Context::createDefaultContext());
     }
 
     public function update(array $data): EntityWrittenContainerEvent
     {
         //validate $data to make sure always has version
 
-        return $this->repository->update($data, Context::createDefaultContext());
+        return $this->tableRepository->update($data, Context::createDefaultContext());
     }
 
     public function findByOrderId(string $orderId, array $associations = []): ?PairingEntity
@@ -123,7 +124,7 @@ class PairingRepository
 
 
         /** @var PairingEntity $entity */
-        $entity = $this->repository->search($criteria, Context::createDefaultContext())
+        $entity = $this->viewRepository->search($criteria, Context::createDefaultContext())
             ->first();
 
         return $entity;
