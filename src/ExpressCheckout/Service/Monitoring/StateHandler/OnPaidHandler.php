@@ -274,6 +274,7 @@ class OnPaidHandler implements StateHandlerInterface
         $criteria = new Criteria([$orderId]);
         $criteria->addAssociation('transactions');
         $criteria->addAssociation('currency');
+        $criteria->addAssociation('orderCustomer.customer');
 
         /** @var OrderEntity $order */
         $order = $this->orderRepository->search($criteria, Context::createDefaultContext())
