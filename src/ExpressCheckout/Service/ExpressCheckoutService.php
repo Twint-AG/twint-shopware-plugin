@@ -24,6 +24,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Twint\Core\Repository\PairingRepository;
 use Twint\Core\Service\CurrencyService;
+use Twint\ExpressCheckout\Util\PaymentMethodUtil;
 use Twint\Sdk\Exception\SdkError;
 use Twint\Sdk\Value\Money;
 use Twint\Sdk\Value\ShippingMethod;
@@ -43,6 +44,7 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
         private readonly AbstractSalesChannelContextFactory $contextFactory,
         private readonly AbstractCartPersister $cartPersister,
         private readonly CurrencyService $currencyService,
+        private readonly PaymentMethodUtil $paymentMethodUtil,
     ) {
     }
 
@@ -73,8 +75,34 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
 
     protected function cloneCart(SalesChannelContext $context): Cart
     {
+
+        $ecPaymentMethodId = $this->paymentMethodUtil->getExpressCheckoutMethodId();
+        if ($ecPaymentMethodId !== null) {
+            $context = $this->contextFactory->create(
+                $context->getToken(),
+                $context->getSalesChannel()->getId(),
+                ['paymentMethodId' => $ecPaymentMethodId]
+            );
+        }
+
         $cart = $this->cartService->getCart($context->getToken(), $context);
+
+        $uncloneableErrors = [];
+        foreach ($cart->getErrors()->getElements() as $key => $error) {
+            try {
+                clone $error;
+            } catch (\Throwable) {
+                $uncloneableErrors[$key] = $error;
+                $cart->getErrors()->remove($key);
+            }
+        }
+
         $cloneCart = clone $cart;
+
+        foreach ($uncloneableErrors as $error) {
+            $cart->getErrors()->add($error);
+        }
+
         $token = Uuid::randomHex();
         $cloneCart->setToken($token);
         $cloneCart->setCustomerComment($token);
