@@ -22,6 +22,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Event\RouteRequest\ShippingMethodRouteRequestEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Throwable;
 use Twint\Core\Repository\PairingRepository;
 use Twint\Core\Service\CurrencyService;
 use Twint\ExpressCheckout\Util\PaymentMethodUtil;
@@ -75,32 +76,27 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
 
     protected function cloneCart(SalesChannelContext $context): Cart
     {
-
         $ecPaymentMethodId = $this->paymentMethodUtil->getExpressCheckoutMethodId();
         if ($ecPaymentMethodId !== null) {
             $context = $this->contextFactory->create(
                 $context->getToken(),
-                $context->getSalesChannel()->getId(),
-                ['paymentMethodId' => $ecPaymentMethodId]
+                $context->getSalesChannel()
+                    ->getId(),
+                [
+                    'paymentMethodId' => $ecPaymentMethodId,
+                ]
             );
         }
 
         $cart = $this->cartService->getCart($context->getToken(), $context);
 
         $uncloneableErrors = [];
-        foreach ($cart->getErrors()->getElements() as $key => $error) {
-            try {
-                clone $error;
-            } catch (\Throwable) {
-                $uncloneableErrors[$key] = $error;
-                $cart->getErrors()->remove($key);
-            }
-        }
 
         $cloneCart = clone $cart;
 
         foreach ($uncloneableErrors as $error) {
-            $cart->getErrors()->add($error);
+            $cart->getErrors()
+                ->add($error);
         }
 
         $token = Uuid::randomHex();
