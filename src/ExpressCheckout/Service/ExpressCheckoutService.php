@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Twint\ExpressCheckout\Service;
 
+use ReflectionObject;
 use Shopware\Core\Checkout\Cart\AbstractCartPersister;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\Delivery\DeliveryBuilder;
@@ -22,7 +23,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Event\RouteRequest\ShippingMethodRouteRequestEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Throwable;
 use Twint\Core\Repository\PairingRepository;
 use Twint\Core\Service\CurrencyService;
 use Twint\ExpressCheckout\Util\PaymentMethodUtil;
@@ -89,8 +89,14 @@ class ExpressCheckoutService implements ExpressCheckoutServiceInterface
         }
 
         $cart = $this->cartService->getCart($context->getToken(), $context);
-
         $uncloneableErrors = [];
+        foreach ($cart->getErrors()->getElements() as $key => $error) {
+            if (!(new ReflectionObject($error))->isCloneable()) {
+                $uncloneableErrors[$key] = $error;
+                $cart->getErrors()
+                    ->remove($key);
+            }
+        }
 
         $cloneCart = clone $cart;
 
