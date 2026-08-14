@@ -26,6 +26,7 @@
             <argument type="service" id="Shopware\Core\System\SalesChannel\Context\CachedSalesChannelContextFactory"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\CartPersister"/>
             <argument type="service" id="Twint\Core\Service\CurrencyService"/>
+            <argument type="service" id="Twint\ExpressCheckout\Util\PaymentMethodUtil"/>
         </service>
 
         <service id="Twint\ExpressCheckout\Service\ExpressPaymentService">
